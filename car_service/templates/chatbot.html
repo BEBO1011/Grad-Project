@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Car Problem - ChatBot</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* Mobile specific enhancements */
+        @media (max-width: 768px) {
+            .chatbot-container {
+                padding: 15px;
+                margin-top: 10px;
+            }
+            
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1000;
+                background: #2c3e50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 12px;
+                width: auto;
+            }
+            
+            .sidebar.mobile-visible {
+                display: block;
+                position: fixed;
+                width: 70%;
+                height: 100%;
+                z-index: 999;
+                top: 0;
+                left: 0;
+                animation: slideIn 0.3s ease-in-out;
+            }
+            
+            @keyframes slideIn {
+                from { transform: translateX(-100%); }
+                to { transform: translateX(0); }
+            }
+            
+            main.content {
+                margin-left: 0;
+                padding: 15px;
+                margin-top: 40px;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            header h2 {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Mobile menu toggle button -->
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="/static/images/photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
+                <h2>CService</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/map"><i class="fas fa-map"></i> Map</a></li>
+                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
+                    <li><a href="/chatbot" class="active"><i class="fas fa-comments"></i> ChatBot</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="help-center">
+                <p>Having Trouble?</p>
+                <button onclick="location.href='/chatbot'">Go To Help Center</button>
+            </div>            
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header>
+                <h2>Search Car Problem - ChatBot</h2>
+                <div class="user-icons">
+                    <span><i class="fas fa-bell"></i></span>
+                    <span><i class="fas fa-user"></i></span>
+                </div>
+            </header>
+
+            <section class="chatbot-container">
+                <h3>Describe Your Car Problem</h3>
+                <textarea id="query" placeholder="Type your car problem here..."></textarea>
+
+                <label for="brand">Car Brand:</label>
+                <select id="brand">
+                    <option value="">Select your brand...</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Mercedes">Mercedes</option>
+                    <option value="Fiat">Fiat</option>
+                    <option value="Audi">Audi</option>
+                </select>
+
+                <label for="model">Car Model:</label>
+                <select id="model">
+                    <option value="">Select your model...</option>
+                </select>
+
+                <button id="search-btn">Find Solution</button>
+
+                <div id="response-container">
+                    <h3>Possible Solutions:</h3>
+                    <div id="results"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('mobile-visible');
+                });
+                
+                // Close sidebar when clicking outside of it
+                document.addEventListener('click', function(event) {
+                    if (!sidebar.contains(event.target) && event.target !== menuToggle) {
+                        sidebar.classList.remove('mobile-visible');
+                    }
+                });
+            }
+            
+            // Car brand to model mapping
+            const carModels = {
+                "Toyota": ["Corolla", "Camry", "Rav4"],
+                "Mercedes": ["C-Class", "E-Class", "G-Class"],
+                "Fiat": ["128", "500", "Tipo"],
+                "Audi": ["A4", "A6", "Q5"]
+            };
+            
+            // UI Elements
+            const brandSelect = document.getElementById("brand");
+            const modelSelect = document.getElementById("model");
+            const searchBtn = document.getElementById("search-btn");
+            const queryInput = document.getElementById("query");
+            const resultsContainer = document.getElementById("results");
+            const responseContainer = document.getElementById("response-container");
+            
+            // Load models dynamically when brand is selected
+            if (brandSelect) {
+                brandSelect.addEventListener("change", function() {
+                    const selectedBrand = brandSelect.value;
+                    modelSelect.innerHTML = '<option value="">Select your model...</option>';
+                    
+                    if (selectedBrand && carModels[selectedBrand]) {
+                        carModels[selectedBrand].forEach(model => {
+                            const option = document.createElement("option");
+                            option.value = model;
+                            option.textContent = model;
+                            modelSelect.appendChild(option);
+                        });
+                    }
+                });
+            }
+            
+            // Fetch solutions
+            if (searchBtn) {
+                searchBtn.addEventListener("click", async function() {
+                    const query = queryInput.value.trim();
+                    const brand = brandSelect.value;
+                    const model = modelSelect.value;
+                    
+                    if (!query || !brand || !model) {
+                        alert("Please enter a problem, select a brand, and a model.");
+                        return;
+                    }
+                    
+                    // Show loading indicator
+                    resultsContainer.innerHTML = "<p>Searching for solutions...</p>";
+                    responseContainer.style.display = "block";
+                    
+                    try {
+                        const response = await fetch("/search", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ query, brand, model })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Server Error: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        console.log("API Response:", data);
+                        
+                        resultsContainer.innerHTML = ""; // Clear previous results
+                        
+                        // Handle follow-up questions
+                        if (data.follow_up_question) {
+                            const followUpCard = document.createElement("div");
+                            followUpCard.className = "card";
+                            followUpCard.innerHTML = `
+                                <h4>I need more information</h4>
+                                <p>${data.follow_up_question}</p>
+                            `;
+                            resultsContainer.appendChild(followUpCard);
+                            responseContainer.style.display = "block";
+                            return;
+                        }
+                        
+                        // Handle no results
+                        if (!data.results || !Array.isArray(data.results) || data.results.length === 0) {
+                            resultsContainer.innerHTML = "<p>No solutions found. Try rephrasing your query or providing more details.</p>";
+                            responseContainer.style.display = "block";
+                            return;
+                        }
+                        
+                        // Display results
+                        data.results.forEach(item => {
+                            const resultCard = document.createElement("div");
+                            resultCard.className = "card";
+                            resultCard.innerHTML = `
+                                <h4>${item.problem}</h4>
+                                <p><strong>Solution:</strong> ${item.solution}</p>
+                            `;
+                            resultsContainer.appendChild(resultCard);
+                        });
+                        
+                        responseContainer.style.display = "block";
+                        
+                    } catch (error) {
+                        console.error("Error fetching solutions:", error);
+                        resultsContainer.innerHTML = "<p>Error connecting to the server. Please try again later.</p>";
+                        responseContainer.style.display = "block";
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
