@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css">
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.css">
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; }
+        #map { width: 100%; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="assets/download.jpg" alt="Car Logo">
+                <h2>CService</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="map.html" class="active"><i class="fas fa-map"></i> Map</a></li>
+                    <li><a href="maintenance-centers.html"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="help-center">
+                <p>Having Trouble?</p>
+                <button onclick="location.href='chatbot.html'">Go To Help Center</button>
+            </div>            
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header>
+                <h2>Map</h2>
+                <div class="user-icons">
+                    <span><i class="fas fa-bell"></i></span>
+                    <span><i class="fas fa-user"></i></span>
+                </div>
+            </header>
+
+            <section class="location-selector">
+                <h3>Location Selector</h3>
+                <select id="location-select">
+                    <option value="">Select location...</option>
+                </select>
+                <div id="map"></div>
+                <div class="location-info">
+                    <label>Address:</label>
+                    <input type="text" id="address" placeholder="Loading..." readonly>
+                    <label>Latitude:</label>
+                    <input type="text" id="latitude" placeholder="Loading..." readonly>
+                    <label>Longitude:</label>
+                    <input type="text" id="longitude" placeholder="Loading..." readonly>
+                    <label>Elevation:</label>
+                    <input type="text" id="elevation" placeholder="Loading..." readonly>
+                </div>
+                <button id="get-directions">Get Directions</button>
+                <button id="get-location" onclick="getUserLocationAndDisplay()">Get Location</button>
+            </section>
+        </main>
+    </div>
+
+    <!-- Include Mapbox GL JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.js"></script>
+    <script src="js/frontend_api.js"></script>
+
+    <script>
+        // Function to get user location
+        function getUserLocation(callback) {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+                        console.log("User Location:", userLat, userLon);
+                        callback(userLat, userLon);
+                    },
+                    error => {
+                        console.error("Error getting location:", error);
+                        alert("Error getting your location. Using default location.");
+                        
+                        // Default location (Cairo, Egypt)
+                        const defaultLat = 30.0444;
+                        const defaultLon = 31.2357;
+                        callback(defaultLat, defaultLon);
+                    }
+                );
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+                alert("Geolocation is not supported. Using default location.");
+                
+                // Default location if geolocation is not supported
+                const defaultLat = 30.0444;
+                const defaultLon = 31.2357;
+                callback(defaultLat, defaultLon);
+            }
+        }
+
+        // Function to send location to the backend
+        function sendLocationToBackend(latitude, longitude) {
+            const userId = 1; // Replace with actual user ID if needed
+
+            fetch('/save-location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Location saved:', data);
+            })
+            .catch(error => {
+                console.error('Error saving location:', error);
+            });
+        }
+        getUserLocation((lat, lon) => {
+    map.setCenter([lon, lat]);
+
+    new mapboxgl.Marker()
+        .setLngLat([lon, lat])
+        .addTo(map);
+});
+
+        // Function to get and display user location
+        function getUserLocationAndDisplay() {
+            getUserLocation(function(latitude, longitude) {
+                // Display the coordinates in the input fields
+                document.getElementById("latitude").value = latitude;
+                document.getElementById("longitude").value = longitude;
+
+                // Send location to backend
+                sendLocationToBackend(latitude, longitude);
+            });
+        }
+
+        // Initialize Mapbox
+        mapboxgl.accessToken = 'pk.eyJ1IjoicmFvb3V1ZiIsImEiOiJjbThhczR3dHQwaXNrMmlyNDFiNWNlbXJuIn0.aG1MNazYf9MdCc9w3bT27A';
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [-79.4512, 43.6568], // Default coordinates
+            zoom: 13
+        });
+
+        map.addControl(
+            new MapboxDirections({
+                accessToken: mapboxgl.accessToken
+            }),
+            'top-left'
+        );
+    </script>
+</body>
+</html>

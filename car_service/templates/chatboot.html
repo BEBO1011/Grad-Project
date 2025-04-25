@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Car Problem - ChatBot</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
+                <h2>CService</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="map.html"><i class="fas fa-map"></i> Map</a></li>
+                    <li><a href="maintenance-centers.html"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
+                    <li><a href="chatbot.html" class="active"><i class="fas fa-comments"></i> ChatBot</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="help-center">
+                <p>Having Trouble?</pa>
+                <button onclick="location.href='chatbot.html'">Go To Help Center</button>
+            </div>            
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header>
+                <h2>Search Car Problem - ChatBot</h2>
+                <div class="user-icons">
+                    <span><i class="fas fa-bell"></i></span>
+                    <span><i class="fas fa-user"></i></span>
+                </div>
+            </header>
+
+            <section class="chatbot-container">
+                <h3>Describe Your Car Problem</h3>
+                <textarea id="query" placeholder="Type your car problem here..."></textarea>
+
+                <label for="brand">Car Brand:</label>
+                <select id="brand">
+                    <option value="">Select your brand...</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Mercedes">Mercedes</option>
+                    <option value="Fiat">Fiat</option>
+                    <option value="Audi">Audi</option>
+                </select>
+
+                <label for="model">Car Model:</label>
+                <select id="model">
+                    <option value="">Select your model...</option>
+                </select>
+
+                <button id="search-btn">Find Solution</button>
+
+                <div id="response-container">
+                    <h3>Possible Solutions:</h3>
+                    <div id="results"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/frontend_api.js"></script>
+    <script>
+       document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ Page Loaded - Running ChatBot Script");
+
+    // Selecting UI Elements
+    const brandSelect = document.getElementById("brand");
+    const modelSelect = document.getElementById("model");
+    const searchBtn = document.getElementById("search-btn");
+    const queryInput = document.getElementById("query");
+    const resultsContainer = document.getElementById("results");
+    const responseContainer = document.getElementById("response-container");
+
+    // Debugging: Check if elements exist
+    if (!brandSelect || !modelSelect || !searchBtn || !queryInput || !resultsContainer || !responseContainer) {
+        console.error("❌ ERROR: One or more elements are missing in the HTML.");
+        return;
+    }
+
+    // Car brand to model mapping
+    const carModels = {
+        "Toyota": ["Corolla", "Camry", "Rav4"],
+        "Mercedes": ["C-Class", "E-Class", "G-Class"],
+        "Fiat": ["128", "500", "Tipo"],
+        "Audi": ["A4", "A6", "Q5"]
+    };
+
+    // Load models dynamically when brand is selected
+    brandSelect.addEventListener("change", function () {
+        const selectedBrand = brandSelect.value;
+        modelSelect.innerHTML = `<option value="">Select your model...</option>`;
+
+        if (selectedBrand && carModels[selectedBrand]) {
+            carModels[selectedBrand].forEach(model => {
+                const option = document.createElement("option");
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+        }
+    });
+
+    // Fetch solutions
+    searchBtn.addEventListener("click", async function () {
+        const query = queryInput.value.trim();
+        const brand = brandSelect.value;
+        const model = modelSelect.value;
+
+        if (!query || !brand || !model) {
+            alert("Please enter a problem, select a brand, and a model.");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://127.0.0.1:5000/search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query, brand, model })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("✅ API Response:", data); // Debugging
+
+            resultsContainer.innerHTML = ""; // Clear previous results
+
+            if (!data.results || !Array.isArray(data.results) || data.results.length === 0) {
+                resultsContainer.innerHTML = "<p>No solutions found.</p>";
+                responseContainer.style.display = "block";
+                return;
+            }
+
+            // Append results
+            data.results.forEach(item => {
+                const resultCard = document.createElement("div");
+                resultCard.className = "card";
+                resultCard.innerHTML = `
+                    <h4>${item.problem}</h4>
+                    <p><strong>Solution:</strong> ${item.solution}</p>
+                `;
+                resultsContainer.appendChild(resultCard);
+            });
+
+            responseContainer.style.display = "block";
+            console.log("✅ Solutions displayed successfully!");
+
+        } catch (error) {
+            console.error("❌ Error fetching solutions:", error);
+            alert("Error connecting to the server.");
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Centers</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+    <body style="background-image: url('maintenance_center_new_background.png'); background-size: cover; background-position: top center; background-repeat: no-repeat;">
+    
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
+                <h2>CService</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="map.html"><i class="fas fa-map"></i> Map</a></li>
+                    <li><a href="maintenance-centers.html" class="active"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="help-center">
+                <p>Having Trouble?</p>
+                <button onclick="location.href='chatbot.html'">Go To Help Center</button>
+            </div>            
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header>
+                <h2>Maintenance Centers</h2>
+                <div class="user-icons">
+                    <span><i class="fas fa-bell"></i></span>
+                    <span><i class="fas fa-user"></i></span>
+                </div>
+            </header>
+        
+            <section class="recently-viewed">
+                <h3>Recently Viewed</h3>
+                <div class="cards-container" id="recently-viewed"></div>
+            </section>
+        
+            <section class="all-centers">
+                <h3>All Maintenance Centers</h3>
+                <div class="cards-container" id="all-centers"></div>
+                <div class="search-filter-container">
+                    <input type="text" id="searchBox" placeholder="🔍 ابحث عن مركز صيانة...">
+                    
+                    <select id="filterSelect">
+                        <option value="all">كل المراكز</option>
+                        <option value="rating">الأعلى تقييماً</option>
+                        <option value="location">الأقرب إليك</option>
+                    </select>
+                </div>
+                
+                <div id="maintenanceCenters">
+                    <div class="maintenance-center" data-name="AutoFix Garage" data-rating="4.8" data-location="Cairo">
+                        <h2>AutoFix Garage</h2>
+                        <p>📍 123 شارع النصر، القاهرة</p>
+                        <p>⭐ 4.8 (150 تقييم)</p>
+                      <button onclick="openDetails('AutoFix Garage', '123 شارع النصر، القاهرة', 'مفتوح الآن', ['تغيير الزيت', 'فحص شامل'], ['تغيير الزيت: 200 جنيه', 'فحص شامل: 500 جنيه'], 'https://maps.google.com/?q=30.0444,31.2357')">
+                            عرض التفاصيل
+                        </button>
+                    
+                        
+                        <button class="call-btn">📞 اتصل الآن</button>
+                        <button class="whatsapp-btn" id="whatsappButton">💬 واتساب</button>
+                    </div>
+                
+                    <div class="maintenance-center" data-name="Speedy Repairs" data-rating="4.5" data-location="Alexandria">
+                        <h2>Speedy Repairs</h2>
+                        <p>📍 45 شارع الثورة، الإسكندرية</p>
+                        <p>⭐ 4.5 (98 تقييم)</p>
+                        <button onclick="openDetails('اسم المركز', 'عنوانه', 'حالة العمل', ['الخدمة 1', 'الخدمة 2'], ['السعر 1', 'السعر 2'], 'رابط خرائط جوجل')">
+                            عرض التفاصيل
+                        </button>
+                        
+                        <button class="call-btn">📞 اتصل الآن</button>
+                        <button class="whatsapp-btn" id="whatsappButton">💬 واتساب</button>
+        
+                    </div>
+                
+                    <div class="maintenance-center" data-name="QuickFix Motors" data-rating="4.7" data-location="Giza">
+                        <h2>QuickFix Motors</h2>
+                        <p>📍 10 شارع التحرير، الجيزة</p>
+                        <p>⭐ 4.7 (120 تقييم)</p>
+                        <button onclick="openDetails('اسم المركز', 'عنوانه', 'حالة العمل', ['الخدمة 1', 'الخدمة 2'], ['السعر 1', 'السعر 2'], 'رابط خرائط جوجل')">
+                            عرض التفاصيل
+                        </button>
+                        
+                        <button class="call-btn">📞 اتصل الآن</button>
+                        <button class="whatsapp-btn" id="whatsappButton">💬 واتساب</button>
+                    </div>
+                </div>
+
+                <div  class="review-btn">أضف تقييم</button>
+ 
+                    <div class="reviews">
+                        <h3>التقييمات:</h3>
+                        <ul class="review-list">
+                            <li>⭐ ⭐ ⭐ ⭐ ⭐ - "خدمة ممتازة!"</li>
+                            <li>⭐ ⭐ ⭐ ⭐ - "السعر مرتفع قليلاً لكن الخدمة جيدة."</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- فورم إضافة تقييم -->
+                <div id="review-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2>أضف تقييمك</h2>
+                        <select id="rating">
+                            <option value="5">⭐ ⭐ ⭐ ⭐ ⭐</option>
+                            <option value="4">⭐ ⭐ ⭐ ⭐</option>
+                            <option value="3">⭐ ⭐ ⭐</option>
+                            <option value="2">⭐ ⭐</option>
+                            <option value="1">⭐</option>
+                        </select>
+                        <textarea id="review-text" placeholder="اكتب تعليقك هنا..."></textarea>
+                        <button id="submit-review">إرسال</button>
+                    </div>
+                </div>
+                
+
+
+            </section>
+        </main>
+    </div>
+
+    <script src="js/frontend_api.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/maintenance-centers");
+                const centers = await response.json();
+
+                console.log("Loaded maintenance centers:", centers); // Debugging
+
+                const allCentersContainer = document.getElementById("all-centers");
+                const recentlyViewedContainer = document.getElementById("recently-viewed");
+
+                centers.forEach((center, index) => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.innerHTML = `
+                        <i class="fas fa-tools"></i> ${center.name} 
+                        <br>📍 Location: ${center.latitude}, ${center.longitude}
+                    `;
+
+                    allCentersContainer.appendChild(card);
+
+                    // Simulate recently viewed centers (first 3 centers)
+                    if (index < 3) {
+                        recentlyViewedContainer.appendChild(card.cloneNode(true));
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error loading maintenance centers:", error);
+
+
+                
+
+
+            }
+        });
+
+        function openDetails(name, address, status, services, prices, mapLink) {
+    const params = new URLSearchParams();
+    params.append("name", name);
+    params.append("address", address);
+    params.append("status", status);
+    params.append("services", JSON.stringify(services));
+    params.append("prices", JSON.stringify(prices));
+    params.append("mapLink", mapLink);
+
+    window.location.href = `center-details.html?${params.toString()}`;
+}
+
+    </script>
+    
+</body>
+</html>
