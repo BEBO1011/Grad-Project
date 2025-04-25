@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        body {
+            background-image: url('IMG-20250413-WA0000.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 80px auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .form-box {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h2 id="form-title">Sign In</h2>
+            <form id="auth-form">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Email address" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <svg id="eyeIcon" class="eye-icon" viewBox="0 0 24 24" onclick="togglePassword()">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+                    </svg>
+                </div>
+                <button type="button" onclick="window.location.href='home.html'">Continue</button>
+            </form>
+            <p id="toggle-form">Don't have an account? <a href="signup.html">Sign Up</a></p>
+        </div>
+    </div>
+    <script>
+        function togglePassword() {
+            let passField = document.getElementById("password");
+            let eyeIcon = document.getElementById("eyeIcon");
+
+            if (passField.type === "password") {
+                passField.type = "text";
+                eyeIcon.innerHTML = '<path d="M12 4.5c-4.97 0-9.27 3.11-11 7.5 1.73 4.39 6.03 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6.03-7.5-11-7.5zm0 13c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm-4.41-.9c1.03.67 2.26 1.07 3.61 1.07 3.87 0 7-3.13 7-7 0-1.35-.4-2.58-1.07-3.61l-1.42 1.42c.3.74.49 1.54.49 2.19 0 2.76-2.24 5-5 5-1.39 0-2.68-.57-3.61-1.49l-1.42 1.42zm8.99-8.99-1.42-1.42c-.93.93-1.49 2.22-1.49 3.61 0 2.76 2.24 5 5 5 .65 0 1.45-.19 2.19-.49l1.42 1.42c-.93.93-2.22 1.49-3.61 1.49-2.76 0-5-2.24-5-5 0-1.39.57-2.68 1.49-3.61z"/>';
+            } else {
+                passField.type = "password";
+                eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>';
+            }
+        }
+    </script>
+</body>
+</html>
