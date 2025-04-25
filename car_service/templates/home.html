@@ -1,48 +1,129 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Home - Car Service</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        .center-logo {
-            width: 50px;  /* Resize the image to a logo size */
-            height: auto;
-            margin-bottom: 10px; /* Add some space between the logo and the center name */
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .center-logo {
+                width: 40px;
+                margin-bottom: 8px;
+            }
+            
+            .cards {
+                flex-direction: column;
+            }
+            
+            .card {
+                margin: 8px 0;
+                width: 100%;
+            }
+            
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1000;
+                background: #2c3e50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 12px;
+                width: auto;
+            }
+            
+            .sidebar.mobile-visible {
+                display: block;
+                position: fixed;
+                width: 70%;
+                height: 100%;
+                z-index: 999;
+                top: 0;
+                left: 0;
+                animation: slideIn 0.3s ease-in-out;
+            }
+            
+            @keyframes slideIn {
+                from { transform: translateX(-100%); }
+                to { transform: translateX(0); }
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            
+            header {
+                margin-top: 40px;
+            }
         }
+        
+        .center-logo {
+            width: 50px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        
         .card {
             text-align: center;
             margin: 10px;
+            transition: transform 0.3s ease;
         }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
         .cards {
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
         }
+        
+        .rating {
+            color: #ffcc00;
+            margin: 5px 0;
+        }
+        
+        .details-btn {
+            margin-top: 10px;
+            background-color: #1abc9c;
+        }
+        
+        .details-btn:hover {
+            background-color: #16a085;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
+        <!-- Mobile menu toggle button -->
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+        
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="Car_Service_Logo.jpeg" alt="Car Logo">
+                <img src="/static/images/photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
                 <h2>CService</h2>
             </div>
             <nav>
                 <ul>
-                    <li><a href="home.html" class="active"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="map.html"><i class="fas fa-map"></i> Map</a></li>
-                    <li><a href="maintenance-centers.html"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
-                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/home" class="active"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/map"><i class="fas fa-map"></i> Map</a></li>
+                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
+                    <li><a href="/chatbot"><i class="fas fa-comments"></i> ChatBot</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
             </nav>
             <div class="help-center">
                 <p>Having Trouble?</p>
-                <button onclick="location.href='chatbot.html'">Go To Help Center</button>
+                <button onclick="location.href='/chatbot'">Go To Help Center</button>
             </div>            
         </aside>
 
@@ -59,22 +140,22 @@
                 <h2>Featured Centers</h2>
                 <div class="cards">
                     <div class="card">
-                        <img src="IMG-20250413-WA001.jpeg" alt="Center 1" class="center-logo">
+                        <img src="/static/images/IMG-20250413-WA001.jpeg" alt="Center 1" class="center-logo">
                         <h3>Premium Center 1</h3>
                         <div class="rating">⭐⭐⭐⭐⭐</div>
-                        <button class="details-btn">View Details</button>
+                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
                     </div>
                     <div class="card">
-                        <img src="IMG-20250413-WA002.jpeg" alt="Center 2" class="center-logo">
+                        <img src="/static/images/IMG-20250413-WA002.jpeg" alt="Center 2" class="center-logo">
                         <h3>Premium Center 2</h3>
                         <div class="rating">⭐⭐⭐⭐</div>
-                        <button class="details-btn">View Details</button>
+                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
                     </div>
                     <div class="card">
-                        <img src="IMG-20250413-WA003.jpeg" alt="Center 3" class="center-logo">
+                        <img src="/static/images/IMG-20250413-WA003.jpeg" alt="Center 3" class="center-logo">
                         <h3>Premium Center 3</h3>
                         <div class="rating">⭐⭐⭐⭐⭐</div>
-                        <button class="details-btn">View Details</button>
+                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
                     </div>
                 </div>
             </section>
@@ -83,20 +164,71 @@
                 <h2>Nearby Centers</h2>
                 <div class="cards">
                     <div class="card">
-                        <img src="IMG-20250413-WA004.jpeg" alt="Nearby Center 1" class="center-logo">
+                        <img src="/static/images/IMG-20250413-WA004.jpeg" alt="Nearby Center 1" class="center-logo">
                         <h3>Nearby Center 1</h3>
                         <div class="rating">⭐⭐⭐⭐</div>
-                        <button class="details-btn">View Details</button>
+                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
                     </div>
                     <div class="card">
-                        <img src="IMG-20250413-WA004.jpeg" alt="Nearby Center 2" class="center-logo">
+                        <img src="/static/images/IMG-20250413-WA005.jpeg" alt="Nearby Center 2" class="center-logo">
                         <h3>Nearby Center 2</h3>
                         <div class="rating">⭐⭐⭐⭐⭐</div>
-                        <button class="details-btn">View Details</button>
+                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
                     </div>
+                </div>
+            </section>
+            
+            <section class="car-diagnostic">
+                <h2>Having Car Problems?</h2>
+                <div class="card">
+                    <i class="fas fa-tools" style="font-size: 2em; color: #1abc9c; margin-bottom: 10px;"></i>
+                    <h3>Diagnose Your Car Problems</h3>
+                    <p>Our AI-powered chatbot can help diagnose and suggest solutions for your car problems.</p>
+                    <button class="details-btn" onclick="location.href='/chatbot'">Chat with Bot</button>
                 </div>
             </section>
         </main>
     </div>
+
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('mobile-visible');
+                });
+                
+                // Check if we're on a mobile device and show the toggle button
+                if (window.innerWidth <= 768) {
+                    menuToggle.style.display = 'block';
+                    sidebar.classList.remove('mobile-visible');
+                }
+                
+                // Close sidebar when clicking outside of it
+                document.addEventListener('click', function(event) {
+                    if (!sidebar.contains(event.target) && event.target !== menuToggle) {
+                        sidebar.classList.remove('mobile-visible');
+                    }
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth <= 768) {
+                        menuToggle.style.display = 'block';
+                        if (!sidebar.classList.contains('mobile-visible')) {
+                            sidebar.style.display = 'none';
+                        }
+                    } else {
+                        menuToggle.style.display = 'none';
+                        sidebar.style.display = 'flex';
+                        sidebar.classList.remove('mobile-visible');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

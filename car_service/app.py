@@ -413,4 +413,5 @@ def save_location():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Use a different port (8080) since port 5000 is used by Streamlit
+    app.run(host="0.0.0.0", port=8080, debug=True)
