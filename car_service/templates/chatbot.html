@@ -75,11 +75,11 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/map"><i class="fas fa-map"></i> Map</a></li>
-                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
-                    <li><a href="/chatbot" class="active"><i class="fas fa-comments"></i> ChatBot</a></li>
-                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="http://0.0.0.0:8080/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="http://0.0.0.0:8080/map"><i class="fas fa-map"></i> Map</a></li>
+                    <li><a href="http://0.0.0.0:8080/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
+                    <li><a href="http://0.0.0.0:8080/chatbot" class="active"><i class="fas fa-comments"></i> ChatBot</a></li>
+                    <li><a href="http://0.0.0.0:8080/settings"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
             </nav>
             <div class="help-center">
@@ -195,7 +195,7 @@
                     responseContainer.style.display = "block";
                     
                     try {
-                        const response = await fetch("/search", {
+                        const response = await fetch("http://0.0.0.0:8080/search", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json"
