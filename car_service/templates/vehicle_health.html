@@ -1165,14 +1165,14 @@
             </div>
             
             <!-- Vehicle Selector Section -->
-            <div class="vehicle-selector-container animate__animated animate__fadeIn" style="margin-bottom: 2rem; padding: 1rem; background: white; border-radius: 12px; box-shadow: var(--shadow-sm);">
-                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--dark-bg); border-bottom: 2px solid var(--primary-gold); padding-bottom: 0.5rem; display: inline-block;">
-                    <i class="fas fa-car" style="color: var(--primary-gold); margin-right: 8px;"></i>Select Your Vehicle
+            <div class="vehicle-selector-container animate__animated animate__fadeIn">
+                <h3>
+                    <i class="fas fa-car"></i> Select Your Vehicle
                 </h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
-                    <div style="flex: 1; min-width: 200px;">
-                        <label for="vehicleBrand" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Brand</label>
-                        <select id="vehicleBrand" class="form-select animate__animated animate__fadeIn" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-light); background-color: white; font-family: 'Montserrat', sans-serif;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vehicleBrand">Brand</label>
+                        <select id="vehicleBrand" class="form-select animate__animated animate__fadeIn">
                             <option value="">Select brand...</option>
                             <option value="Mercedes">Mercedes-Benz</option>
                             <option value="BMW">BMW</option>
@@ -1184,15 +1184,15 @@
                             <option value="Fiat">Fiat</option>
                         </select>
                     </div>
-                    <div style="flex: 1; min-width: 200px;">
-                        <label for="vehicleModel" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Model</label>
-                        <select id="vehicleModel" class="form-select animate__animated animate__fadeIn" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-light); background-color: white; font-family: 'Montserrat', sans-serif;">
+                    <div class="form-group">
+                        <label for="vehicleModel">Model</label>
+                        <select id="vehicleModel" class="form-select animate__animated animate__fadeIn">
                             <option value="">Select model...</option>
                         </select>
                     </div>
-                    <div style="flex: 0 0 auto;">
-                        <button id="applyVehicleBtn" class="action-btn primary-action animate__animated animate__fadeIn" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: var(--gold-gradient); color: var(--text-dark); font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);">
-                            <i class="fas fa-check" style="margin-right: 5px;"></i> Apply
+                    <div>
+                        <button id="applyVehicleBtn" class="action-btn animate__animated animate__fadeIn">
+                            <i class="fas fa-check"></i> Apply
                         </button>
                     </div>
                 </div>

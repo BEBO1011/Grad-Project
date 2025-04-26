@@ -50,26 +50,29 @@
             <section class="chatbot-container animate__animated animate__fadeIn">
                 <h3>Vehicle Diagnostic Consultation</h3>
                 
-                <div class="form-group">
-                    <label for="brand"><i class="fas fa-car" style="margin-right: 8px;"></i>Vehicle Brand</label>
-                    <select id="brand" class="animate__animated animate__fadeIn">
-                        <option value="">Select your brand...</option>
-                        <option value="Mercedes">Mercedes-Benz</option>
-                        <option value="BMW">BMW</option>
-                        <option value="Audi">Audi</option>
-                        <option value="Lexus">Lexus</option>
-                        <option value="Porsche">Porsche</option>
-                        <option value="Tesla">Tesla</option>
-                        <option value="Toyota">Toyota</option>
-                        <option value="Fiat">Fiat</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="model"><i class="fas fa-tag" style="margin-right: 8px;"></i>Vehicle Model</label>
-                    <select id="model" class="animate__animated animate__fadeIn">
-                        <option value="">Select your model...</option>
-                    </select>
+                <div class="vehicle-selector-container animate__animated animate__fadeIn">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="brand"><i class="fas fa-car"></i> Vehicle Brand</label>
+                            <select id="brand" class="form-select animate__animated animate__fadeIn">
+                                <option value="">Select your brand...</option>
+                                <option value="Mercedes">Mercedes-Benz</option>
+                                <option value="BMW">BMW</option>
+                                <option value="Audi">Audi</option>
+                                <option value="Lexus">Lexus</option>
+                                <option value="Porsche">Porsche</option>
+                                <option value="Tesla">Tesla</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Fiat">Fiat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="model"><i class="fas fa-tag"></i> Vehicle Model</label>
+                            <select id="model" class="form-select animate__animated animate__fadeIn">
+                                <option value="">Select your model...</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -138,26 +141,10 @@
         </main>
     </div>
 
+    <script src="/static/js/mobile.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log("✅ Page Loaded - Running ChatBot Script");
-            
-            // Mobile menu toggle
-            const menuToggle = document.getElementById('menuToggle');
-            const sidebar = document.getElementById('sidebar');
-            
-            if (menuToggle && sidebar) {
-                menuToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('mobile-visible');
-                });
-                
-                // Close sidebar when clicking outside of it
-                document.addEventListener('click', function(event) {
-                    if (!sidebar.contains(event.target) && event.target !== menuToggle) {
-                        sidebar.classList.remove('mobile-visible');
-                    }
-                });
-            }
             
             // Notification toggle
             const notificationBtn = document.getElementById('notifications');
