@@ -3,418 +3,876 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Problem Diagnostics - ChatBot</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>CarLux | AI Diagnostics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* Additional mobile-specific styles */
-        .diagnostic-card {
-            position: relative;
+        /* Base Variables */
+        :root {
+            --primary-gold: #d4af37;
+            --dark-gold: #a58e2d;
+            --light-gold: #f2dc9e;
+            --dark-bg: #14151a;
+            --light-bg: #ffffff;
+            --text-light: #ffffff;
+            --text-dark: #14151a;
+            --text-secondary: #6c757d;
+            --card-bg: #ffffff;
+            --border-light: rgba(0, 0, 0, 0.05);
+            --blue-accent: #4361ee;
+            --blue-light: rgba(67, 97, 238, 0.1);
+            --red: #dc3545;
+            --green: #28a745;
+            --yellow: #ffc107;
+            --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f2dc9e 50%, #d4af37 100%);
+        }
+        
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            background-color: #f5f5f7;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+        
+        /* Layout */
+        .app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        /* Header & Navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--dark-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 36px;
+            border-radius: 8px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-items {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .nav-item {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            color: var(--primary-gold);
+        }
+        
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .user-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-icons span {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .user-icons span:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--dark-bg);
+            padding: 6rem 1.5rem 1.5rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 900;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .nav-group {
+            margin-bottom: 2rem;
+        }
+        
+        .nav-group-title {
+            color: var(--text-light);
+            opacity: 0.6;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .nav-list {
+            list-style: none;
+        }
+        
+        .nav-list li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-list a i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s ease;
+        }
+        
+        .nav-list a:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-list a:hover i {
+            color: var(--primary-gold);
+        }
+        
+        .nav-list a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-gold);
+        }
+        
+        .nav-list a.active i {
+            color: var(--primary-gold);
+        }
+        
+        /* Support Card */
+        .support-card {
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            color: var(--text-light);
+            margin-top: 2rem;
+        }
+        
+        .support-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-gold);
+        }
+        
+        .support-card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+        
+        .support-card button {
+            width: 100%;
+            padding: 0.7rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .support-card button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 6rem 2rem 2rem;
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+        
+        /* Page Title */
+        .page-title {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        
+        /* Diagnostic Form Card */
+        .diagnostic-form-card {
             background: var(--card-bg);
-            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-light);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .diagnostic-form-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .form-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-title h3 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .form-title i {
+            font-size: 3rem;
+            color: var(--primary-gold);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .form-row {
             margin-bottom: 1.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border-left: 4px solid transparent;
+        }
+        
+        .form-row label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .form-row textarea {
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 150px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-row textarea:focus {
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+            outline: none;
+        }
+        
+        .form-row select {
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%232c3e50' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-row select:focus {
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+            outline: none;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .primary-button {
+            display: block;
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #4361ee 0%, #3a54d6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+            margin-top: 1rem;
+        }
+        
+        .primary-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        /* Results Section */
+        .results-section {
+            margin-top: 3rem;
+            display: none;
+        }
+        
+        .results-section h3 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+        
+        .diagnostic-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            position: relative;
         }
         
         .diagnostic-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+            box-shadow: var(--shadow-md);
         }
         
         .severity-indicator {
             position: absolute;
             top: 0;
             right: 0;
-            padding: 5px 12px;
+            padding: 0.4rem 1rem;
             color: white;
             font-weight: 600;
             font-size: 0.8rem;
-            border-bottom-left-radius: 8px;
+            border-bottom-left-radius: 10px;
         }
         
-        .diagnostic-card h4 {
-            margin-top: 0.5rem;
-            padding: 0.75rem 1rem;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        .severity-critical {
+            background-color: var(--red);
         }
         
-        .diagnostic-card .solution {
-            padding: 1rem;
-            line-height: 1.6;
-            color: var(--text-primary);
+        .severity-warning {
+            background-color: var(--yellow);
         }
         
-        .diagnostic-details {
+        .severity-minor {
+            background-color: var(--green);
+        }
+        
+        .diagnostic-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .diagnostic-header h4 {
+            font-size: 1.4rem;
+            margin-bottom: 0;
+            color: var(--text-dark);
+        }
+        
+        .diagnostic-body {
+            padding: 1.5rem;
+        }
+        
+        .solution-text {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .diagnostic-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            background: rgba(0, 0, 0, 0.02);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+        }
+        
+        .meta-item {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 1rem 1rem;
-            gap: 10px;
+            flex-direction: column;
         }
         
-        .cost-estimate {
-            font-weight: 500;
-            color: var(--text-primary);
+        .meta-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+            color: var(--text-dark);
         }
         
         .badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 0.4rem 0.8rem;
             border-radius: 30px;
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            text-align: center;
         }
         
         .diy-possible {
             background-color: rgba(40, 167, 69, 0.1);
-            color: #28a745;
+            color: var(--green);
         }
         
         .diy-professional {
             background-color: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
+            color: var(--red);
         }
         
-        .additional-info {
-            margin-top: 1rem;
-            padding: 0 1rem 1rem;
-            color: var(--text-secondary);
-            font-style: italic;
+        .parts-tools-section {
+            margin-top: 1.5rem;
         }
         
-        .tools-parts-section {
-            background-color: rgba(0, 0, 0, 0.02);
-            padding: 1rem;
-            margin: 0 1rem 1rem;
-            border-radius: 8px;
+        .section-title {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
         }
         
-        .tools-parts-section h5 {
-            margin-top: 0;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-        
-        .tools-parts-list {
+        .chips-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin: 0;
-            padding: 0;
+            gap: 0.5rem;
+        }
+        
+        .chip {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--text-dark);
+        }
+        
+        /* Related Issues & Maintenance Tips */
+        .additional-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        
+        .info-card h4 {
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .info-list {
             list-style: none;
         }
         
-        .tools-parts-list li {
-            background-color: rgba(0, 0, 0, 0.04);
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-        }
-        
-        .related-issues-section, 
-        .maintenance-tips-section, 
-        .follow-up-section {
-            background: var(--light-bg);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-        }
-        
-        .related-issues-section h4, 
-        .maintenance-tips-section h4,
-        .follow-up-section h4 {
-            margin-top: 0;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-        }
-        
-        .related-issues-list li, 
-        .maintenance-tips-list li,
-        .follow-up-list li {
-            margin-bottom: 0.5rem;
+        .info-list li {
             position: relative;
             padding-left: 1.5rem;
+            margin-bottom: 1rem;
             line-height: 1.5;
         }
         
-        .related-issues-list li:before, 
-        .maintenance-tips-list li:before {
+        .info-list li:before {
             content: "•";
             position: absolute;
-            left: 0.5rem;
-            color: var(--accent-color);
+            left: 0;
+            top: 0;
+            color: var(--primary-gold);
             font-weight: bold;
+            font-size: 1.2rem;
         }
         
-        .related-issues-list li strong,
-        .maintenance-tips-list li strong {
-            color: var(--text-primary);
+        /* Loading Indicator */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 3rem 0;
         }
         
-        .follow-up-question {
-            color: var(--button-primary-bg);
-            text-decoration: none;
-            font-weight: 500;
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(67, 97, 238, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--blue-accent);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
         }
         
-        .follow-up-question:hover {
-            text-decoration: underline;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
-        .time-estimate {
-            display: block;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        /* Mobile specific styles */
-        @media (max-width: 480px) {
-            .menu-toggle {
-                display: block;
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                z-index: 1000;
-                background: var(--sidebar-bg);
-                color: var(--sidebar-text);
-                border-radius: 8px;
-                padding: 10px 14px;
-                border: none;
-                width: auto;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .form-grid {
+                grid-template-columns: 1fr;
             }
             
-            .content {
-                margin-left: 0;
-                width: 100%;
-                padding: 15px;
+            .additional-info-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.3rem;
+            }
+            
+            .logo img {
+                height: 30px;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .nav-items {
+                display: none;
             }
             
             .sidebar {
-                display: none;
-                width: 80%;
+                transform: translateX(-100%);
+                width: 280px;
             }
             
             .sidebar.active {
-                display: block;
-                position: fixed;
-                z-index: 999;
-                height: 100vh;
-                animation: slideIn 0.3s ease;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+                transform: translateX(0);
+                box-shadow: 5px 0 20px rgba(0, 0, 0, 0.15);
             }
             
-            @keyframes slideIn {
-                from { transform: translateX(-100%); }
-                to { transform: translateX(0); }
+            .main-content {
+                margin-left: 0;
+                padding: 5rem 1.2rem 1.5rem;
             }
             
-            textarea {
-                width: 100%;
-                height: 120px;
-                border-radius: 12px;
-                border: 1px solid var(--input-border);
-                padding: 12px;
-                font-size: 16px; /* Prevent zoom on iOS */
-                transition: border-color 0.2s ease;
+            .diagnostic-form-card {
+                padding: 1.5rem;
             }
             
-            textarea:focus {
-                border-color: var(--input-focus-border);
-                outline: none;
+            .page-title h2 {
+                font-size: 1.6rem;
             }
             
-            select {
-                width: 100%;
-                padding: 12px;
-                border-radius: 12px;
-                border: 1px solid var(--input-border);
-                background: var(--input-bg);
-                font-size: 16px;
-                margin-bottom: 16px;
-                appearance: none;
-                background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-                background-repeat: no-repeat;
-                background-position: right 12px top 50%;
-                background-size: 12px auto;
+            .form-title h3 {
+                font-size: 1.4rem;
             }
             
-            button#search-btn {
-                width: 100%;
-                padding: 14px;
-                border-radius: 12px;
-                background: var(--button-primary-bg);
-                color: var(--button-primary-text);
-                font-weight: 600;
-                border: none;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                margin-bottom: 24px;
-                box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);
+            .diagnostic-meta {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
-            
-            button#search-btn:hover {
-                background: linear-gradient(45deg, var(--button-primary-bg), #5E7CE2);
-                box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
-            }
-            
-            .diagnostic-card {
-                margin-bottom: 16px;
-            }
-            
-            .diagnostic-details {
+        }
+        
+        @media (max-width: 480px) {
+            .page-title {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 0.5rem;
             }
             
-            .cost-estimate {
-                margin-bottom: 8px;
+            .diagnostic-header h4 {
+                font-size: 1.2rem;
+            }
+            
+            .diagnostic-body, .diagnostic-header {
+                padding: 1.2rem;
+            }
+            
+            .primary-button {
+                padding: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Mobile Menu Toggle -->
-        <button class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></button>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="/static/images/car_service_logo.jpeg" alt="CarLux Logo">
+            <h1>CarLux AI</h1>
+        </div>
         
+        <button class="mobile-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-items">
+            <a href="/" class="nav-item">Home</a>
+            <a href="/maintenance-centers" class="nav-item">Service Centers</a>
+            <a href="/map" class="nav-item">Map</a>
+            <a href="/chatbot" class="nav-item">AI Diagnostics</a>
+        </div>
+        
+        <div class="user-icons">
+            <span><i class="fas fa-bell"></i></span>
+            <span><i class="fas fa-user"></i></span>
+        </div>
+    </header>
+    
+    <!-- App Container -->
+    <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <img src="/static/images/photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
-                <h2>CService</h2>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/map"><i class="fas fa-map"></i> Map</a></li>
-                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
-                    <li><a href="/chatbot" class="active"><i class="fas fa-comments"></i> ChatBot</a></li>
-                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+            <div class="nav-group">
+                <h3 class="nav-group-title">Main Menu</h3>
+                <ul class="nav-list">
+                    <li><a href="/home"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="/chatbot" class="active"><i class="fas fa-robot"></i> AI Diagnostics</a></li>
+                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Service Centers</a></li>
+                    <li><a href="/map"><i class="fas fa-map-marker-alt"></i> Interactive Map</a></li>
                 </ul>
-            </nav>
-            <div class="help-center">
-                <strong>Help Center</strong>
-                <p>Having trouble? Please contact us for more questions.</p>
-                <button onclick="location.href='/chatbot'">Go To Help Center</button>
+            </div>
+            
+            <div class="nav-group">
+                <h3 class="nav-group-title">Account</h3>
+                <ul class="nav-list">
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#"><i class="fas fa-history"></i> History</a></li>
+                    <li><a href="#"><i class="fas fa-car"></i> My Vehicles</a></li>
+                </ul>
+            </div>
+            
+            <div class="support-card">
+                <h4>Need Help?</h4>
+                <p>Contact our customer support team for assistance with your premium service.</p>
+                <button>Contact Support</button>
             </div>
         </aside>
-
+        
         <!-- Main Content -->
-        <main class="content">
-            <header>
-                <h2>Car Problem Diagnostics</h2>
-                <div class="user-icons">
-                    <span><i class="fas fa-bell"></i></span>
-                    <span><i class="fas fa-user"></i></span>
-                </div>
-            </header>
-
-            <section class="chatbot-container">
-                <h3>Describe Your Car Problem</h3>
-                <textarea id="query" placeholder="Type your car problem here...
-For example: 'My car won't start' or 'Strange noise when braking'"></textarea>
-
-                <label for="brand">Car Brand:</label>
-                <select id="brand">
-                    <option value="">Select your brand...</option>
-                    <!-- Luxury Brands -->
-                    <option value="Audi">Audi</option>
-                    <option value="BMW">BMW</option>
-                    <option value="Mercedes">Mercedes-Benz</option>
-                    <option value="Lexus">Lexus</option>
-                    <option value="Jaguar">Jaguar</option>
-                    <option value="Land Rover">Land Rover</option>
-                    <option value="Bentley">Bentley</option>
-                    <option value="Porsche">Porsche</option>
-                    <option value="Maserati">Maserati</option>
-                    <option value="Rolls-Royce">Rolls-Royce</option>
-                    <option value="Ferrari">Ferrari</option>
-                    <option value="Lamborghini">Lamborghini</option>
-                    <option value="Bugatti">Bugatti</option>
-                    <option value="Aston Martin">Aston Martin</option>
-                    <option value="Tesla">Tesla</option>
-                    <option value="Cadillac">Cadillac</option>
-                    <option value="Infiniti">Infiniti</option>
-                    <option value="Lincoln">Lincoln</option>
-                    
-                    <!-- Common Brands -->
-                    <option value="Toyota">Toyota</option>
-                    <option value="Honda">Honda</option>
-                    <option value="Nissan">Nissan</option>
-                    <option value="Ford">Ford</option>
-                    <option value="Chevrolet">Chevrolet</option>
-                    <option value="Volkswagen">Volkswagen</option>
-                    <option value="Hyundai">Hyundai</option>
-                    <option value="Kia">Kia</option>
-                    <option value="Mazda">Mazda</option>
-                    <option value="Subaru">Subaru</option>
-                    <option value="Fiat">Fiat</option>
-                    <option value="Peugeot">Peugeot</option>
-                    <option value="Renault">Renault</option>
-                    <option value="Citroën">Citroën</option>
-                    <option value="Volvo">Volvo</option>
-                    <option value="Mini">Mini</option>
-                    <option value="Jeep">Jeep</option>
-                    <option value="Dodge">Dodge</option>
-                    <option value="Chrysler">Chrysler</option>
-                    <option value="Mitsubishi">Mitsubishi</option>
-                    <option value="Suzuki">Suzuki</option>
-                    <option value="Buick">Buick</option>
-                    <option value="GMC">GMC</option>
-                </select>
-
-                <label for="model">Car Model:</label>
-                <select id="model">
-                    <option value="">Select your model...</option>
-                </select>
-
-                <button id="search-btn">Find Solution</button>
-
-                <div id="response-container">
-                    <h3>Possible Solutions:</h3>
-                    <div id="results"></div>
+        <main class="main-content">
+            <div class="page-title">
+                <h2>AI Car Diagnostics</h2>
+            </div>
+            
+            <!-- Diagnostic Form -->
+            <div class="diagnostic-form-card">
+                <div class="form-title">
+                    <i class="fas fa-robot"></i>
+                    <h3>Advanced Diagnostic Tool</h3>
+                    <p>Describe your car's problem to receive AI-powered solutions and recommendations</p>
                 </div>
                 
-                <div id="loading" style="display: none; text-align: center; margin-top: 20px;">
-                    <i class="fas fa-spinner fa-spin fa-2x"></i>
-                    <p>Diagnosing your car problem...</p>
+                <div class="form-row">
+                    <label for="query">Describe Your Car Problem:</label>
+                    <textarea id="query" placeholder="Provide details about your car issue... For example: 'My BMW 3 Series makes a grinding noise when braking' or 'My Mercedes won't start in cold weather'"></textarea>
                 </div>
-            </section>
+                
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label for="brand">Car Brand:</label>
+                        <select id="brand">
+                            <option value="">Select your brand...</option>
+                            <!-- Luxury Brands -->
+                            <option value="Audi">Audi</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Mercedes">Mercedes-Benz</option>
+                            <option value="Lexus">Lexus</option>
+                            <option value="Jaguar">Jaguar</option>
+                            <option value="Land Rover">Land Rover</option>
+                            <option value="Bentley">Bentley</option>
+                            <option value="Porsche">Porsche</option>
+                            <option value="Maserati">Maserati</option>
+                            <option value="Rolls-Royce">Rolls-Royce</option>
+                            <option value="Ferrari">Ferrari</option>
+                            <option value="Lamborghini">Lamborghini</option>
+                            <option value="Bugatti">Bugatti</option>
+                            <option value="Aston Martin">Aston Martin</option>
+                            <option value="Tesla">Tesla</option>
+                            <option value="Cadillac">Cadillac</option>
+                            <option value="Infiniti">Infiniti</option>
+                            <option value="Lincoln">Lincoln</option>
+                            
+                            <!-- Common Brands -->
+                            <option value="Toyota">Toyota</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Nissan">Nissan</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Chevrolet">Chevrolet</option>
+                            <option value="Volkswagen">Volkswagen</option>
+                            <option value="Hyundai">Hyundai</option>
+                            <option value="Kia">Kia</option>
+                            <option value="Mazda">Mazda</option>
+                            <option value="Subaru">Subaru</option>
+                            <option value="Fiat">Fiat</option>
+                            <option value="Peugeot">Peugeot</option>
+                            <option value="Renault">Renault</option>
+                            <option value="Citroën">Citroën</option>
+                            <option value="Volvo">Volvo</option>
+                            <option value="Mini">Mini</option>
+                            <option value="Jeep">Jeep</option>
+                            <option value="Dodge">Dodge</option>
+                            <option value="Chrysler">Chrysler</option>
+                            <option value="Mitsubishi">Mitsubishi</option>
+                            <option value="Suzuki">Suzuki</option>
+                            <option value="Buick">Buick</option>
+                            <option value="GMC">GMC</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="model">Car Model:</label>
+                        <select id="model">
+                            <option value="">Select your model...</option>
+                            <!-- Will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="search-btn" class="primary-button">
+                    <i class="fas fa-search"></i> Diagnose Problem
+                </button>
+            </div>
+            
+            <!-- Loading Indicator -->
+            <div id="loading" class="loading-indicator">
+                <div class="spinner"></div>
+                <h3>Analyzing Your Vehicle Issue</h3>
+                <p>Our AI is processing your description to provide accurate solutions...</p>
+            </div>
+            
+            <!-- Results Section -->
+            <div id="response-container" class="results-section">
+                <h3>Diagnostic Results:</h3>
+                <div id="results">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </div>
         </main>
     </div>
-
+    
     <script>
-        // Mobile Menu Toggle
-        document.getElementById('menu-toggle').addEventListener('click', function() {
+        // Mobile Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
         });
         
-        // Close sidebar when clicking outside of it on mobile
+        // Close sidebar when clicking outside (for mobile)
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
-            const menuToggle = document.getElementById('menu-toggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
             
-            if (window.innerWidth <= 480 && 
+            if (window.innerWidth <= 768 && 
                 sidebar.classList.contains('active') && 
                 !sidebar.contains(event.target) && 
-                event.target !== menuToggle) {
+                event.target !== sidebarToggle) {
                 sidebar.classList.remove('active');
             }
         });
-       
-        document.addEventListener("DOMContentLoaded", function () {
-            console.log("✅ Page Loaded - Running ChatBot Script");
-
-            // Selecting UI Elements
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("✅ Page Loaded - Running Diagnostic Tool Script");
+            
+            // Elements
             const brandSelect = document.getElementById("brand");
             const modelSelect = document.getElementById("model");
             const searchBtn = document.getElementById("search-btn");
@@ -422,12 +880,303 @@ For example: 'My car won't start' or 'Strange noise when braking'"></textarea>
             const resultsContainer = document.getElementById("results");
             const responseContainer = document.getElementById("response-container");
             const loadingIndicator = document.getElementById("loading");
-
+            
             // Check if elements exist
             if (!brandSelect || !modelSelect || !searchBtn || !queryInput || !resultsContainer || !responseContainer) {
-                console.error("❌ ERROR: One or more elements are missing in the HTML.");
+                console.error("❌ ERROR: One or more elements are missing in the HTML");
                 return;
             }
+            
+            // Car Models Dataset
+            const carModels = {
+                // Luxury Brands
+                "Audi": ["A1", "A3", "A4", "A5", "A6", "A7", "A8", "Q2", "Q3", "Q5", "Q7", "Q8", "e-tron", "TT", "R8"],
+                "BMW": ["1 Series", "2 Series", "3 Series", "4 Series", "5 Series", "6 Series", "7 Series", "8 Series", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "Z4", "i3", "i8"],
+                "Mercedes": ["A-Class", "B-Class", "C-Class", "E-Class", "S-Class", "G-Class", "GLA", "GLB", "GLC", "GLE", "GLS", "AMG GT", "CLA", "CLS", "EQC"],
+                "Lexus": ["CT", "IS", "ES", "GS", "LS", "UX", "NX", "RX", "GX", "LX", "RC", "LC"],
+                "Jaguar": ["XE", "XF", "XJ", "F-Type", "E-Pace", "F-Pace", "I-Pace"],
+                "Land Rover": ["Defender", "Discovery", "Discovery Sport", "Range Rover", "Range Rover Evoque", "Range Rover Sport", "Range Rover Velar"],
+                "Bentley": ["Continental GT", "Flying Spur", "Bentayga", "Mulsanne"],
+                "Porsche": ["911", "718 Cayman", "718 Boxster", "Taycan", "Panamera", "Macan", "Cayenne"],
+                "Maserati": ["Ghibli", "Quattroporte", "Levante", "GranTurismo", "GranCabrio", "MC20"],
+                "Rolls-Royce": ["Phantom", "Ghost", "Wraith", "Dawn", "Cullinan"],
+                "Ferrari": ["488", "F8", "Roma", "Portofino", "812", "SF90", "GTC4Lusso"],
+                "Lamborghini": ["Aventador", "Huracán", "Urus"],
+                "Bugatti": ["Chiron", "Divo", "La Voiture Noire"],
+                "Aston Martin": ["DB11", "Vantage", "DBS Superleggera", "Valkyrie", "DBX"],
+                "Tesla": ["Model S", "Model 3", "Model X", "Model Y", "Cybertruck", "Roadster"],
+                "Cadillac": ["CT4", "CT5", "Escalade", "XT4", "XT5", "XT6"],
+                "Infiniti": ["Q50", "Q60", "QX50", "QX55", "QX60", "QX80"],
+                "Lincoln": ["Aviator", "Corsair", "Continental", "Nautilus", "Navigator"],
+                
+                // Common Brands
+                "Toyota": ["Corolla", "Camry", "Prius", "RAV4", "Highlander", "4Runner", "Land Cruiser", "Tacoma", "Tundra", "Yaris", "C-HR", "Sienna", "Avalon", "Supra", "86"],
+                "Honda": ["Civic", "Accord", "CR-V", "HR-V", "Pilot", "Odyssey", "Fit", "Ridgeline", "Insight", "Clarity", "Passport"],
+                "Nissan": ["Micra", "Altima", "Maxima", "Sentra", "Versa", "Juke", "Kicks", "Rogue", "Murano", "Pathfinder", "Armada", "Frontier", "Titan", "370Z", "GT-R", "LEAF"],
+                "Ford": ["Fiesta", "Focus", "Fusion", "Mustang", "EcoSport", "Escape", "Edge", "Explorer", "Expedition", "Ranger", "F-150", "F-250", "F-350", "Transit", "Bronco"],
+                "Chevrolet": ["Spark", "Malibu", "Impala", "Camaro", "Corvette", "Trax", "Equinox", "Traverse", "Tahoe", "Suburban", "Colorado", "Silverado", "Bolt", "Volt"],
+                "Volkswagen": ["Polo", "Golf", "Jetta", "Passat", "Arteon", "T-Cross", "T-Roc", "Tiguan", "Touareg", "Atlas", "ID.3", "ID.4"],
+                "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Sonata", "Tucson", "Santa Fe", "Palisade", "Kona", "Venue", "Ioniq", "Veloster"],
+                "Kia": ["Picanto", "Rio", "Ceed", "Stinger", "Forte", "Optima", "K5", "Soul", "Seltos", "Sportage", "Sorento", "Telluride", "Niro"],
+                "Mazda": ["Mazda2", "Mazda3", "Mazda6", "CX-3", "CX-30", "CX-5", "CX-9", "MX-5", "BT-50"],
+                "Subaru": ["Impreza", "Legacy", "WRX", "BRZ", "Crosstrek", "Forester", "Outback", "Ascent"],
+                "Fiat": ["500", "500X", "Tipo", "Panda", "500L"],
+                "Peugeot": ["108", "208", "308", "508", "2008", "3008", "5008", "Partner", "Rifter", "Traveller"],
+                "Renault": ["Clio", "Megane", "Captur", "Kadjar", "Koleos", "Twingo", "Zoe"],
+                "Citroën": ["C1", "C3", "C4", "C5", "C3 Aircross", "C5 Aircross", "Berlingo"],
+                "Volvo": ["S60", "S90", "V60", "V90", "XC40", "XC60", "XC90"],
+                "Mini": ["Cooper", "Countryman", "Clubman", "Convertible", "Electric"],
+                "Jeep": ["Renegade", "Compass", "Cherokee", "Grand Cherokee", "Wrangler", "Gladiator", "Wagoneer"],
+                "Dodge": ["Challenger", "Charger", "Durango", "Journey"],
+                "Chrysler": ["300", "Pacifica", "Voyager"],
+                "Mitsubishi": ["Mirage", "Outlander", "Eclipse Cross", "ASX", "Pajero", "L200"],
+                "Suzuki": ["Swift", "Ignis", "Vitara", "S-Cross", "Jimny"],
+                "Buick": ["Encore", "Envision", "Enclave", "Regal", "LaCrosse"],
+                "GMC": ["Terrain", "Acadia", "Yukon", "Canyon", "Sierra"],
+            };
+            
+            // Update model dropdown based on selected brand
+            brandSelect.addEventListener("change", function() {
+                const selectedBrand = this.value;
+                modelSelect.innerHTML = '<option value="">Select your model...</option>';
+                
+                if (selectedBrand && carModels[selectedBrand]) {
+                    carModels[selectedBrand].forEach(model => {
+                        const option = document.createElement("option");
+                        option.value = model;
+                        option.textContent = model;
+                        modelSelect.appendChild(option);
+                    });
+                }
+            });
+            
+            // Handle diagnostic search
+            searchBtn.addEventListener("click", function() {
+                const query = queryInput.value.trim();
+                const brand = brandSelect.value;
+                const model = modelSelect.value;
+                
+                if (!query) {
+                    alert("Please describe your car problem.");
+                    return;
+                }
+                
+                if (!brand) {
+                    alert("Please select your car brand.");
+                    return;
+                }
+                
+                if (!model) {
+                    alert("Please select your car model.");
+                    return;
+                }
+                
+                // Show loading indicator
+                loadingIndicator.style.display = "block";
+                resultsContainer.innerHTML = "";
+                responseContainer.style.display = "none";
+                
+                // Make API request
+                fetch("/search", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        brand: brand,
+                        model: model
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loading indicator
+                    loadingIndicator.style.display = "none";
+                    
+                    // Show response container
+                    responseContainer.style.display = "block";
+                    
+                    // Process and display results
+                    displayResults(data);
+                })
+                .catch(error => {
+                    // Hide loading indicator
+                    loadingIndicator.style.display = "none";
+                    console.error("Error:", error);
+                    
+                    // Show error message
+                    resultsContainer.innerHTML = `
+                        <div class="diagnostic-card">
+                            <div class="diagnostic-header">
+                                <h4>Error Processing Request</h4>
+                            </div>
+                            <div class="diagnostic-body">
+                                <p class="solution-text">We encountered an issue while processing your request. Please try again or contact support if the problem persists.</p>
+                            </div>
+                        </div>
+                    `;
+                    responseContainer.style.display = "block";
+                });
+            });
+            
+            // Function to display diagnostic results
+            function displayResults(data) {
+                let htmlContent = "";
+                
+                // If we have AI-generated results
+                if (data.results && data.results.length > 0) {
+                    // Generate HTML for each diagnostic result
+                    data.results.forEach(result => {
+                        const severityClass = result.problem_severity?.toLowerCase() === 'critical' ? 'severity-critical' :
+                                            result.problem_severity?.toLowerCase() === 'warning' ? 'severity-warning' : 'severity-minor';
+                        
+                        const diyBadgeClass = result.diy_possible ? 'diy-possible' : 'diy-professional';
+                        const diyBadgeText = result.diy_possible ? 'DIY Possible' : 'Professional Required';
+                        
+                        // Build HTML for the diagnostic card
+                        htmlContent += `
+                            <div class="diagnostic-card">
+                                <div class="severity-indicator ${severityClass}">
+                                    ${result.problem_severity || 'Minor'}
+                                </div>
+                                
+                                <div class="diagnostic-header">
+                                    <h4>${result.problem || 'Unknown Issue'}</h4>
+                                </div>
+                                
+                                <div class="diagnostic-body">
+                                    <p class="solution-text">${result.solution || 'No solution available'}</p>
+                                    
+                                    <div class="diagnostic-meta">
+                                        <div class="meta-item">
+                                            <span class="meta-label">Estimated Cost</span>
+                                            <span class="meta-value">${result.estimated_cost || 'Unknown'}</span>
+                                        </div>
+                                        
+                                        <div class="meta-item">
+                                            <span class="meta-label">Repair Difficulty</span>
+                                            <span class="badge ${diyBadgeClass}">${diyBadgeText}</span>
+                                        </div>
+                                        
+                                        ${result.time_estimate ? `
+                                        <div class="meta-item">
+                                            <span class="meta-label">Estimated Time</span>
+                                            <span class="meta-value">${result.time_estimate}</span>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                    
+                                    ${(result.tools_required && result.tools_required.length > 0) ? `
+                                    <div class="parts-tools-section">
+                                        <h5 class="section-title">Tools Required</h5>
+                                        <div class="chips-container">
+                                            ${result.tools_required.map(tool => `<span class="chip">${tool}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                    
+                                    ${(result.parts_needed && result.parts_needed.length > 0) ? `
+                                    <div class="parts-tools-section">
+                                        <h5 class="section-title">Parts Needed</h5>
+                                        <div class="chips-container">
+                                            ${result.parts_needed.map(part => `<span class="chip">${part}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                    
+                                    ${result.additional_info ? `
+                                    <p class="additional-info">${result.additional_info}</p>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    // Add related issues section if available
+                    if (data.related_issues && data.related_issues.length > 0) {
+                        htmlContent += `
+                            <div class="additional-info-grid">
+                                <div class="info-card">
+                                    <h4>Related Issues to Check</h4>
+                                    <ul class="info-list">
+                                        ${data.related_issues.map(issue => `
+                                            <li><strong>${issue.issue}</strong>: ${issue.description}</li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                        `;
+                        
+                        // Add maintenance tips if available
+                        if (data.maintenance_tips && data.maintenance_tips.length > 0) {
+                            htmlContent += `
+                                <div class="info-card">
+                                    <h4>Maintenance Recommendations</h4>
+                                    <ul class="info-list">
+                                        ${data.maintenance_tips.map(tip => `<li>${tip}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                            `;
+                        } else {
+                            htmlContent += `</div>`;
+                        }
+                    } else if (data.maintenance_tips && data.maintenance_tips.length > 0) {
+                        // Only maintenance tips available
+                        htmlContent += `
+                            <div class="info-card" style="max-width: 800px; margin: 0 auto;">
+                                <h4>Maintenance Recommendations</h4>
+                                <ul class="info-list">
+                                    ${data.maintenance_tips.map(tip => `<li>${tip}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                } else if (data.message) {
+                    // For general messages or errors
+                    htmlContent = `
+                        <div class="diagnostic-card">
+                            <div class="diagnostic-header">
+                                <h4>AI Diagnostic Response</h4>
+                            </div>
+                            <div class="diagnostic-body">
+                                <p class="solution-text">${data.message}</p>
+                                
+                                ${data.follow_up_question ? `
+                                <div class="parts-tools-section">
+                                    <h5 class="section-title">Additional Information Needed</h5>
+                                    <p>${data.follow_up_question}</p>
+                                </div>
+                                ` : ''}
+                                
+                                ${data.follow_up_questions && data.follow_up_questions.length > 0 ? `
+                                <div class="parts-tools-section">
+                                    <h5 class="section-title">Please Consider the Following</h5>
+                                    <ul class="info-list">
+                                        ${data.follow_up_questions.map(question => `<li>${question}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // No results found
+                    htmlContent = `
+                        <div class="diagnostic-card">
+                            <div class="diagnostic-header">
+                                <h4>No Results Found</h4>
+                            </div>
+                            <div class="diagnostic-body">
+                                <p class="solution-text">No diagnostic information was found for your query. Please try providing more details about your vehicle issue.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Update results container
+                resultsContainer.innerHTML = htmlContent;
+            }
+            
 
             // Car brand to model mapping
             const carModels = {
