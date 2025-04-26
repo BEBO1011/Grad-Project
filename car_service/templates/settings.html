@@ -538,12 +538,48 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(to bottom right, rgba(245, 245, 245, 0.15), rgba(255, 255, 255, 0.05));
+            border-radius: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toggles-container:before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
         }
         
         .toggles-column {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .toggle-group {
+            padding: 1.2rem 1rem;
+            background-color: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-group:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
         }
         
         .data-clear-container {
@@ -553,15 +589,19 @@
             justify-content: flex-start;
         }
         
-        .button-group {
+        .save-preferences-container {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
             margin-top: 3.5rem;
             position: relative;
-            justify-content: center;
+            background: linear-gradient(135deg, rgba(245, 245, 245, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
         
-        .button-group:before {
+        .save-preferences-container:before {
             content: '';
             position: absolute;
             top: -1.8rem;
@@ -569,6 +609,49 @@
             right: 0;
             height: 1px;
             background: linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.2) 50%, rgba(212, 175, 55, 0) 100%);
+        }
+        
+        .save-preferences-icon {
+            flex: 0 0 auto;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+        }
+        
+        .save-preferences-icon i {
+            font-size: 2rem;
+            color: var(--primary-gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        
+        .save-preferences-content {
+            flex: 1;
+        }
+        
+        .save-preferences-content h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            color: var(--text-dark);
+        }
+        
+        .save-preferences-content p {
+            margin: 0 0 1.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            position: relative;
         }
         
         .btn {
@@ -680,9 +763,44 @@
             margin-right: 10px;
         }
         
+        @media (max-width: 992px) {
+            .theme-selection-container,
+            .settings-section-grid,
+            .toggles-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .format-radio-group {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .unit-radio-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
         @media (max-width: 768px) {
             .settings-container {
                 padding: 1.5rem;
+                border-radius: 12px;
+            }
+            
+            .settings-section {
+                margin-bottom: 2.5rem;
+                padding-bottom: 2rem;
+            }
+            
+            .settings-section-title {
+                margin-bottom: 1.8rem;
+            }
+            
+            .format-radio-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .unit-radio-group {
+                grid-template-columns: 1fr;
             }
             
             .radio-group {
@@ -692,14 +810,97 @@
             
             .radio-option {
                 width: 100%;
+                min-width: 100%;
+            }
+            
+            .theme-radio-group {
+                flex-direction: column;
+            }
+            
+            .toggles-container {
+                padding: 1rem;
+            }
+            
+            .toggle-group {
+                padding: 1rem 0.8rem;
             }
             
             .button-group {
                 flex-direction: column;
+                margin-top: 2.5rem;
             }
             
             .btn {
                 width: 100%;
+            }
+            
+            .theme-selection-container {
+                padding: 1rem;
+            }
+            
+            .save-preferences-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 1.5rem;
+            }
+            
+            .save-preferences-content h4 {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .settings-container {
+                padding: 1rem;
+                margin: 0;
+                border-radius: 8px;
+            }
+            
+            .settings-section-title i {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+            
+            .settings-section-title h3 {
+                font-size: 1.2rem;
+            }
+            
+            .form-group label {
+                font-size: 0.9rem;
+            }
+            
+            .toggle-group {
+                padding: 0.8rem 0.6rem;
+                margin-bottom: 0.6rem;
+            }
+            
+            .toggle-label {
+                font-size: 0.9rem;
+            }
+            
+            .toggle-switch {
+                width: 48px;
+                height: 24px;
+            }
+            
+            .toggle-slider:before {
+                height: 16px;
+                width: 16px;
+            }
+            
+            input:checked + .toggle-slider:before {
+                transform: translateX(24px);
+            }
+            
+            .button-group {
+                gap: 1rem;
+            }
+            
+            .btn {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -1005,13 +1206,22 @@
                     </div>
                 </div>
                 
-                <div class="button-group">
-                    <button class="btn btn-primary" id="save-settings">
-                        <span><i class="fas fa-save"></i> Save Preferences</span>
-                    </button>
-                    <button class="btn btn-secondary" id="reset-settings">
-                        <span><i class="fas fa-undo"></i> Reset</span>
-                    </button>
+                <div class="save-preferences-container">
+                    <div class="save-preferences-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="save-preferences-content">
+                        <h4>Save Your Preferences</h4>
+                        <p>Your settings will be securely saved and applied immediately.</p>
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="save-settings">
+                                <span><i class="fas fa-save"></i> Save Preferences</span>
+                            </button>
+                            <button class="btn btn-secondary" id="reset-settings">
+                                <span><i class="fas fa-undo"></i> Reset</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
