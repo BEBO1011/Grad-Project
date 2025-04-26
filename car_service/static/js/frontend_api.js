@@ -1,4 +1,4 @@
-const API_BASE_URL = "";
+const API_BASE_URL = ""; // Empty string for same-domain relative paths
 
 
 // Get all WhatsApp buttons with the class "whatsapp-btn"
@@ -218,4 +218,20 @@ async function saveUserLocation(userId, lat, lon) {
         body: JSON.stringify({ user_id: userId, latitude: lat, longitude: lon })
     });
     return response.json();
+}
+// Function to send location to the backend
+async function sendLocationToBackend(lat, lon) {
+    try {
+        // Only send if we have a logged-in user
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+            console.log("Sending location to backend for user:", userId);
+            await saveUserLocation(userId, lat, lon);
+            console.log("Location saved successfully");
+        } else {
+            console.log("User not logged in, location not saved");
+        }
+    } catch (error) {
+        console.error("Error saving location:", error);
+    }
 }
