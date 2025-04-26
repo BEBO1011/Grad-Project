@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarLux | Vehicle Health Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Base Variables */
+        :root {
+            --primary-gold: #d4af37;
+            --dark-gold: #a58e2d;
+            --light-gold: #f2dc9e;
+            --dark-bg: #14151a;
+            --light-bg: #ffffff;
+            --text-light: #ffffff;
+            --text-dark: #14151a;
+            --text-secondary: #6c757d;
+            --card-bg: #ffffff;
+            --border-light: rgba(0, 0, 0, 0.05);
+            --blue-accent: #4361ee;
+            --blue-light: rgba(67, 97, 238, 0.1);
+            --red: #dc3545;
+            --green: #28a745;
+            --yellow: #ffc107;
+            --orange: #fd7e14;
+            --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f2dc9e 50%, #d4af37 100%);
+        }
+        
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            background-color: #f5f5f7;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+        
+        /* Layout */
+        .app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        /* Header & Navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--dark-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 36px;
+            border-radius: 8px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-items {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .nav-item {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            color: var(--primary-gold);
+        }
+        
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .user-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-icons span {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .user-icons span:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--dark-bg);
+            padding: 6rem 1.5rem 1.5rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 900;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .nav-group {
+            margin-bottom: 2rem;
+        }
+        
+        .nav-group-title {
+            color: var(--text-light);
+            opacity: 0.6;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .nav-list {
+            list-style: none;
+        }
+        
+        .nav-list li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-list a i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s ease;
+        }
+        
+        .nav-list a:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-list a:hover i {
+            color: var(--primary-gold);
+        }
+        
+        .nav-list a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-gold);
+        }
+        
+        .nav-list a.active i {
+            color: var(--primary-gold);
+        }
+        
+        /* Support Card */
+        .support-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: var(--text-light);
+            margin-top: 2rem;
+        }
+        
+        .support-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-gold);
+        }
+        
+        .support-card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+        
+        .support-card button {
+            width: 100%;
+            padding: 0.7rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .support-card button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 6rem 2rem 2rem;
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+        
+        /* Page Title */
+        .page-title {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        
+        /* Vehicle Health Card */
+        .health-overview {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-light);
+            transition: box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .health-overview:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .health-score-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+        
+        .health-score {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .health-score .score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-gold);
+            line-height: 1;
+        }
+        
+        .health-score .label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        
+        .health-details {
+            flex: 1;
+        }
+        
+        .health-details h3 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .health-status {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .health-status.excellent {
+            color: var(--green);
+        }
+        
+        .health-status.good {
+            color: var(--primary-gold);
+        }
+        
+        .health-status.fair {
+            color: var(--orange);
+        }
+        
+        .health-status.poor {
+            color: var(--red);
+        }
+        
+        .health-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .health-actions .action-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .health-actions .primary-action {
+            background: var(--gold-gradient);
+            color: var(--dark-bg);
+            border: none;
+        }
+        
+        .health-actions .secondary-action {
+            background: transparent;
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+        }
+        
+        .health-actions .primary-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        .health-actions .secondary-action:hover {
+            background: rgba(212, 175, 55, 0.05);
+        }
+        
+        /* Component health grid */
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .component-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+        
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .component-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+        
+        .component-icon.excellent {
+            color: var(--green);
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        .component-icon.good {
+            color: var(--primary-gold);
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+        
+        .component-icon.fair {
+            color: var(--orange);
+            background-color: rgba(253, 126, 20, 0.1);
+        }
+        
+        .component-icon.poor {
+            color: var(--red);
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .component-icon.critical {
+            color: var(--red);
+            background-color: rgba(220, 53, 69, 0.2);
+        }
+        
+        .component-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .component-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .component-status {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        
+        .component-status.excellent {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--green);
+        }
+        
+        .component-status.good {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold);
+        }
+        
+        .component-status.fair {
+            background-color: rgba(253, 126, 20, 0.1);
+            color: var(--orange);
+        }
+        
+        .component-status.poor {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--red);
+        }
+        
+        .component-status.critical {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--red);
+        }
+        
+        /* Anomalies Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header h3 {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-header .section-icon {
+            color: var(--primary-gold);
+        }
+        
+        .anomaly-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .anomaly-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .anomaly-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .anomaly-header {
+            padding: 1.2rem 1.5rem;
+            background-color: rgba(212, 175, 55, 0.05);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .anomaly-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+        
+        .severity-badge {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+        }
+        
+        .severity-badge.critical {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--red);
+        }
+        
+        .severity-badge.warning {
+            background-color: rgba(253, 126, 20, 0.1);
+            color: var(--orange);
+        }
+        
+        .anomaly-body {
+            padding: 1.5rem;
+        }
+        
+        .reading-display {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1.5rem;
+        }
+        
+        .current-reading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(220, 53, 69, 0.05);
+            border-radius: 10px;
+            min-width: 120px;
+        }
+        
+        .current-reading.warning {
+            background-color: rgba(253, 126, 20, 0.05);
+        }
+        
+        .current-reading.critical {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .reading-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .reading-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--red);
+        }
+        
+        .reading-value.warning {
+            color: var(--orange);
+        }
+        
+        .expected-range {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(40, 167, 69, 0.05);
+            border-radius: 10px;
+            min-width: 120px;
+        }
+        
+        .range-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--green);
+        }
+        
+        .vs-indicator {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+        
+        .recommendation {
+            padding: 1.2rem;
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--blue-accent);
+        }
+        
+        .recommendation-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .recommendation-label i {
+            color: var(--blue-accent);
+        }
+        
+        .recommendation-text {
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        /* AI Insights Section */
+        .ai-insights {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-insights:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .insights-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .insights-header i {
+            font-size: 1.8rem;
+            color: var(--primary-gold);
+        }
+        
+        .insights-header h3 {
+            margin-bottom: 0;
+        }
+        
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .insight-item {
+            padding: 1.2rem;
+            background-color: rgba(212, 175, 55, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-gold);
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .insight-description {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .insight-action {
+            font-weight: 600;
+            color: var(--primary-gold);
+        }
+        
+        /* AI Diagnostic Section */
+        .diagnostics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .diagnostic-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .diagnostic-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .diagnostic-severity {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-bottom-left-radius: 15px;
+        }
+        
+        .diagnostic-severity.critical {
+            background-color: var(--red);
+            color: white;
+        }
+        
+        .diagnostic-severity.warning {
+            background-color: var(--orange);
+            color: white;
+        }
+        
+        .diagnostic-severity.minor {
+            background-color: var(--green);
+            color: white;
+        }
+        
+        .diagnostic-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .diagnostic-header h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0;
+            color: var(--text-dark);
+        }
+        
+        .diagnostic-body {
+            padding: 1.5rem;
+        }
+        
+        .diagnostic-solution {
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .diagnostic-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-radius: 10px;
+            padding: 1.2rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .diy-badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.6rem;
+            border-radius: 30px;
+            margin-top: 0.3rem;
+        }
+        
+        .diy-badge.possible {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--green);
+        }
+        
+        .diy-badge.not-possible {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--red);
+        }
+        
+        /* Maintenance Tips Section */
+        .tips-list {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        .tip-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: rgba(212, 175, 55, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-gold);
+        }
+        
+        .tip-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .tip-text {
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .health-overview {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+            
+            .health-actions {
+                justify-content: center;
+            }
+            
+            .diagnostics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .nav-items {
+                display: none;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 5px 0 20px rgba(0, 0, 0, 0.15);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 5rem 1.2rem 1.5rem;
+            }
+            
+            .component-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .page-title h2 {
+                font-size: 1.6rem;
+            }
+            
+            .reading-display {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .current-reading, .expected-range {
+                padding: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .health-score-container {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .health-score .score {
+                font-size: 2rem;
+            }
+            
+            .health-actions {
+                flex-direction: column;
+            }
+            
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="/static/images/car_service_logo.jpeg" alt="CarLux Logo">
+            <h1>CarLux</h1>
+        </div>
+        
+        <button class="mobile-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-items">
+            <a href="/" class="nav-item">Home</a>
+            <a href="/maintenance-centers" class="nav-item">Service Centers</a>
+            <a href="/map" class="nav-item">Map</a>
+            <a href="/chatbot" class="nav-item">AI Diagnostics</a>
+        </div>
+        
+        <div class="user-icons">
+            <span id="notifications"><i class="fas fa-bell"></i></span>
+            <span id="profile"><i class="fas fa-user"></i></span>
+        </div>
+    </header>
+    
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="nav-group">
+                <h3 class="nav-group-title">Main Menu</h3>
+                <ul class="nav-list">
+                    <li><a href="/home"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="/vehicle-health" class="active"><i class="fas fa-heartbeat"></i> Vehicle Health</a></li>
+                    <li><a href="/chatbot"><i class="fas fa-robot"></i> AI Diagnostics</a></li>
+                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Service Centers</a></li>
+                    <li><a href="/map"><i class="fas fa-map-marker-alt"></i> Interactive Map</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <h3 class="nav-group-title">Account</h3>
+                <ul class="nav-list">
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#"><i class="fas fa-history"></i> History</a></li>
+                    <li><a href="#"><i class="fas fa-car"></i> My Vehicles</a></li>
+                </ul>
+            </div>
+            
+            <div class="support-card">
+                <h4>Need Help?</h4>
+                <p>Contact our customer support team for assistance with your premium service.</p>
+                <button onclick="location.href='/chatbot'">Contact Support</button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-title">
+                <h2><i class="fas fa-heartbeat" style="color: var(--primary-gold); margin-right: 10px;"></i> Vehicle Health Monitor</h2>
+                <button id="refreshBtn" class="action-btn secondary-action" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                    <i class="fas fa-sync-alt" style="margin-right: 5px;"></i> Refresh Data
+                </button>
+            </div>
+            
+            <!-- Vehicle Health Overview Section -->
+            <div class="health-overview">
+                <div class="health-score-container">
+                    <canvas id="healthScoreChart"></canvas>
+                    <div class="health-score">
+                        <div class="score" id="overallScore">--</div>
+                        <div class="label">Health Score</div>
+                    </div>
+                </div>
+                
+                <div class="health-details">
+                    <h3>Mercedes-Benz S-Class</h3>
+                    <div class="health-status" id="healthStatus">Calculating health status...</div>
+                    <p>Last updated: <span id="lastUpdated">April 26, 2025 at 10:45 AM</span></p>
+                    <div class="health-actions">
+                        <button class="action-btn primary-action">
+                            <i class="fas fa-wrench" style="margin-right: 5px;"></i> Schedule Service
+                        </button>
+                        <button class="action-btn secondary-action">
+                            <i class="fas fa-file-alt" style="margin-right: 5px;"></i> Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Component Health Grid -->
+            <h3><i class="fas fa-cogs" style="color: var(--primary-gold); margin-right: 10px;"></i> Component Health</h3>
+            <div class="component-grid" id="componentGrid">
+                <!-- Components will be inserted here by JavaScript -->
+                <div class="component-card">
+                    <div class="component-icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <div class="component-name">Loading...</div>
+                </div>
+            </div>
+            
+            <!-- Anomalies Section -->
+            <div class="section-header">
+                <h3><i class="fas fa-exclamation-triangle section-icon"></i> Detected Anomalies</h3>
+            </div>
+            
+            <div class="anomaly-list" id="anomalyList">
+                <!-- Anomalies will be inserted here by JavaScript -->
+                <div class="anomaly-card">
+                    <div class="anomaly-header">
+                        <h4 class="anomaly-title"><i class="fas fa-spinner fa-spin"></i> Loading anomalies...</h4>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Insights Section -->
+            <div class="section-header">
+                <h3><i class="fas fa-lightbulb section-icon"></i> AI Insights</h3>
+            </div>
+            
+            <div class="ai-insights">
+                <div class="insights-header">
+                    <i class="fas fa-brain"></i>
+                    <h3>Intelligent Pattern Analysis</h3>
+                </div>
+                
+                <div class="insights-list" id="insightsList">
+                    <!-- Insights will be inserted here by JavaScript -->
+                    <div class="insight-item">
+                        <div class="insight-title"><i class="fas fa-spinner fa-spin"></i> Loading insights...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Diagnostic Results Section -->
+            <div class="section-header">
+                <h3><i class="fas fa-stethoscope section-icon"></i> AI Diagnostic Results</h3>
+            </div>
+            
+            <div class="diagnostics-container" id="diagnosticsContainer">
+                <!-- Diagnostic cards will be inserted here by JavaScript -->
+                <div class="diagnostic-card">
+                    <div class="diagnostic-header">
+                        <h4><i class="fas fa-spinner fa-spin"></i> Loading diagnostics...</h4>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Maintenance Tips Section -->
+            <div class="section-header">
+                <h3><i class="fas fa-wrench section-icon"></i> Maintenance Recommendations</h3>
+            </div>
+            
+            <div class="ai-insights">
+                <ul class="tips-list" id="tipsList">
+                    <!-- Tips will be inserted here by JavaScript -->
+                    <li class="tip-item">
+                        <p class="tip-text"><i class="fas fa-spinner fa-spin"></i> Loading maintenance recommendations...</p>
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("✅ Page Loaded - Running Vehicle Health Monitor");
+            
+            // Mobile Sidebar Toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+            
+            // Close sidebar when clicking outside (for mobile)
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                
+                if (window.innerWidth <= 768 && 
+                    sidebar.classList.contains('active') && 
+                    !sidebar.contains(event.target) && 
+                    event.target !== sidebarToggle) {
+                    sidebar.classList.remove('active');
+                }
+            });
+            
+            // Initialize Health Score Chart
+            initHealthChart();
+            
+            // Fetch vehicle health data
+            fetchVehicleHealthData();
+            
+            // Refresh button event listener
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                fetchVehicleHealthData();
+            });
+        });
+        
+        // Initialize the health score chart
+        function initHealthChart() {
+            const ctx = document.getElementById('healthScoreChart').getContext('2d');
+            
+            window.healthChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [75, 25],
+                        backgroundColor: [
+                            'rgba(212, 175, 55, 0.8)',
+                            'rgba(241, 241, 241, 0.5)',
+                        ],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        tooltip: {
+                            enabled: false
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update health chart with new score
+        function updateHealthChart(score) {
+            if (window.healthChart) {
+                window.healthChart.data.datasets[0].data = [score, 100 - score];
+                
+                // Change color based on score
+                let color;
+                if (score >= 90) {
+                    color = 'rgba(40, 167, 69, 0.8)'; // green
+                } else if (score >= 70) {
+                    color = 'rgba(212, 175, 55, 0.8)'; // gold
+                } else if (score >= 50) {
+                    color = 'rgba(253, 126, 20, 0.8)'; // orange
+                } else {
+                    color = 'rgba(220, 53, 69, 0.8)'; // red
+                }
+                
+                window.healthChart.data.datasets[0].backgroundColor[0] = color;
+                window.healthChart.update();
+            }
+        }
+        
+        // Get status class based on score value
+        function getStatusClass(score) {
+            if (score >= 90) return 'excellent';
+            if (score >= 70) return 'good';
+            if (score >= 50) return 'fair';
+            return 'poor';
+        }
+        
+        // Get severity class based on severity value
+        function getSeverityClass(severity) {
+            if (severity === 'critical') return 'critical';
+            if (severity === 'warning') return 'warning';
+            return 'minor';
+        }
+        
+        // Fetch vehicle health data from API
+        function fetchVehicleHealthData() {
+            // Display loading state
+            document.getElementById('overallScore').textContent = '--';
+            document.getElementById('healthStatus').textContent = 'Loading data...';
+            document.getElementById('lastUpdated').textContent = 'Updating...';
+            
+            document.getElementById('componentGrid').innerHTML = '<div class="component-card"><div class="component-icon"><i class="fas fa-spinner fa-spin"></i></div><div class="component-name">Loading...</div></div>';
+            
+            document.getElementById('anomalyList').innerHTML = '<div class="anomaly-card"><div class="anomaly-header"><h4 class="anomaly-title"><i class="fas fa-spinner fa-spin"></i> Loading anomalies...</h4></div></div>';
+            
+            document.getElementById('insightsList').innerHTML = '<div class="insight-item"><div class="insight-title"><i class="fas fa-spinner fa-spin"></i> Loading insights...</div></div>';
+            
+            document.getElementById('diagnosticsContainer').innerHTML = '<div class="diagnostic-card"><div class="diagnostic-header"><h4><i class="fas fa-spinner fa-spin"></i> Loading diagnostics...</h4></div></div>';
+            
+            document.getElementById('tipsList').innerHTML = '<li class="tip-item"><p class="tip-text"><i class="fas fa-spinner fa-spin"></i> Loading maintenance recommendations...</p></li>';
+            
+            // Make API request to get data
+            fetch('/api/vehicle-health?vehicle_id=MB-S550-1234&brand=Mercedes&model=S-Class&year=2024')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayVehicleHealthData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicle health data:', error);
+                    
+                    // For demo purposes, we'll generate sample data if the API fails
+                    // In production, you'd show an error message instead
+                    console.log('Using sample data for demonstration');
+                    generateSampleData();
+                });
+        }
+        
+        // Display vehicle health data in the UI
+        function displayVehicleHealthData(data) {
+            // Update health score and status
+            const score = data.health_scores.overall_score;
+            const status = data.health_scores.overall_status;
+            const statusClass = getStatusClass(score);
+            
+            document.getElementById('overallScore').textContent = score;
+            document.getElementById('healthStatus').textContent = status;
+            document.getElementById('healthStatus').className = `health-status ${statusClass}`;
+            
+            // Update last updated time
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+            const formattedTime = now.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: 'numeric', 
+                hour12: true 
+            });
+            document.getElementById('lastUpdated').textContent = `${formattedDate} at ${formattedTime}`;
+            
+            // Update health chart
+            updateHealthChart(score);
+            
+            // Update component grid
+            updateComponentGrid(data.health_scores.component_scores, data.health_scores.component_statuses);
+            
+            // Update anomalies list
+            updateAnomaliesList(data.anomalies);
+            
+            // Update AI insights
+            updateInsightsList(data.pattern_insights);
+            
+            // Update AI diagnostics
+            updateDiagnostics(data.ai_diagnostics);
+            
+            // Update maintenance tips
+            updateMaintenanceTips(data.ai_diagnostics.maintenance_tips || []);
+        }
+        
+        // Update component grid
+        function updateComponentGrid(scores, statuses) {
+            const grid = document.getElementById('componentGrid');
+            grid.innerHTML = '';
+            
+            // Icons for each component type
+            const icons = {
+                engine: 'fa-engine',
+                battery: 'fa-car-battery',
+                brakes: 'fa-brake-warning',
+                transmission: 'fa-gears',
+                tires: 'fa-tire',
+                fuel_system: 'fa-gas-pump',
+                cooling_system: 'fa-temperature-arrow-down'
+            };
+            
+            // Fallback icons for those without specific FA icons
+            const fallbackIcons = {
+                engine: 'fa-cogs',
+                brakes: 'fa-circle-stop',
+                transmission: 'fa-cogs',
+                tires: 'fa-circle',
+                cooling_system: 'fa-temperature-low'
+            };
+            
+            // Create component cards
+            for (const [component, score] of Object.entries(scores)) {
+                const status = statuses[component];
+                const statusClass = status.toLowerCase();
+                
+                // Select icon, with fallback
+                let icon = icons[component];
+                if (!document.querySelector(`.${icon}`)) {
+                    icon = fallbackIcons[component] || 'fa-wrench';
+                }
+                
+                const card = document.createElement('div');
+                card.className = 'component-card';
+                card.innerHTML = `
+                    <div class="component-icon ${statusClass}">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="component-name">${component.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                    <div class="component-score">${score}</div>
+                    <div class="component-status ${statusClass}">${status}</div>
+                `;
+                
+                grid.appendChild(card);
+            }
+        }
+        
+        // Update anomalies list
+        function updateAnomaliesList(anomalies) {
+            const list = document.getElementById('anomalyList');
+            list.innerHTML = '';
+            
+            if (!anomalies || anomalies.length === 0) {
+                list.innerHTML = `
+                    <div class="anomaly-card">
+                        <div class="anomaly-header">
+                            <h4 class="anomaly-title"><i class="fas fa-check-circle" style="color: var(--green);"></i> No Anomalies Detected</h4>
+                        </div>
+                        <div class="anomaly-body">
+                            <p>All vehicle systems are currently operating within normal parameters.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create anomaly cards
+            anomalies.forEach(anomaly => {
+                const severityClass = getSeverityClass(anomaly.severity);
+                
+                const card = document.createElement('div');
+                card.className = 'anomaly-card';
+                card.innerHTML = `
+                    <div class="anomaly-header">
+                        <h4 class="anomaly-title">
+                            <i class="fas fa-exclamation-triangle" style="color: ${severityClass === 'critical' ? 'var(--red)' : 'var(--orange)'};"></i>
+                            ${anomaly.sensor.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </h4>
+                        <span class="severity-badge ${severityClass}">${anomaly.severity.toUpperCase()}</span>
+                    </div>
+                    <div class="anomaly-body">
+                        <div class="reading-display">
+                            <div class="current-reading ${severityClass}">
+                                <span class="reading-label">Current</span>
+                                <span class="reading-value ${severityClass}">${anomaly.current_value} ${anomaly.unit}</span>
+                            </div>
+                            
+                            <span class="vs-indicator">vs</span>
+                            
+                            <div class="expected-range">
+                                <span class="reading-label">Expected</span>
+                                <span class="range-value">${anomaly.expected_range}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation">
+                            <div class="recommendation-label">
+                                <i class="fas fa-lightbulb"></i> Recommendation
+                            </div>
+                            <p class="recommendation-text">${anomaly.recommendation}</p>
+                        </div>
+                    </div>
+                `;
+                
+                list.appendChild(card);
+            });
+        }
+        
+        // Update insights list
+        function updateInsightsList(insights) {
+            const list = document.getElementById('insightsList');
+            list.innerHTML = '';
+            
+            if (!insights || insights.length === 0) {
+                list.innerHTML = `
+                    <div class="insight-item">
+                        <div class="insight-title">No pattern insights available</div>
+                        <div class="insight-description">Continue driving to gather more data for pattern analysis.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create insight items
+            insights.forEach(insight => {
+                const item = document.createElement('div');
+                item.className = 'insight-item';
+                item.innerHTML = `
+                    <div class="insight-title">${insight.type.replace(/\b\w/g, l => l.toUpperCase())} Pattern</div>
+                    <div class="insight-description">${insight.description}</div>
+                    <div class="insight-action">${insight.recommendation}</div>
+                `;
+                
+                list.appendChild(item);
+            });
+        }
+        
+        // Update diagnostics section
+        function updateDiagnostics(diagnostics) {
+            const container = document.getElementById('diagnosticsContainer');
+            container.innerHTML = '';
+            
+            if (!diagnostics || !diagnostics.results || diagnostics.results.length === 0) {
+                container.innerHTML = `
+                    <div class="diagnostic-card">
+                        <div class="diagnostic-header">
+                            <h4>No Issues Detected</h4>
+                        </div>
+                        <div class="diagnostic-body">
+                            <p class="diagnostic-solution">Vehicle diagnostics did not detect any significant issues. Continue with regular maintenance.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create diagnostic cards
+            diagnostics.results.forEach(result => {
+                const severityClass = result.problem_severity ? getSeverityClass(result.problem_severity.toLowerCase()) : 'minor';
+                const diyClass = result.diy_possible ? 'possible' : 'not-possible';
+                const diyText = result.diy_possible ? 'DIY Possible' : 'Professional Required';
+                
+                const card = document.createElement('div');
+                card.className = 'diagnostic-card';
+                card.innerHTML = `
+                    <div class="diagnostic-severity ${severityClass}">${result.problem_severity || 'Minor'}</div>
+                    <div class="diagnostic-header">
+                        <h4>${result.problem || 'Unknown Issue'}</h4>
+                    </div>
+                    <div class="diagnostic-body">
+                        <p class="diagnostic-solution">${result.solution || 'No solution available'}</p>
+                        
+                        <div class="diagnostic-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Estimated Cost</span>
+                                <span class="meta-value">${result.estimated_cost || 'Unknown'}</span>
+                            </div>
+                            
+                            <div class="meta-item">
+                                <span class="meta-label">Repair Type</span>
+                                <span class="diy-badge ${diyClass}">${diyText}</span>
+                            </div>
+                            
+                            ${result.time_estimate ? `
+                            <div class="meta-item">
+                                <span class="meta-label">Time Estimate</span>
+                                <span class="meta-value">${result.time_estimate}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Update maintenance tips
+        function updateMaintenanceTips(tips) {
+            const list = document.getElementById('tipsList');
+            list.innerHTML = '';
+            
+            if (!tips || tips.length === 0) {
+                list.innerHTML = `
+                    <li class="tip-item">
+                        <p class="tip-text">No specific maintenance recommendations available at this time.</p>
+                    </li>
+                `;
+                return;
+            }
+            
+            // Create tip items
+            tips.forEach(tip => {
+                const item = document.createElement('li');
+                item.className = 'tip-item';
+                item.innerHTML = `<p class="tip-text">${tip}</p>`;
+                
+                list.appendChild(item);
+            });
+        }
+        
+        // Generate sample data for demo purposes
+        function generateSampleData() {
+            // Sample data structure matching the expected API response
+            const sampleData = {
+                vehicle_data: {
+                    vehicle_id: "MB-S550-1234",
+                    brand: "Mercedes",
+                    model: "S-Class",
+                    year: "2024",
+                    timestamp: new Date().toISOString(),
+                    readings: {
+                        oil_pressure: {
+                            value: 15.5,
+                            unit: "psi"
+                        },
+                        coolant_temp: {
+                            value: 88.2,
+                            unit: "°C"
+                        },
+                        battery_voltage: {
+                            value: 14.1,
+                            unit: "V"
+                        },
+                        tire_pressure: {
+                            value: 30.5,
+                            unit: "psi"
+                        }
+                    }
+                },
+                health_scores: {
+                    overall_score: 72.5,
+                    overall_status: "Good",
+                    component_scores: {
+                        engine: 65,
+                        battery: 95,
+                        brakes: 80,
+                        transmission: 90,
+                        tires: 75,
+                        fuel_system: 85,
+                        cooling_system: 70
+                    },
+                    component_statuses: {
+                        engine: "Fair",
+                        battery: "Excellent",
+                        brakes: "Good",
+                        transmission: "Excellent",
+                        tires: "Good",
+                        fuel_system: "Good",
+                        cooling_system: "Good"
+                    }
+                },
+                anomalies: [
+                    {
+                        sensor: "oil_pressure",
+                        current_value: 15.5,
+                        unit: "psi",
+                        expected_range: "30 - 60 psi",
+                        severity: "critical",
+                        timestamp: new Date().toISOString(),
+                        recommendation: "Low oil pressure detected. Check oil level immediately and refill if necessary. If problem persists, inspect for oil leaks or engine damage."
+                    },
+                    {
+                        sensor: "tire_pressure",
+                        current_value: 30.5,
+                        unit: "psi",
+                        expected_range: "32 - 36 psi",
+                        severity: "warning",
+                        timestamp: new Date().toISOString(),
+                        recommendation: "Front-right tire pressure slightly below recommended level. Inflate to 35 psi for optimal performance and fuel efficiency."
+                    }
+                ],
+                pattern_insights: [
+                    {
+                        type: "consumption",
+                        description: "Fuel consumption has increased by 15% over the past month, primarily during city driving.",
+                        recommendation: "Consider using premium fuel and reviewing your city driving routes for more efficiency."
+                    },
+                    {
+                        type: "battery",
+                        description: "Battery voltage shows consistent drops during cold starts in the morning.",
+                        recommendation: "Battery is showing early signs of wear. Consider a charging system check within the next 3 months."
+                    },
+                    {
+                        type: "maintenance",
+                        description: "Based on your driving patterns, your brake pad wear is accelerating faster than typical for your vehicle model.",
+                        recommendation: "Consider adjusting your braking habits to extend brake life. Anticipate stops earlier and brake more gradually."
+                    }
+                ],
+                ai_diagnostics: {
+                    results: [
+                        {
+                            problem: "Low Engine Oil Pressure",
+                            problem_severity: "Critical",
+                            solution: "Your engine is experiencing dangerously low oil pressure which can cause severe engine damage if not addressed immediately. The oil pressure reading of 15.5 psi is well below the minimum threshold of 30 psi for your Mercedes S-Class. This could be caused by low oil level, oil pump failure, clogged oil filter, or worn engine bearings.",
+                            estimated_cost: "$150-$1,500",
+                            diy_possible: false,
+                            time_estimate: "1-4 hours",
+                            tools_required: ["Oil pressure gauge", "Socket set", "Oil filter wrench"],
+                            parts_needed: ["Engine oil", "Oil filter", "Possibly oil pump"]
+                        },
+                        {
+                            problem: "Low Tire Pressure",
+                            problem_severity: "Warning",
+                            solution: "Your front-right tire pressure is slightly below the manufacturer's recommended level. Low tire pressure can lead to decreased fuel efficiency, uneven tire wear, and reduced handling performance.",
+                            estimated_cost: "$0-$5",
+                            diy_possible: true,
+                            time_estimate: "5-10 minutes",
+                            tools_required: ["Tire pressure gauge", "Air compressor"],
+                            parts_needed: []
+                        }
+                    ],
+                    follow_up_questions: [
+                        "Have you noticed any unusual engine noises?",
+                        "When was your last oil change?",
+                        "Do you see any oil leaks under the vehicle?"
+                    ],
+                    maintenance_tips: [
+                        "Check oil level weekly until the pressure issue is resolved",
+                        "For your S-Class model, use Mercedes-Benz approved 5W-40 synthetic oil",
+                        "Replace the oil filter with every oil change",
+                        "Monitor tire pressures monthly, adjusting for ambient temperature changes",
+                        "Rotate tires every 5,000 miles for even wear and extended tire life"
+                    ]
+                }
+            };
+            
+            // Display the sample data
+            displayVehicleHealthData(sampleData);
+        }
+    </script>
+</body>
+</html>

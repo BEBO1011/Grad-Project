@@ -480,6 +480,34 @@ def save_location():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/vehicle-health")
+def vehicle_health_page():
+    """Display the vehicle health monitoring page."""
+    return render_template("vehicle_health.html")
+
+@app.route("/api/vehicle-health")
+def vehicle_health_api():
+    """API endpoint to get vehicle health data."""
+    try:
+        from utils.ai_insights import get_complete_vehicle_analysis
+        
+        # Get parameters from request
+        vehicle_id = request.args.get("vehicle_id", "default-vehicle")
+        brand = request.args.get("brand", "Unknown")
+        model = request.args.get("model", "Unknown")
+        year = request.args.get("year", "2024")
+        condition = request.args.get("condition", "")
+        
+        # Get complete analysis
+        analysis = get_complete_vehicle_analysis(vehicle_id, brand, model, year, condition)
+        
+        # Return the analysis as JSON
+        return jsonify(analysis)
+        
+    except Exception as e:
+        print(f"Error in vehicle health API: {str(e)}")
+        return jsonify({"error": "An error occurred while analyzing vehicle health"}), 500
+
 if __name__ == "__main__":
     # Use a different port (8080) since port 5000 is used by Streamlit
     app.run(host="0.0.0.0", port=8080, debug=True)
