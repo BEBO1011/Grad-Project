@@ -3,196 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Car Service</title>
+    <title>EliteCars | Premium Vehicle Care</title>
     <link rel="stylesheet" href="/static/css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            .center-logo {
-                width: 40px;
-                margin-bottom: 8px;
-            }
-            
-            .cards {
-                flex-direction: column;
-            }
-            
-            .card {
-                margin: 8px 0;
-                width: 100%;
-            }
-            
-            .menu-toggle {
-                display: block;
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                z-index: 1000;
-                background: #2c3e50;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 12px;
-                width: auto;
-            }
-            
-            .sidebar.mobile-visible {
-                display: block;
-                position: fixed;
-                width: 70%;
-                height: 100%;
-                z-index: 999;
-                top: 0;
-                left: 0;
-                animation: slideIn 0.3s ease-in-out;
-            }
-            
-            @keyframes slideIn {
-                from { transform: translateX(-100%); }
-                to { transform: translateX(0); }
-            }
-            
-            .content {
-                margin-left: 0;
-                padding: 15px;
-            }
-            
-            header {
-                margin-top: 40px;
-            }
-        }
-        
-        .center-logo {
-            width: 50px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-        
-        .card {
-            text-align: center;
-            margin: 10px;
-            transition: transform 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-        
-        .cards {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        
-        .rating {
-            color: #ffcc00;
-            margin: 5px 0;
-        }
-        
-        .details-btn {
-            margin-top: 10px;
-            background-color: #1abc9c;
-        }
-        
-        .details-btn:hover {
-            background-color: #16a085;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Mobile menu toggle button -->
-        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-        
+    <!-- Mobile Menu Button -->
+    <div class="mobile-menu" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="/static/images/photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
-                <h2>CService</h2>
+                <img src="/static/images/car_service_logo.jpeg" alt="Luxury Cars">
+                <h2>Elite<span style="font-weight:300">Cars</span></h2>
             </div>
             <nav>
                 <ul>
-                    <li><a href="/home" class="active"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/map"><i class="fas fa-map"></i> Map</a></li>
-                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
-                    <li><a href="/chatbot"><i class="fas fa-comments"></i> ChatBot</a></li>
-                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="http://0.0.0.0:8080/home" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="http://0.0.0.0:8080/map"><i class="fas fa-map-marker-alt"></i> Find Centers</a></li>
+                    <li><a href="http://0.0.0.0:8080/maintenance-centers"><i class="fas fa-tools"></i> Services</a></li>
+                    <li><a href="http://0.0.0.0:8080/chatbot"><i class="fas fa-robot"></i> AI Diagnostics</a></li>
+                    <li><a href="http://0.0.0.0:8080/settings"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
             </nav>
             <div class="help-center">
-                <p>Having Trouble?</p>
-                <button onclick="location.href='/chatbot'">Go To Help Center</button>
+                <p>Need Assistance?</p>
+                <button onclick="location.href='http://0.0.0.0:8080/chatbot'">Contact Support</button>
             </div>            
         </aside>
 
         <!-- Main Content -->
         <main class="content">
             <header>
+                <h2><i class="fas fa-tachometer-alt" style="color: var(--secondary-color);"></i> Dashboard</h2>
                 <div class="user-icons">
-                    <span><i class="fas fa-bell"></i></span>
-                    <span><i class="fas fa-user"></i></span>
+                    <span id="notifications"><i class="fas fa-bell"></i></span>
+                    <span id="profile"><i class="fas fa-user"></i></span>
                 </div>
             </header>
 
-            <section class="featured-centers">
-                <h2>Featured Centers</h2>
-                <div class="cards">
-                    <div class="card">
-                        <img src="/static/images/IMG-20250413-WA001.jpeg" alt="Center 1" class="center-logo">
-                        <h3>Premium Center 1</h3>
-                        <div class="rating">⭐⭐⭐⭐⭐</div>
-                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
-                    </div>
-                    <div class="card">
-                        <img src="/static/images/IMG-20250413-WA002.jpeg" alt="Center 2" class="center-logo">
-                        <h3>Premium Center 2</h3>
-                        <div class="rating">⭐⭐⭐⭐</div>
-                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
-                    </div>
-                    <div class="card">
-                        <img src="/static/images/IMG-20250413-WA003.jpeg" alt="Center 3" class="center-logo">
-                        <h3>Premium Center 3</h3>
-                        <div class="rating">⭐⭐⭐⭐⭐</div>
-                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
-                    </div>
+            <!-- Welcome Banner -->
+            <div class="card animate__animated animate__fadeIn" style="background: linear-gradient(135deg, rgba(20, 21, 26, 0.9) 0%, rgba(30, 31, 37, 0.9) 100%), url('/static/images/maintenance_center_new_background.png'); background-size: cover; background-position: center; padding: 2rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                <div>
+                    <h1 style="margin-bottom: 0.5rem; font-size: 2.2rem;">Welcome, Alex</h1>
+                    <p style="margin-bottom: 1.5rem; color: var(--text-secondary); max-width: 600px;">Your Mercedes-Benz S-Class is due for scheduled maintenance in 5 days. Schedule your appointment today for premium service.</p>
+                    <button class="button-premium" style="width: auto; padding: 0.8rem 2rem;">Schedule Service</button>
                 </div>
-            </section>
+                <div class="animate__animated animate__fadeInRight" style="animation-delay: 0.3s;">
+                    <img src="/static/images/IMG-20250413-WA001.jpeg" alt="Mercedes" style="width: 180px; height: 180px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 3px solid var(--secondary-color);">
+                </div>
+            </div>
 
-            <section class="nearby-centers">
-                <h2>Nearby Centers</h2>
-                <div class="cards">
-                    <div class="card">
-                        <img src="/static/images/IMG-20250413-WA004.jpeg" alt="Nearby Center 1" class="center-logo">
-                        <h3>Nearby Center 1</h3>
-                        <div class="rating">⭐⭐⭐⭐</div>
-                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
-                    </div>
-                    <div class="card">
-                        <img src="/static/images/IMG-20250413-WA005.jpeg" alt="Nearby Center 2" class="center-logo">
-                        <h3>Nearby Center 2</h3>
-                        <div class="rating">⭐⭐⭐⭐⭐</div>
-                        <button class="details-btn" onclick="location.href='/maintenance-centers'">View Details</button>
-                    </div>
+            <!-- Stats Overview -->
+            <h3 class="animate__animated animate__fadeIn" style="animation-delay: 0.4s;">Vehicle Status</h3>
+            <div class="stats-container animate__animated animate__fadeIn" style="animation-delay: 0.5s;">
+                <div class="stat-card">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>38,253</h3>
+                    <p>Odometer (km)</p>
                 </div>
-            </section>
-            
-            <section class="car-diagnostic">
-                <h2>Having Car Problems?</h2>
+                <div class="stat-card">
+                    <i class="fas fa-oil-can"></i>
+                    <h3>87%</h3>
+                    <p>Oil Life</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-car-battery"></i>
+                    <h3>92%</h3>
+                    <p>Battery Health</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>5</h3>
+                    <p>Days to Next Service</p>
+                </div>
+            </div>
+
+            <!-- Service History and Upcoming Service -->
+            <div class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.6s;">
+                <!-- Service History -->
                 <div class="card">
-                    <i class="fas fa-tools" style="font-size: 2em; color: #1abc9c; margin-bottom: 10px;"></i>
-                    <h3>Diagnose Your Car Problems</h3>
-                    <p>Our AI-powered chatbot can help diagnose and suggest solutions for your car problems.</p>
-                    <button class="details-btn" onclick="location.href='/chatbot'">Chat with Bot</button>
+                    <h3><i class="fas fa-history" style="margin-right: 10px; color: var(--secondary-color);"></i> Service History</h3>
+                    <canvas id="serviceChart" width="400" height="250"></canvas>
                 </div>
-            </section>
+                
+                <!-- Upcoming Service -->
+                <div class="card">
+                    <h3><i class="fas fa-calendar-check" style="margin-right: 10px; color: var(--secondary-color);"></i> Upcoming Service</h3>
+                    <div style="margin-top: 1rem;">
+                        <h4 style="color: var(--secondary-color);">30,000 km Scheduled Maintenance</h4>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-calendar" style="margin-right: 8px;"></i> May 1, 2025</p>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> Elite Service Center - Downtown</p>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h5 style="font-size: 1rem; color: var(--text-primary);">Service Includes:</h5>
+                            <ul style="list-style: none; padding: 0; margin-top: 0.8rem;">
+                                <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                                    <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Oil and Filter Change
+                                </li>
+                                <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                                    <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Brake System Inspection
+                                </li>
+                                <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                                    <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Tire Rotation and Alignment
+                                </li>
+                                <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                                    <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Fluid Level Check
+                                </li>
+                                <li style="display: flex; align-items: center;">
+                                    <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Air Filter Replacement
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                            <button class="button-premium" style="flex: 2;">Confirm Appointment</button>
+                            <button style="flex: 1; background: rgba(196, 30, 58, 0.15); color: var(--danger-color); border: 1px solid rgba(196, 30, 58, 0.3); border-radius: 8px; padding: 0.8rem; font-weight: 600; cursor: pointer;">Reschedule</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Diagnostics & Service Recommendations -->
+            <div class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.7s; margin-top: 2rem;">
+                <!-- Recent Diagnostics -->
+                <div class="card">
+                    <h3><i class="fas fa-stethoscope" style="margin-right: 10px; color: var(--secondary-color);"></i> Recent Diagnostics</h3>
+                    <div style="margin-top: 1rem;">
+                        <div style="border-left: 3px solid var(--secondary-color); padding-left: 1rem; margin-bottom: 1rem;">
+                            <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Brake System Check</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;"><i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> April 20, 2025</p>
+                            <p><strong>Result:</strong> Brake pads at 65% - Normal wear</p>
+                        </div>
+                        <div style="border-left: 3px solid var(--accent-color); padding-left: 1rem; margin-bottom: 1rem;">
+                            <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Engine Performance Analysis</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;"><i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> April 15, 2025</p>
+                            <p><strong>Result:</strong> Optimal performance - No issues detected</p>
+                        </div>
+                        <div style="border-left: 3px solid #ff5a76; padding-left: 1rem; margin-bottom: 1rem;">
+                            <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Air Conditioning Check</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;"><i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> April 10, 2025</p>
+                            <p><strong>Result:</strong> Refrigerant level low - Refill recommended</p>
+                        </div>
+                        
+                        <button class="button-premium" style="width: auto; margin-top: 1rem; padding: 0.6rem 1.5rem; font-size: 0.9rem;">View Full History</button>
+                    </div>
+                </div>
+                
+                <!-- Service Recommendations -->
+                <div class="card">
+                    <h3><i class="fas fa-clipboard-list" style="margin-right: 10px; color: var(--secondary-color);"></i> Recommended Services</h3>
+                    <div style="margin-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
+                            <div>
+                                <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Air Conditioning Service</h4>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem;">Recommended due to low refrigerant level</p>
+                            </div>
+                            <span class="badge badge-popular">High Priority</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
+                            <div>
+                                <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Wheel Alignment</h4>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem;">Due to uneven tire wear pattern</p>
+                            </div>
+                            <span class="badge badge-certified">Medium Priority</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
+                            <div>
+                                <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Wiper Blade Replacement</h4>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem;">Current blades showing wear at 20 months</p>
+                            </div>
+                            <span class="badge badge-premium">Low Priority</span>
+                        </div>
+                        
+                        <button class="button-premium" style="width: 100%; margin-top: 1rem;">Schedule Selected Services</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Services -->
+            <h3 class="animate__animated animate__fadeIn" style="animation-delay: 0.8s; margin-top: 2rem;">Premium Services</h3>
+            <div class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.9s; margin-bottom: 2rem;">
+                <div class="service-card">
+                    <img src="/static/images/IMG-20250413-WA002.jpeg" alt="Premium Detail">
+                    <div class="service-card-content">
+                        <h3>Premium Detailing</h3>
+                        <p>Complete interior & exterior detailing with ceramic coating</p>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <img src="/static/images/IMG-20250413-WA003.jpeg" alt="Performance Tuning">
+                    <div class="service-card-content">
+                        <h3>Performance Tuning</h3>
+                        <p>Custom ECU tuning for improved power and efficiency</p>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <img src="/static/images/IMG-20250413-WA004.jpeg" alt="Full Protection">
+                    <div class="service-card-content">
+                        <h3>Full Protection Package</h3>
+                        <p>Paint protection film and window tinting for ultimate protection</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                    <h4>Notifications</h4>
+                    <a href="#">Mark all as read</a>
+                </div>
+                <div class="notification-body">
+                    <div class="notification-item unread">
+                        <h5>Service Reminder</h5>
+                        <p>Your vehicle is due for scheduled maintenance</p>
+                        <div class="notification-time">2 hours ago</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>Appointment Confirmed</h5>
+                        <p>Your service appointment has been confirmed</p>
+                        <div class="notification-time">Yesterday</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>New Center Added</h5>
+                        <p>A new maintenance center is available near you</p>
+                        <div class="notification-time">3 days ago</div>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <button>View All Notifications</button>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-header">
+                    <div class="profile-pic">
+                        <img src="/static/images/user-profile.jpg" alt="Profile" onerror="this.src='/static/images/photo_2025-03-31_23-49-16.jpg'">
+                    </div>
+                    <h4>Alex Johnson</h4>
+                    <p>Premium Member</p>
+                </div>
+                <div class="profile-body">
+                    <a href="#" class="profile-link"><i class="fas fa-user"></i> My Profile</a>
+                    <a href="#" class="profile-link"><i class="fas fa-car"></i> My Vehicles</a>
+                    <a href="#" class="profile-link"><i class="fas fa-history"></i> Service History</a>
+                    <a href="#" class="profile-link"><i class="fas fa-bell"></i> Notifications</a>
+                    <a href="#" class="profile-link"><i class="fas fa-cog"></i> Settings</a>
+                </div>
+                <div class="profile-footer">
+                    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        // Mobile menu toggle functionality
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("✅ Page Loaded - Running Dashboard Script");
+            
+            // Mobile menu toggle
             const menuToggle = document.getElementById('menuToggle');
             const sidebar = document.getElementById('sidebar');
             
@@ -201,30 +276,120 @@
                     sidebar.classList.toggle('mobile-visible');
                 });
                 
-                // Check if we're on a mobile device and show the toggle button
-                if (window.innerWidth <= 768) {
-                    menuToggle.style.display = 'block';
-                    sidebar.classList.remove('mobile-visible');
-                }
-                
                 // Close sidebar when clicking outside of it
                 document.addEventListener('click', function(event) {
                     if (!sidebar.contains(event.target) && event.target !== menuToggle) {
                         sidebar.classList.remove('mobile-visible');
                     }
                 });
+            }
+            
+            // Notification toggle
+            const notificationBtn = document.getElementById('notifications');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    notificationDropdown.classList.toggle('show');
+                    if (profileDropdown.classList.contains('show')) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // Profile toggle
+            const profileBtn = document.getElementById('profile');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if (profileBtn && profileDropdown) {
+                profileBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                    if (notificationDropdown.classList.contains('show')) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                if (notificationDropdown.classList.contains('show')) {
+                    notificationDropdown.classList.remove('show');
+                }
+                if (profileDropdown.classList.contains('show')) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
+            
+            // Chart.js for service history
+            const serviceCanvas = document.getElementById('serviceChart');
+            if (serviceCanvas) {
+                const ctx = serviceCanvas.getContext('2d');
+                const gradientFill = ctx.createLinearGradient(0, 0, 0, 300);
+                gradientFill.addColorStop(0, 'rgba(212, 175, 55, 0.5)');
+                gradientFill.addColorStop(1, 'rgba(212, 175, 55, 0.05)');
                 
-                // Handle window resize
-                window.addEventListener('resize', function() {
-                    if (window.innerWidth <= 768) {
-                        menuToggle.style.display = 'block';
-                        if (!sidebar.classList.contains('mobile-visible')) {
-                            sidebar.style.display = 'none';
+                const serviceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+                        datasets: [{
+                            label: 'Service Expenses',
+                            data: [150, 300, 200, 500, 250, 450, 350],
+                            backgroundColor: gradientFill,
+                            borderColor: '#d4af37',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#d4af37',
+                            pointBorderColor: '#1e1f25',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                },
+                                ticks: {
+                                    color: '#a0a0a0',
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)'
+                                },
+                                ticks: {
+                                    color: '#a0a0a0'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#14151a',
+                                titleColor: '#d4af37',
+                                bodyColor: '#ffffff',
+                                borderColor: '#d4af37',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Expense: $' + context.parsed.y;
+                                    }
+                                }
+                            }
                         }
-                    } else {
-                        menuToggle.style.display = 'none';
-                        sidebar.style.display = 'flex';
-                        sidebar.classList.remove('mobile-visible');
                     }
                 });
             }

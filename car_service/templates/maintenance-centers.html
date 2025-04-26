@@ -3,187 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maintenance Centers</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Elite Service Centers | Premium Vehicle Care</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
+<body>
+    <!-- Mobile Menu Button -->
+    <div class="mobile-menu" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </div>
 
-    <body style="background-image: url('maintenance_center_new_background.png'); background-size: cover; background-position: top center; background-repeat: no-repeat;">
-    
-    <div class="wrapper">
+    <div class="container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
-                <h2>CService</h2>
+                <img src="/static/images/car_service_logo.jpeg" alt="Luxury Cars">
+                <h2>Elite<span style="font-weight:300">Cars</span></h2>
             </div>
             <nav>
                 <ul>
-                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="map.html"><i class="fas fa-map"></i> Map</a></li>
-                    <li><a href="maintenance-centers.html" class="active"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
-                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="http://0.0.0.0:8080/home"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="http://0.0.0.0:8080/map"><i class="fas fa-map-marker-alt"></i> Find Centers</a></li>
+                    <li><a href="http://0.0.0.0:8080/maintenance-centers" class="active"><i class="fas fa-tools"></i> Services</a></li>
+                    <li><a href="http://0.0.0.0:8080/chatbot"><i class="fas fa-robot"></i> AI Diagnostics</a></li>
+                    <li><a href="http://0.0.0.0:8080/settings"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
             </nav>
             <div class="help-center">
-                <p>Having Trouble?</p>
-                <button onclick="location.href='chatbot.html'">Go To Help Center</button>
+                <p>Need Assistance?</p>
+                <button onclick="location.href='http://0.0.0.0:8080/chatbot'">Contact Support</button>
             </div>            
         </aside>
 
         <!-- Main Content -->
         <main class="content">
             <header>
-                <h2>Maintenance Centers</h2>
+                <h2><i class="fas fa-tools" style="color: var(--secondary-color);"></i> Service Centers</h2>
                 <div class="user-icons">
-                    <span><i class="fas fa-bell"></i></span>
-                    <span><i class="fas fa-user"></i></span>
+                    <span id="notifications"><i class="fas fa-bell"></i></span>
+                    <span id="profile"><i class="fas fa-user"></i></span>
                 </div>
             </header>
-        
-            <section class="recently-viewed">
-                <h3>Recently Viewed</h3>
-                <div class="cards-container" id="recently-viewed"></div>
-            </section>
-        
-            <section class="all-centers">
-                <h3>All Maintenance Centers</h3>
-                <div class="cards-container" id="all-centers"></div>
-                <div class="search-filter-container">
-                    <input type="text" id="searchBox" placeholder="🔍 ابحث عن مركز صيانة...">
-                    
-                    <select id="filterSelect">
-                        <option value="all">كل المراكز</option>
-                        <option value="rating">الأعلى تقييماً</option>
-                        <option value="location">الأقرب إليك</option>
-                    </select>
-                </div>
-                
-                <div id="maintenanceCenters">
-                    <div class="maintenance-center" data-name="AutoFix Garage" data-rating="4.8" data-location="Cairo">
-                        <h2>AutoFix Garage</h2>
-                        <p>📍 123 شارع النصر، القاهرة</p>
-                        <p>⭐ 4.8 (150 تقييم)</p>
-                      <button onclick="openDetails('AutoFix Garage', '123 شارع النصر، القاهرة', 'مفتوح الآن', ['تغيير الزيت', 'فحص شامل'], ['تغيير الزيت: 200 جنيه', 'فحص شامل: 500 جنيه'], 'https://maps.google.com/?q=30.0444,31.2357')">
-                            عرض التفاصيل
-                        </button>
-                    
-                        
-                        <button class="call-btn">📞 اتصل الآن</button>
-                        <button class="whatsapp-btn" id="whatsappButton">💬 واتساب</button>
-                    </div>
-                
-                    <div class="maintenance-center" data-name="Speedy Repairs" data-rating="4.5" data-location="Alexandria">
-                        <h2>Speedy Repairs</h2>
-                        <p>📍 45 شارع الثورة، الإسكندرية</p>
-                        <p>⭐ 4.5 (98 تقييم)</p>
-                        <button onclick="openDetails('اسم المركز', 'عنوانه', 'حالة العمل', ['الخدمة 1', 'الخدمة 2'], ['السعر 1', 'السعر 2'], 'رابط خرائط جوجل')">
-                            عرض التفاصيل
-                        </button>
-                        
-                        <button class="call-btn">📞 اتصل الآن</button>
-                        <button class="whatsapp-btn" id="whatsappButton">💬 واتساب</button>
-        
-                    </div>
-                
-                    <div class="maintenance-center" data-name="QuickFix Motors" data-rating="4.7" data-location="Giza">
-                        <h2>QuickFix Motors</h2>
-                        <p>📍 10 شارع التحرير، الجيزة</p>
-                        <p>⭐ 4.7 (120 تقييم)</p>
-                        <button onclick="openDetails('اسم المركز', 'عنوانه', 'حالة العمل', ['الخدمة 1', 'الخدمة 2'], ['السعر 1', 'السعر 2'], 'رابط خرائط جوجل')">
-                            عرض التفاصيل
-                        </button>
-                        
-                        <button class="call-btn">📞 اتصل الآن</button>
-                        <button class="whatsapp-btn" id="whatsappButton">💬 واتساب</button>
-                    </div>
-                </div>
 
-                <div  class="review-btn">أضف تقييم</button>
- 
-                    <div class="reviews">
-                        <h3>التقييمات:</h3>
-                        <ul class="review-list">
-                            <li>⭐ ⭐ ⭐ ⭐ ⭐ - "خدمة ممتازة!"</li>
-                            <li>⭐ ⭐ ⭐ ⭐ - "السعر مرتفع قليلاً لكن الخدمة جيدة."</li>
-                        </ul>
-                    </div>
+            <!-- Hero Banner -->
+            <div class="card animate__animated animate__fadeIn" style="background: linear-gradient(135deg, rgba(20, 21, 26, 0.85) 0%, rgba(30, 31, 37, 0.85) 100%), url('/static/images/maintenance_center_new_background.png'); background-size: cover; background-position: center; padding: 2.5rem; text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Premium Service Centers</h1>
+                <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto 1.5rem; font-size: 1.1rem;">Experience unparalleled service at our luxury maintenance centers. Our certified technicians specialize in high-end vehicles and provide meticulous care using advanced diagnostics and genuine parts.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="button-premium" style="min-width: 200px;">Find Nearest Center</button>
+                    <button style="min-width: 200px; background: rgba(212, 175, 55, 0.15); color: var(--secondary-color); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 30px; padding: 1rem; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Schedule Service</button>
                 </div>
-                
-                <!-- فورم إضافة تقييم -->
-                <div id="review-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>أضف تقييمك</h2>
-                        <select id="rating">
-                            <option value="5">⭐ ⭐ ⭐ ⭐ ⭐</option>
-                            <option value="4">⭐ ⭐ ⭐ ⭐</option>
-                            <option value="3">⭐ ⭐ ⭐</option>
-                            <option value="2">⭐ ⭐</option>
-                            <option value="1">⭐</option>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="card animate__animated animate__fadeIn" style="animation-delay: 0.2s; margin-bottom: 2rem;">
+                <h3><i class="fas fa-filter" style="margin-right: 10px;"></i> Filter Service Centers</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <label for="region" style="display: block; margin-bottom: 0.5rem; color: var(--secondary-color); font-weight: 500;">Region</label>
+                        <select id="region" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); background: var(--primary-color); color: var(--text-primary);">
+                            <option value="">All Regions</option>
+                            <option value="north">North</option>
+                            <option value="south">South</option>
+                            <option value="east">East</option>
+                            <option value="west">West</option>
+                            <option value="central">Central</option>
                         </select>
-                        <textarea id="review-text" placeholder="اكتب تعليقك هنا..."></textarea>
-                        <button id="submit-review">إرسال</button>
+                    </div>
+                    <div>
+                        <label for="brand" style="display: block; margin-bottom: 0.5rem; color: var(--secondary-color); font-weight: 500;">Specialization</label>
+                        <select id="brand" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); background: var(--primary-color); color: var(--text-primary);">
+                            <option value="">All Brands</option>
+                            <option value="mercedes">Mercedes-Benz</option>
+                            <option value="bmw">BMW</option>
+                            <option value="audi">Audi</option>
+                            <option value="lexus">Lexus</option>
+                            <option value="porsche">Porsche</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="service" style="display: block; margin-bottom: 0.5rem; color: var(--secondary-color); font-weight: 500;">Service Type</label>
+                        <select id="service" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); background: var(--primary-color); color: var(--text-primary);">
+                            <option value="">All Services</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="repair">Repairs</option>
+                            <option value="detailing">Detailing</option>
+                            <option value="performance">Performance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="rating" style="display: block; margin-bottom: 0.5rem; color: var(--secondary-color); font-weight: 500;">Rating</label>
+                        <select id="rating" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.3); background: var(--primary-color); color: var(--text-primary);">
+                            <option value="">Any Rating</option>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4+ Stars</option>
+                            <option value="3">3+ Stars</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="button-premium" style="width: 100%; margin-top: 0.5rem;">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Centers -->
+            <h3 class="animate__animated animate__fadeIn" style="animation-delay: 0.3s;">Featured Service Centers</h3>
+            <div class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                <!-- Center 1 -->
+                <div class="card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">EliteCars Downtown</h3>
+                        <span class="badge badge-premium">Premium Center</span>
+                    </div>
+                    <div style="position: relative; height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
+                        <img src="/static/images/IMG-20250413-WA003.jpeg" alt="Downtown Center" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(20, 21, 26, 0.7); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.8rem;">
+                            <i class="fas fa-star"></i> 4.9 (127 reviews)
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.8rem;"><i class="fas fa-map-marker-alt" style="color: var(--secondary-color); margin-right: 8px;"></i> 123 Luxury Lane, Downtown</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.8rem;"><i class="fas fa-phone" style="color: var(--secondary-color); margin-right: 8px;"></i> (555) 123-4567</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;"><i class="fas fa-clock" style="color: var(--secondary-color); margin-right: 8px;"></i> Open: 7:00 AM - 8:00 PM</p>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Mercedes</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">BMW</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Audi</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Porsche</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="button-premium" style="flex: 2;">Book Appointment</button>
+                        <button style="flex: 1; background: rgba(212, 175, 55, 0.15); color: var(--secondary-color); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 0.8rem; font-weight: 600; cursor: pointer;">Details</button>
                     </div>
                 </div>
                 
+                <!-- Center 2 -->
+                <div class="card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">EliteCars Westside</h3>
+                        <span class="badge badge-certified">Certified</span>
+                    </div>
+                    <div style="position: relative; height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
+                        <img src="/static/images/IMG-20250413-WA004.jpeg" alt="Westside Center" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(20, 21, 26, 0.7); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.8rem;">
+                            <i class="fas fa-star"></i> 4.7 (98 reviews)
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.8rem;"><i class="fas fa-map-marker-alt" style="color: var(--secondary-color); margin-right: 8px;"></i> 456 Elite Drive, Westside</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.8rem;"><i class="fas fa-phone" style="color: var(--secondary-color); margin-right: 8px;"></i> (555) 987-6543</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;"><i class="fas fa-clock" style="color: var(--secondary-color); margin-right: 8px;"></i> Open: 8:00 AM - 7:00 PM</p>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Lexus</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Jaguar</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Land Rover</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="button-premium" style="flex: 2;">Book Appointment</button>
+                        <button style="flex: 1; background: rgba(212, 175, 55, 0.15); color: var(--secondary-color); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 0.8rem; font-weight: 600; cursor: pointer;">Details</button>
+                    </div>
+                </div>
+                
+                <!-- Center 3 -->
+                <div class="card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">EliteCars Eastside</h3>
+                        <span class="badge badge-popular">Highly Rated</span>
+                    </div>
+                    <div style="position: relative; height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
+                        <img src="/static/images/IMG-20250413-WA005.jpeg" alt="Eastside Center" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(20, 21, 26, 0.7); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.8rem;">
+                            <i class="fas fa-star"></i> 4.8 (112 reviews)
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.8rem;"><i class="fas fa-map-marker-alt" style="color: var(--secondary-color); margin-right: 8px;"></i> 789 Premium Blvd, Eastside</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.8rem;"><i class="fas fa-phone" style="color: var(--secondary-color); margin-right: 8px;"></i> (555) 567-8901</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;"><i class="fas fa-clock" style="color: var(--secondary-color); margin-right: 8px;"></i> Open: 7:30 AM - 8:30 PM</p>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Mercedes</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Audi</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Ferrari</span>
+                        <span style="background: rgba(212, 175, 55, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Porsche</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="button-premium" style="flex: 2;">Book Appointment</button>
+                        <button style="flex: 1; background: rgba(212, 175, 55, 0.15); color: var(--secondary-color); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 0.8rem; font-weight: 600; cursor: pointer;">Details</button>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Service Offerings -->
+            <h3 class="animate__animated animate__fadeIn" style="animation-delay: 0.5s; margin-top: 2rem;">Our Premium Services</h3>
+            <div class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.6s; margin-bottom: 2rem;">
+                <div class="card">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <div style="width: 60px; height: 60px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="fas fa-cog" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                        </div>
+                        <h3 style="margin: 0;">Scheduled Maintenance</h3>
+                    </div>
+                    <p style="margin-bottom: 1rem;">Comprehensive maintenance packages tailored to your vehicle's specifications. Our certified technicians use only genuine parts and fluids.</p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Oil and filter changes
+                        </li>
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Brake system inspection
+                        </li>
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Multi-point inspection
+                        </li>
+                        <li style="display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Fluid top-ups and checks
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <div style="width: 60px; height: 60px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="fas fa-car" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                        </div>
+                        <h3 style="margin: 0;">Premium Detailing</h3>
+                    </div>
+                    <p style="margin-bottom: 1rem;">Meticulous detailing services that restore your vehicle's showroom appearance. Our specialists use premium products for lasting results.</p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Ceramic coating application
+                        </li>
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Interior detailing
+                        </li>
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Paint correction
+                        </li>
+                        <li style="display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Leather treatment
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <div style="width: 60px; height: 60px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="fas fa-tachometer-alt" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                        </div>
+                        <h3 style="margin: 0;">Performance Upgrades</h3>
+                    </div>
+                    <p style="margin-bottom: 1rem;">Enhance your vehicle's performance with our expert tuning services. From ECU remapping to exhaust upgrades, we improve power and efficiency.</p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> ECU tuning
+                        </li>
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Suspension upgrades
+                        </li>
+                        <li style="margin-bottom: 0.5rem; display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Exhaust systems
+                        </li>
+                        <li style="display: flex; align-items: center;">
+                            <i class="fas fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i> Brake upgrades
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-            </section>
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                    <h4>Notifications</h4>
+                    <a href="#">Mark all as read</a>
+                </div>
+                <div class="notification-body">
+                    <div class="notification-item unread">
+                        <h5>Service Reminder</h5>
+                        <p>Your vehicle is due for scheduled maintenance</p>
+                        <div class="notification-time">2 hours ago</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>Appointment Confirmed</h5>
+                        <p>Your service appointment has been confirmed</p>
+                        <div class="notification-time">Yesterday</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>New Center Added</h5>
+                        <p>A new maintenance center is available near you</p>
+                        <div class="notification-time">3 days ago</div>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <button>View All Notifications</button>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-header">
+                    <div class="profile-pic">
+                        <img src="/static/images/user-profile.jpg" alt="Profile" onerror="this.src='/static/images/photo_2025-03-31_23-49-16.jpg'">
+                    </div>
+                    <h4>Alex Johnson</h4>
+                    <p>Premium Member</p>
+                </div>
+                <div class="profile-body">
+                    <a href="#" class="profile-link"><i class="fas fa-user"></i> My Profile</a>
+                    <a href="#" class="profile-link"><i class="fas fa-car"></i> My Vehicles</a>
+                    <a href="#" class="profile-link"><i class="fas fa-history"></i> Service History</a>
+                    <a href="#" class="profile-link"><i class="fas fa-bell"></i> Notifications</a>
+                    <a href="#" class="profile-link"><i class="fas fa-cog"></i> Settings</a>
+                </div>
+                <div class="profile-footer">
+                    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                </div>
+            </div>
         </main>
     </div>
 
-    <script src="js/frontend_api.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", async function () {
-            try {
-                const response = await fetch("http://127.0.0.1:5000/api/maintenance-centers");
-                const centers = await response.json();
-
-                console.log("Loaded maintenance centers:", centers); // Debugging
-
-                const allCentersContainer = document.getElementById("all-centers");
-                const recentlyViewedContainer = document.getElementById("recently-viewed");
-
-                centers.forEach((center, index) => {
-                    const card = document.createElement("div");
-                    card.className = "card";
-                    card.innerHTML = `
-                        <i class="fas fa-tools"></i> ${center.name} 
-                        <br>📍 Location: ${center.latitude}, ${center.longitude}
-                    `;
-
-                    allCentersContainer.appendChild(card);
-
-                    // Simulate recently viewed centers (first 3 centers)
-                    if (index < 3) {
-                        recentlyViewedContainer.appendChild(card.cloneNode(true));
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("✅ Page Loaded - Running Service Centers Script");
+            
+            // Mobile menu toggle
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('mobile-visible');
+                });
+                
+                // Close sidebar when clicking outside of it
+                document.addEventListener('click', function(event) {
+                    if (!sidebar.contains(event.target) && event.target !== menuToggle) {
+                        sidebar.classList.remove('mobile-visible');
                     }
                 });
-
-            } catch (error) {
-                console.error("Error loading maintenance centers:", error);
-
-
-                
-
-
             }
+            
+            // Notification toggle
+            const notificationBtn = document.getElementById('notifications');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    notificationDropdown.classList.toggle('show');
+                    if (profileDropdown.classList.contains('show')) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // Profile toggle
+            const profileBtn = document.getElementById('profile');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if (profileBtn && profileDropdown) {
+                profileBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                    if (notificationDropdown.classList.contains('show')) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                if (notificationDropdown.classList.contains('show')) {
+                    notificationDropdown.classList.remove('show');
+                }
+                if (profileDropdown.classList.contains('show')) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
         });
-
-        function openDetails(name, address, status, services, prices, mapLink) {
-    const params = new URLSearchParams();
-    params.append("name", name);
-    params.append("address", address);
-    params.append("status", status);
-    params.append("services", JSON.stringify(services));
-    params.append("prices", JSON.stringify(prices));
-    params.append("mapLink", mapLink);
-
-    window.location.href = `center-details.html?${params.toString()}`;
-}
-
     </script>
-    
 </body>
 </html>
