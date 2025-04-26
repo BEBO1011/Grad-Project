@@ -95,7 +95,7 @@ def signup_page():
 
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    return render_template('home_new.html')
 
 @app.route('/map')
 def map_page():
