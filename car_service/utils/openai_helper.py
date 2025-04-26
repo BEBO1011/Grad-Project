@@ -294,8 +294,8 @@ def generate_openai_diagnostic(issue_description: str, brand: str, model: str, d
         # Handle specific error types with better messaging
         if "quota" in error_str.lower() or "insufficient_quota" in error_str:
             logger.error("OpenAI API quota exceeded. Using fallback diagnostics.")
-            # For quota issues, raise a specific exception type
-            raise Exception("OpenAI API quota exceeded. Please check your API key and usage limits.")
+            # For quota issues, raise a specific exception type that's easily identifiable
+            raise Exception("QUOTA_EXCEEDED: OpenAI API quota has been reached. The system will use built-in diagnostics until the quota resets.")
         elif "invalid" in error_str.lower() and "api key" in error_str.lower():
             logger.error("Invalid API key configuration")
             raise Exception("Invalid OpenAI API key. Please check your API key configuration.")

@@ -148,26 +148,26 @@ st.markdown("""
     <div class='column feature-card'>
         <h3>🚗 Car Service App</h3>
         <p>Mobile-optimized car diagnostic app with AI-powered solutions</p>
-        <a href='http://0.0.0.0:8080' class='custom-button'>Launch Car Service App</a>
+        <a href='http://localhost:8080' class='custom-button'>Launch Car Service App</a>
         <br><br>
         <p><strong>Direct access to key features:</strong></p>
         <ul>
-            <li><a href='http://0.0.0.0:8080/chatbot'>AI Diagnostic Chatbot</a></li>
-            <li><a href='http://0.0.0.0:8080/maintenance-centers'>Maintenance Centers</a></li>
-            <li><a href='http://0.0.0.0:8080/map'>Interactive Map</a></li>
+            <li><a href='http://localhost:8080/chatbot'>AI Diagnostic Chatbot</a></li>
+            <li><a href='http://localhost:8080/maintenance-centers'>Maintenance Centers</a></li>
+            <li><a href='http://localhost:8080/map'>Interactive Map</a></li>
         </ul>
     </div>
     
     <div class='column feature-card'>
         <h3>📊 Data Analytics Dashboard</h3>
         <p>Powerful analysis tools for creating custom reports and visualizations</p>
-        <a href='http://0.0.0.0:5000' class='custom-button'>Access Analytics Dashboard</a>
+        <a href='/' class='custom-button'>Access Analytics Dashboard</a>
         <br><br>
         <p><strong>Analytics features:</strong></p>
         <ul>
-            <li><a href='http://0.0.0.0:5000/Data_Sources'>Data Source Management</a></li>
-            <li><a href='http://0.0.0.0:5000/Dashboard_Builder'>Dashboard Builder</a></li>
-            <li><a href='http://0.0.0.0:5000/Reports'>Report Generation</a></li>
+            <li><a href='/Data_Sources'>Data Source Management</a></li>
+            <li><a href='/Dashboard_Builder'>Dashboard Builder</a></li>
+            <li><a href='/Reports'>Report Generation</a></li>
         </ul>
     </div>
 </div>
@@ -306,7 +306,7 @@ with screenshot_col1:
     • Beautiful responsive interface optimized for mobile
     • Multi-language support including Arabic
     """)
-    st.markdown("**URL:** [Open Chatbot](http://0.0.0.0:8080/chatbot)")
+    st.markdown("**URL:** [Open Chatbot](http://localhost:8080/chatbot)")
 
 with screenshot_col2:
     st.subheader("Vehicle Health Monitoring Dashboard")
@@ -320,7 +320,7 @@ with screenshot_col2:
     • Interactive visualization of health trends
     • Brand and model-specific insights
     """)
-    st.markdown("**URL:** [Open Vehicle Health Monitor](http://0.0.0.0:8080/vehicle-health)")
+    st.markdown("**URL:** [Open Vehicle Health Monitor](http://localhost:8080/vehicle-health)")
 
 st.sidebar.title("Navigation")
 
@@ -338,11 +338,11 @@ st.sidebar.markdown("""
 # Car Service App Navigation
 st.sidebar.markdown("### Car Service App (Port 8080)")
 st.sidebar.markdown("""
-- [Car App Home](http://0.0.0.0:8080)
-- [Diagnostic Chatbot](http://0.0.0.0:8080/chatbot)
-- [Maintenance Centers](http://0.0.0.0:8080/maintenance-centers)
-- [Interactive Map](http://0.0.0.0:8080/map)
-- [User Settings](http://0.0.0.0:8080/settings)
+- [Car App Home](http://localhost:8080)
+- [Diagnostic Chatbot](http://localhost:8080/chatbot)
+- [Maintenance Centers](http://localhost:8080/maintenance-centers)
+- [Interactive Map](http://localhost:8080/map)
+- [User Settings](http://localhost:8080/settings)
 """)
 
 # About section

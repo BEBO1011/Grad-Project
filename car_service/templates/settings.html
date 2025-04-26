@@ -17,15 +17,15 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="map.html"><i class="fas fa-map"></i> Map</a></li>
-                    <li><a href="maintenance-centers.html"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
-                    <li><a href="settings.html" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/map"><i class="fas fa-map"></i> Map</a></li>
+                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
+                    <li><a href="/settings" class="active"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
             </nav>
             <div class="help-center">
                 <p>Having Trouble?</p>
-                <button onclick="location.href='chatbot.html'">Go To Help Center</button>
+                <button onclick="location.href='/chatbot'">Go To Help Center</button>
             </div>            
         </aside>
 
@@ -63,6 +63,14 @@
                     <label for="12h">12 Hours</label>
                 </div>
 
+                <div class="theme-format">
+                    <label>Theme Mode:</label>
+                    <input type="radio" id="light-theme" name="thememode" value="light" checked>
+                    <label for="light-theme">Light</label>
+                    <input type="radio" id="dark-theme" name="thememode" value="dark">
+                    <label for="dark-theme">Dark</label>
+                </div>
+
                 <button id="save-settings">Save Changes</button>
             </div>
         </main>
@@ -72,31 +80,75 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const saveButton = document.getElementById("save-settings");
+            
+            // Check for saved theme
+            const savedSettings = localStorage.getItem("userSettings");
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                
+                // Apply saved settings
+                document.getElementById("language").value = settings.language;
+                document.getElementById("timezone").value = settings.timezone;
+                document.querySelector(`input[name="timeformat"][value="${settings.timeFormat}"]`).checked = true;
+                
+                // Apply theme if it exists
+                if (settings.theme) {
+                    document.querySelector(`input[name="thememode"][value="${settings.theme}"]`).checked = true;
+                    if (settings.theme === 'dark') {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'light');
+                    }
+                }
+            }
 
             saveButton.addEventListener("click", function () {
                 const language = document.getElementById("language").value;
                 const timezone = document.getElementById("timezone").value;
                 const timeFormat = document.querySelector('input[name="timeformat"]:checked').value;
+                const theme = document.querySelector('input[name="thememode"]:checked').value;
 
                 const settings = {
                     language: language,
                     timezone: timezone,
-                    timeFormat: timeFormat
+                    timeFormat: timeFormat,
+                    theme: theme
                 };
 
+                // Apply theme immediately
+                if (theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+
                 localStorage.setItem("userSettings", JSON.stringify(settings));
-                alert("Settings saved successfully!");
+                
+                // Show success message with animation
+                const notification = document.createElement('div');
+                notification.className = 'notification success';
+                notification.innerHTML = '<i class="fas fa-check-circle"></i> Settings saved successfully!';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }, 3000);
             });
 
-            // Load saved settings
-            const savedSettings = localStorage.getItem("userSettings");
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                document.getElementById("language").value = settings.language;
-                document.getElementById("timezone").value = settings.timezone;
-                document.querySelector(`input[name="timeformat"][value="${settings.timeFormat}"]`).checked = true;
+            // Apply theme from localStorage on page load
+            const currentSettings = localStorage.getItem("userSettings");
+            if (currentSettings) {
+                const settings = JSON.parse(currentSettings);
+                if (settings.theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
             }
         });
     </script>
+    <script src="/static/js/mobile.js"></script>
+    <script src="/static/js/theme.js"></script>
 </body>
 </html>

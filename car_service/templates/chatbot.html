@@ -392,14 +392,27 @@
                     } catch (error) {
                         console.error("Error fetching solutions:", error);
                         
+                        let errorMessage = "Unable to connect to diagnostic services. Please try again.";
+                        let errorTitle = "Connection Error";
+                        let errorIcon = "exclamation-triangle";
+                        let errorDetails = "Our AI diagnostic service is currently experiencing issues. Our team has been notified.";
+                        
+                        // Check if error is related to OpenAI API quota
+                        if (error.message && error.message.includes("QUOTA_EXCEEDED")) {
+                            errorMessage = "AI diagnostic service quota reached";
+                            errorTitle = "AI Service Limit Reached";
+                            errorIcon = "clock";
+                            errorDetails = "Our AI diagnostic service has reached its usage limit for the current period. The system is using built-in diagnostics instead. Full AI service will resume shortly.";
+                        }
+                        
                         // Show error notification
-                        showNotification("Unable to connect to diagnostic services. Please try again.", "error");
+                        showNotification(errorMessage, "error");
                         
                         // Show detailed error card
                         resultsContainer.innerHTML = `
                             <div class="card animate__animated animate__fadeIn" style="border-left: 3px solid var(--danger-color);">
-                                <h4><i class="fas fa-exclamation-triangle" style="color: var(--danger-color); margin-right: 8px;"></i>Connection Error</h4>
-                                <p>Our AI diagnostic service is currently experiencing issues. Our team has been notified.</p>
+                                <h4><i class="fas fa-${errorIcon}" style="color: var(--danger-color); margin-right: 8px;"></i>${errorTitle}</h4>
+                                <p>${errorDetails}</p>
                                 <div style="margin-top: 15px; display: flex; gap: 10px;">
                                     <button id="retryBtn" class="button-premium" style="flex: 1;">Retry Connection</button>
                                     <button id="contactBtn" style="flex: 1; background: rgba(212, 175, 55, 0.15); color: var(--secondary-color); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 30px; padding: 0.8rem; font-weight: 600; cursor: pointer;">Contact Support</button>
@@ -604,5 +617,7 @@
         </style>
     `);
     </script>
+    <script src="/static/js/mobile.js"></script>
+    <script src="/static/js/theme.js"></script>
 </body>
 </html>

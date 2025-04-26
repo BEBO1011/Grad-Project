@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Dual Theme - White with Black & Gold Accents */
+    /* Light Theme (default) - White with Black & Gold Accents */
     --primary-color: #ffffff;
     --secondary-color: #d4af37; /* Gold */
     --accent-color: #960018; /* Deep Red */
@@ -17,6 +17,36 @@
     --card-bg: #ffffff;
     --gradient-bg: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f2dc9e 50%, #d4af37 100%);
+    --sidebar-bg: #ffffff;
+    --content-bg: #f8f9fa;
+    --button-bg: var(--secondary-color);
+    --button-text: #ffffff;
+    --header-bg: #ffffff;
+    --input-bg: #ffffff;
+    --input-border: #e0e0e0;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    --primary-color: #14151a;
+    --secondary-color: #d4af37; /* Gold stays the same */
+    --accent-color: #c41e3a; /* Brighter red for dark mode */
+    --dark-bg: #000000;
+    --light-bg: #1a1a1a;
+    --text-primary: #f0f0f0;
+    --text-secondary: #aaaaaa;
+    --card-bg: #202020;
+    --gradient-bg: linear-gradient(135deg, #14151a 0%, #1a1a1a 100%);
+    --sidebar-bg: #14151a;
+    --content-bg: #14151a;
+    --button-bg: var(--secondary-color);
+    --button-text: #000000;
+    --header-bg: #14151a;
+    --input-bg: #2a2a2a;
+    --input-border: #3a3a3a;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
     
     /* Sidebar colors (dark) */
     --sidebar-bg: #14151a;
@@ -126,6 +156,17 @@ h4 {
     font-size: 1.2rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Mobile sidebar styles */
+.mobile-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-open {
+    transform: translateX(0) !important;
 }
 
 /* PREMIUM LOGO */
@@ -1376,4 +1417,152 @@ h4 {
 
 .logout-btn i {
     margin-right: 0.5rem;
+}
+
+/* Theme Format */
+.theme-format {
+    margin-bottom: 1.5rem;
+}
+
+.theme-format label {
+    display: block;
+    margin-bottom: 0.7rem;
+    font-weight: 500;
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease, slideUp 0.4s ease;
+    transition: opacity 0.5s ease;
+}
+
+.notification.success {
+    background: var(--success-color);
+    color: white;
+}
+
+.notification.error {
+    background: var(--danger-color);
+    color: white;
+}
+
+.notification i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* MEDIA QUERIES FOR RESPONSIVE DESIGN */
+@media screen and (max-width: 991px) {
+    .mobile-menu {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+    }
+    
+    .sidebar {
+        z-index: 1000;
+    }
+    
+    .content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+    }
+    
+    .stats-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .chatbot-container,
+    .form-container {
+        padding: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .content header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .content header h2 {
+        margin-bottom: 1rem;
+    }
+    
+    .user-icons {
+        align-self: flex-end;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .vehicle-health-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .maintenance-suggestions,
+    .performance-metrics {
+        order: -1;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .content {
+        padding: 1rem 0.75rem;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .vehicle-health-header .car-model-selector {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .vehicle-health-header .car-model-selector select {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chatbot-container,
+    .form-container {
+        padding: 1rem;
+    }
+    
+    .user-icons span {
+        width: 35px;
+        height: 35px;
+        margin-left: 1rem;
+    }
 }
