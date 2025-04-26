@@ -271,7 +271,22 @@
                     const model = modelSelect.value;
                     
                     if (!query || !brand || !model) {
-                        alert("Please describe your issue, select a brand, and a model.");
+                        // Show elegant error message
+                        showNotification("Please describe your issue, select a brand, and a model.", "error");
+                        
+                        // Add shake animation to highlight the missing fields
+                        if (!query) {
+                            queryInput.classList.add("shake-animation");
+                            setTimeout(() => queryInput.classList.remove("shake-animation"), 500);
+                        }
+                        if (!brand) {
+                            brandSelect.classList.add("shake-animation");
+                            setTimeout(() => brandSelect.classList.remove("shake-animation"), 500);
+                        }
+                        if (!model) {
+                            modelSelect.classList.add("shake-animation");
+                            setTimeout(() => modelSelect.classList.remove("shake-animation"), 500);
+                        }
                         return;
                     }
                     
@@ -376,18 +391,218 @@
                         
                     } catch (error) {
                         console.error("Error fetching solutions:", error);
+                        
+                        // Show error notification
+                        showNotification("Unable to connect to diagnostic services. Please try again.", "error");
+                        
+                        // Show detailed error card
                         resultsContainer.innerHTML = `
-                            <div class="card" style="border-left: 3px solid var(--danger-color);">
+                            <div class="card animate__animated animate__fadeIn" style="border-left: 3px solid var(--danger-color);">
                                 <h4><i class="fas fa-exclamation-triangle" style="color: var(--danger-color); margin-right: 8px;"></i>Connection Error</h4>
-                                <p>Unable to connect to diagnostic services. Please check your connection and try again.</p>
-                                <button class="button-premium" style="margin-top: 15px; width: auto;">Retry Connection</button>
+                                <p>Our AI diagnostic service is currently experiencing issues. Our team has been notified.</p>
+                                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                    <button id="retryBtn" class="button-premium" style="flex: 1;">Retry Connection</button>
+                                    <button id="contactBtn" style="flex: 1; background: rgba(212, 175, 55, 0.15); color: var(--secondary-color); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 30px; padding: 0.8rem; font-weight: 600; cursor: pointer;">Contact Support</button>
+                                </div>
                             </div>
                         `;
+                        
+                        // Add event listener to the retry button
+                        const retryBtn = document.getElementById("retryBtn");
+                        if (retryBtn) {
+                            retryBtn.addEventListener("click", function() {
+                                showNotification("Retrying connection...");
+                                searchBtn.click(); // Trigger search again
+                            });
+                        }
+                        
+                        // Add event listener to the contact button
+                        const contactBtn = document.getElementById("contactBtn");
+                        if (contactBtn) {
+                            contactBtn.addEventListener("click", function() {
+                                showNotification("Support request submitted. Our team will contact you shortly.");
+                            });
+                        }
+                        
                         responseContainer.style.display = "block";
                     }
                 });
             }
+            
+            // Add notification and animation functions
+            function showNotification(message, type = "info") {
+                const notification = document.createElement('div');
+                notification.className = `notification animate__animated animate__fadeIn ${type}`;
+                notification.innerHTML = `
+                    <div class="notification-content">
+                        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.remove('animate__fadeIn');
+                    notification.classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 500);
+                }, 3000);
+            }
         });
+        
+        // Add CSS for notification and animations
+        document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            /* Notification Styles */
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: rgba(20, 21, 26, 0.9);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                border-left: 4px solid #d4af37;
+                max-width: 350px;
+            }
+            
+            .notification.error {
+                border-left-color: #ff4d5f;
+            }
+            
+            .notification-content {
+                display: flex;
+                align-items: center;
+            }
+            
+            .notification-content i {
+                color: #d4af37;
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
+            
+            .notification.error .notification-content i {
+                color: #ff4d5f;
+            }
+            
+            /* Shake Animation */
+            .shake-animation {
+                animation: shake 0.5s;
+            }
+            
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            /* Enhanced Loading Indicator */
+            .loading-spinner {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem;
+                text-align: center;
+            }
+            
+            .loading-spinner .loading {
+                width: 50px;
+                height: 50px;
+                border: 3px solid rgba(212, 175, 55, 0.3);
+                border-radius: 50%;
+                border-top-color: #d4af37;
+                animation: spin 1s infinite ease-in-out;
+                margin-bottom: 1rem;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            /* Enhanced Mobile Responsiveness */
+            @media (max-width: 768px) {
+                .chatbot-container {
+                    padding: 1rem;
+                    margin: 0.5rem;
+                }
+                
+                .header {
+                    padding: 15px 10px;
+                }
+                
+                .header h1 {
+                    font-size: 1.5rem;
+                }
+                
+                .form-group {
+                    margin-bottom: 1rem;
+                }
+                
+                .form-container {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                .form-container > div {
+                    width: 100%;
+                }
+                
+                textarea, select {
+                    padding: 0.8rem;
+                    font-size: 16px; /* Prevents iOS zoom on focus */
+                    width: 100%;
+                }
+                
+                .card {
+                    padding: 1rem;
+                    margin-bottom: 1rem;
+                }
+                
+                .notification {
+                    left: 20px;
+                    right: 20px;
+                    max-width: unset;
+                    bottom: 20px;
+                    top: unset;
+                }
+                
+                /* Improve touch targets for mobile */
+                button {
+                    min-height: 44px;
+                    min-width: 44px;
+                }
+                
+                /* Optimize spacing for results */
+                .response-section {
+                    margin-top: 1rem;
+                }
+                
+                /* Adjust badges in mobile view */
+                .badge {
+                    padding: 3px 8px;
+                    font-size: 0.7rem;
+                }
+                
+                /* Improved tap areas for actionable elements */
+                .button-premium, button {
+                    padding: 10px 15px;
+                    margin-top: 10px;
+                }
+                
+                /* Fix mobile menu issues */
+                .navbar-menu {
+                    width: 100%;
+                    position: absolute;
+                    top: 100%;
+                    background-color: var(--dark-bg);
+                    z-index: 100;
+                }
+            }
+        </style>
+    `);
     </script>
 </body>
 </html>

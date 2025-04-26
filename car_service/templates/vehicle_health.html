@@ -985,6 +985,117 @@
                 align-items: flex-start;
                 gap: 0.5rem;
             }
+            
+            .section-header h3 {
+                font-size: 1.3rem;
+            }
+            
+            .diagnostic-card .diagnostic-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .diagnostic-card .severity-badge {
+                align-self: flex-start;
+            }
+            
+            .reading-display {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .vs-indicator {
+                display: none;
+            }
+            
+            .anomaly-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .anomaly-card .severity-badge {
+                align-self: flex-start;
+            }
+            
+            .vehicle-selector-container div[style*="display: flex"] {
+                flex-direction: column;
+            }
+            
+            .vehicle-selector-container div[style*="flex: 1"] {
+                width: 100%;
+                margin-bottom: 12px;
+            }
+            
+            .vehicle-selector-container div[style*="flex: 0 0 auto"] {
+                width: 100%;
+            }
+            
+            .vehicle-selector-container button {
+                width: 100%;
+            }
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(20, 21, 26, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            border-left: 4px solid var(--primary-gold);
+            max-width: 350px;
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-content i {
+            color: var(--primary-gold);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Loading Animation */
+        .loading-pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        
+        /* Shine animation */
+        .shine-animation {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shine-animation::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            animation: shine 1s;
+        }
+        
+        @keyframes shine {
+            to {
+                left: 150%;
+            }
         }
     </style>
 </head>
@@ -1051,6 +1162,40 @@
                 <button id="refreshBtn" class="action-btn secondary-action" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
                     <i class="fas fa-sync-alt" style="margin-right: 5px;"></i> Refresh Data
                 </button>
+            </div>
+            
+            <!-- Vehicle Selector Section -->
+            <div class="vehicle-selector-container animate__animated animate__fadeIn" style="margin-bottom: 2rem; padding: 1rem; background: white; border-radius: 12px; box-shadow: var(--shadow-sm);">
+                <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--dark-bg); border-bottom: 2px solid var(--primary-gold); padding-bottom: 0.5rem; display: inline-block;">
+                    <i class="fas fa-car" style="color: var(--primary-gold); margin-right: 8px;"></i>Select Your Vehicle
+                </h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label for="vehicleBrand" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Brand</label>
+                        <select id="vehicleBrand" class="form-select animate__animated animate__fadeIn" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-light); background-color: white; font-family: 'Montserrat', sans-serif;">
+                            <option value="">Select brand...</option>
+                            <option value="Mercedes">Mercedes-Benz</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Audi">Audi</option>
+                            <option value="Lexus">Lexus</option>
+                            <option value="Porsche">Porsche</option>
+                            <option value="Tesla">Tesla</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Fiat">Fiat</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label for="vehicleModel" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Model</label>
+                        <select id="vehicleModel" class="form-select animate__animated animate__fadeIn" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-light); background-color: white; font-family: 'Montserrat', sans-serif;">
+                            <option value="">Select model...</option>
+                        </select>
+                    </div>
+                    <div style="flex: 0 0 auto;">
+                        <button id="applyVehicleBtn" class="action-btn primary-action animate__animated animate__fadeIn" style="padding: 0.75rem 1.5rem; border-radius: 8px; background: var(--gold-gradient); color: var(--text-dark); font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);">
+                            <i class="fas fa-check" style="margin-right: 5px;"></i> Apply
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- Vehicle Health Overview Section -->
@@ -1175,16 +1320,160 @@
                 }
             });
             
+            // Car model data
+            const carModels = {
+                "Mercedes": ["S-Class", "E-Class", "C-Class", "GLE", "GLC", "AMG GT", "G-Wagon"],
+                "BMW": ["7 Series", "5 Series", "3 Series", "X5", "X3", "M5", "i8"],
+                "Audi": ["A8", "A6", "A4", "Q7", "Q5", "RS7", "R8"],
+                "Lexus": ["LS", "ES", "RX", "GX", "LX", "LC", "RC F"],
+                "Porsche": ["911", "Panamera", "Cayenne", "Macan", "Taycan", "718 Cayman", "718 Boxster"],
+                "Tesla": ["Model S", "Model 3", "Model X", "Model Y", "Cybertruck", "Roadster"],
+                "Toyota": ["Corolla", "Camry", "RAV4", "Land Cruiser", "Highlander", "Tundra"],
+                "Fiat": ["500", "Panda", "Tipo", "Spider", "500X", "500L"]
+            };
+            
+            // Vehicle selector elements
+            const brandSelect = document.getElementById('vehicleBrand');
+            const modelSelect = document.getElementById('vehicleModel');
+            const applyVehicleBtn = document.getElementById('applyVehicleBtn');
+            
+            // Add animation delay to vehicle selector elements
+            const animatedElements = document.querySelectorAll('.vehicle-selector-container .animate__fadeIn');
+            animatedElements.forEach((element, index) => {
+                element.style.animationDelay = `${(index * 0.1 + 0.1)}s`;
+            });
+            
+            // Model dropdown population based on brand selection
+            if (brandSelect) {
+                brandSelect.addEventListener('change', function() {
+                    const selectedBrand = brandSelect.value;
+                    modelSelect.innerHTML = '<option value="">Select model...</option>';
+                    
+                    if (selectedBrand && carModels[selectedBrand]) {
+                        carModels[selectedBrand].forEach(model => {
+                            const option = document.createElement('option');
+                            option.value = model;
+                            option.textContent = model;
+                            modelSelect.appendChild(option);
+                        });
+                        
+                        // Add shine animation to the dropdown
+                        modelSelect.classList.remove('shine-animation');
+                        setTimeout(() => {
+                            modelSelect.classList.add('shine-animation');
+                        }, 10);
+                    }
+                });
+            }
+            
+            // Apply vehicle button click handler
+            if (applyVehicleBtn) {
+                applyVehicleBtn.addEventListener('click', function() {
+                    const selectedBrand = brandSelect.value;
+                    const selectedModel = modelSelect.value;
+                    
+                    if (!selectedBrand || !selectedModel) {
+                        // Show error with elegant animation
+                        const container = document.querySelector('.vehicle-selector-container');
+                        container.classList.add('animate__animated', 'animate__shakeX');
+                        setTimeout(() => {
+                            container.classList.remove('animate__shakeX');
+                        }, 1000);
+                        
+                        // Show error notification
+                        showNotification('Please select both brand and model');
+                        return;
+                    }
+                    
+                    // Update vehicle name in the interface
+                    document.querySelector('.health-details h3').textContent = `${selectedBrand} ${selectedModel}`;
+                    
+                    // Show loading state
+                    showLoadingState();
+                    
+                    // Fetch vehicle health data for the selected vehicle
+                    fetchVehicleHealthData(selectedBrand, selectedModel);
+                });
+            }
+            
             // Initialize Health Score Chart
             initHealthChart();
             
-            // Fetch vehicle health data
+            // Fetch default vehicle health data
             fetchVehicleHealthData();
             
             // Refresh button event listener
             document.getElementById('refreshBtn').addEventListener('click', function() {
-                fetchVehicleHealthData();
+                const selectedBrand = brandSelect.value;
+                const selectedModel = modelSelect.value;
+                fetchVehicleHealthData(selectedBrand, selectedModel);
             });
+            
+            // Show notification function
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification animate__animated animate__fadeIn';
+                notification.innerHTML = `
+                    <div class="notification-content">
+                        <i class="fas fa-info-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.remove('animate__fadeIn');
+                    notification.classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 500);
+                }, 3000);
+            }
+            
+            // Show loading state
+            function showLoadingState() {
+                // Add loading animation to component grid
+                document.getElementById('componentGrid').innerHTML = `
+                    <div class="component-card animate__animated animate__pulse animate__infinite">
+                        <div class="component-icon">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="component-name">Loading...</div>
+                    </div>
+                `;
+                
+                // Add loading animation to anomaly list
+                document.getElementById('anomalyList').innerHTML = `
+                    <div class="anomaly-card animate__animated animate__pulse animate__infinite">
+                        <div class="anomaly-header">
+                            <h4 class="anomaly-title"><i class="fas fa-spinner fa-spin"></i> Loading anomalies...</h4>
+                        </div>
+                    </div>
+                `;
+                
+                // Add loading animation to insights list
+                document.getElementById('insightsList').innerHTML = `
+                    <div class="insight-item animate__animated animate__pulse animate__infinite">
+                        <div class="insight-title"><i class="fas fa-spinner fa-spin"></i> Loading insights...</div>
+                    </div>
+                `;
+                
+                // Add loading animation to diagnostics container
+                document.getElementById('diagnosticsContainer').innerHTML = `
+                    <div class="diagnostic-card animate__animated animate__pulse animate__infinite">
+                        <div class="diagnostic-header">
+                            <h4><i class="fas fa-spinner fa-spin"></i> Loading diagnostics...</h4>
+                        </div>
+                    </div>
+                `;
+                
+                // Add loading animation to tips list
+                document.getElementById('tipsList').innerHTML = `
+                    <li class="tip-item animate__animated animate__pulse animate__infinite">
+                        <p class="tip-text"><i class="fas fa-spinner fa-spin"></i> Loading maintenance recommendations...</p>
+                    </li>
+                `;
+            }
         });
         
         // Initialize the health score chart
@@ -1257,24 +1546,44 @@
         }
         
         // Fetch vehicle health data from API
-        function fetchVehicleHealthData() {
+        function fetchVehicleHealthData(brand = '', model = '') {
             // Display loading state
             document.getElementById('overallScore').textContent = '--';
             document.getElementById('healthStatus').textContent = 'Loading data...';
             document.getElementById('lastUpdated').textContent = 'Updating...';
             
-            document.getElementById('componentGrid').innerHTML = '<div class="component-card"><div class="component-icon"><i class="fas fa-spinner fa-spin"></i></div><div class="component-name">Loading...</div></div>';
+            // Show loading indicator for all sections
+            showLoadingState();
             
+            // Set loading states for all UI components
             document.getElementById('anomalyList').innerHTML = '<div class="anomaly-card"><div class="anomaly-header"><h4 class="anomaly-title"><i class="fas fa-spinner fa-spin"></i> Loading anomalies...</h4></div></div>';
-            
             document.getElementById('insightsList').innerHTML = '<div class="insight-item"><div class="insight-title"><i class="fas fa-spinner fa-spin"></i> Loading insights...</div></div>';
-            
             document.getElementById('diagnosticsContainer').innerHTML = '<div class="diagnostic-card"><div class="diagnostic-header"><h4><i class="fas fa-spinner fa-spin"></i> Loading diagnostics...</h4></div></div>';
-            
             document.getElementById('tipsList').innerHTML = '<li class="tip-item"><p class="tip-text"><i class="fas fa-spinner fa-spin"></i> Loading maintenance recommendations...</p></li>';
             
+            // Build vehicle ID from brand and model
+            const vehicleId = brand && model ? 
+                `${brand.substring(0, 2).toUpperCase()}-${model.replace(/\s+/g, '')}-${Math.floor(1000 + Math.random() * 9000)}` : 
+                'MB-S550-1234'; // Default vehicle ID
+            
+            // Create request URL with all parameters properly encoded
+            const params = new URLSearchParams();
+            if (brand) params.append('brand', brand);
+            if (model) params.append('model', model);
+            params.append('vehicle_id', vehicleId);
+            params.append('year', '2025');
+            
+            const requestUrl = `/api/vehicle-health?${params.toString()}`;
+            console.log('Requesting vehicle health data:', requestUrl);
+            
+            // Add animation to show we're fetching data
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Updating...';
+            refreshBtn.disabled = true;
+            refreshBtn.style.opacity = '0.7';
+            
             // Make API request to get data
-            fetch('/api/vehicle-health?vehicle_id=MB-S550-1234&brand=Mercedes&model=S-Class&year=2024')
+            fetch(requestUrl)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -1282,7 +1591,18 @@
                     return response.json();
                 })
                 .then(data => {
-                    displayVehicleHealthData(data);
+                    // Add a slight delay to make the loading animation visible
+                    setTimeout(() => {
+                        displayVehicleHealthData(data);
+                        
+                        // Reset refresh button
+                        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                        refreshBtn.disabled = false;
+                        refreshBtn.style.opacity = '1';
+                        
+                        // Show success notification
+                        showNotification('Data updated successfully');
+                    }, 800);
                 })
                 .catch(error => {
                     console.error('Error fetching vehicle health data:', error);
@@ -1290,7 +1610,19 @@
                     // For demo purposes, we'll generate sample data if the API fails
                     // In production, you'd show an error message instead
                     console.log('Using sample data for demonstration');
-                    generateSampleData();
+                    
+                    // Add a slight delay to make the loading animation visible
+                    setTimeout(() => {
+                        generateSampleData(brand, model);
+                        
+                        // Reset refresh button
+                        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                        refreshBtn.disabled = false;
+                        refreshBtn.style.opacity = '1';
+                        
+                        // Show error notification
+                        showNotification('API connection error - using sample data');
+                    }, 800);
                 });
         }
         

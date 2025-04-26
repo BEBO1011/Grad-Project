@@ -5,6 +5,7 @@ import os
 import json
 import logging
 import random
+import time
 from typing import Dict, List, Any, Optional
 
 # Configure logging
@@ -14,6 +15,29 @@ logger = logging.getLogger(__name__)
 # Check if OpenAI API Key is available
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 has_openai_access = OPENAI_API_KEY is not None
+
+# Variables for keeping track of OpenAI availability
+OPENAI_AVAILABLE = False
+client = None
+
+# Try to import and set up OpenAI
+try:
+    import openai
+    from openai import OpenAI
+    OPENAI_AVAILABLE = True
+    logger.info("OpenAI module imported successfully!")
+    
+    # Initialize client if we have an API key
+    if has_openai_access:
+        try:
+            client = OpenAI(api_key=OPENAI_API_KEY)
+            logger.info("OpenAI client initialized successfully!")
+        except Exception as e:
+            logger.error(f"Error initializing OpenAI client: {e}")
+    else:
+        logger.warning("OpenAI API key not found in environment variables")
+except ImportError:
+    logger.warning("OpenAI module import failed. Using fallback diagnostics.")
 
 # Sample diagnostic data for common car problems
 SAMPLE_DIAGNOSTICS = {
@@ -203,10 +227,16 @@ def generate_openai_diagnostic(issue_description: str, brand: str, model: str, d
         Dictionary containing AI-generated diagnostic information
     """
     try:
-        from openai import OpenAI
-        
-        # Initialize OpenAI client
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        # Use the global client that was initialized earlier
+        global client
+        if client is None:
+            logger.error("OpenAI client not initialized")
+            raise Exception("OpenAI client not initialized")
+            
+        # Check if API key is valid and has quota remaining
+        if not OPENAI_API_KEY or OPENAI_API_KEY.startswith("sk-dummy"):
+            logger.warning("Using dummy or invalid OpenAI API key")
+            raise Exception("Invalid OpenAI API key configuration")
         
         # Construct system prompt
         system_prompt = """
@@ -258,9 +288,20 @@ def generate_openai_diagnostic(issue_description: str, brand: str, model: str, d
         return result
         
     except Exception as e:
+        error_str = str(e)
         logger.error(f"Error generating OpenAI diagnostic: {e}")
-        # Raise the exception for the caller to handle
-        raise e
+        
+        # Handle specific error types with better messaging
+        if "quota" in error_str.lower() or "insufficient_quota" in error_str:
+            logger.error("OpenAI API quota exceeded. Using fallback diagnostics.")
+            # For quota issues, raise a specific exception type
+            raise Exception("OpenAI API quota exceeded. Please check your API key and usage limits.")
+        elif "invalid" in error_str.lower() and "api key" in error_str.lower():
+            logger.error("Invalid API key configuration")
+            raise Exception("Invalid OpenAI API key. Please check your API key configuration.")
+        else:
+            # For other errors, just pass through the original exception
+            raise e
 
 def generate_rule_based_diagnostic(issue_description: str, brand: str, model: str, detailed: bool) -> Dict[str, Any]:
     """

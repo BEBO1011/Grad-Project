@@ -291,14 +291,36 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Placeholder for actual screenshots once they're available
+# Display rich information about our applications
 screenshot_col1, screenshot_col2 = st.columns(2)
 
 with screenshot_col1:
-    st.image("https://placehold.co/600x400?text=Car+Diagnostic+App", caption="Car Service & Diagnostic App")
+    st.subheader("AI-Powered Car Diagnostic Chatbot")
+    st.info("""
+    The diagnostic chatbot features:
+    
+    • Natural language processing for vehicle issues
+    • Support for 41+ car brands and their models
+    • Detailed diagnostic information with severity indicators
+    • Cost estimates and DIY possibility assessment
+    • Beautiful responsive interface optimized for mobile
+    • Multi-language support including Arabic
+    """)
+    st.markdown("**URL:** [Open Chatbot](http://0.0.0.0:8080/chatbot)")
 
 with screenshot_col2:
-    st.image("https://placehold.co/600x400?text=Analytics+Dashboard", caption="Data Analytics Dashboard")
+    st.subheader("Vehicle Health Monitoring Dashboard")
+    st.info("""
+    The health monitoring dashboard provides:
+    
+    • Real-time vehicle health metrics and status
+    • AI-powered anomaly detection with alerts
+    • Component-level diagnostics and insights
+    • Customized maintenance recommendations
+    • Interactive visualization of health trends
+    • Brand and model-specific insights
+    """)
+    st.markdown("**URL:** [Open Vehicle Health Monitor](http://0.0.0.0:8080/vehicle-health)")
 
 st.sidebar.title("Navigation")
 

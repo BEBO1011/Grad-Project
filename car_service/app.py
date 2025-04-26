@@ -296,18 +296,33 @@ def simulate_translation(text, target_lang="en"):
 @app.route("/search", methods=["POST"])
 def search():
     try:
+        import logging
         from utils.openai_helper import generate_diagnostic_response, generate_maintenance_tips, generate_related_issues
         
+        # Set up logging for diagnostics
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
+        logger.info("Starting diagnostic search")
+        
+        # Parse request data
         data = request.json
-        query_text = data.get("query", "")
+        if not data:
+            logger.error("No JSON data received in request")
+            return jsonify({"error": "Invalid request format. Please provide JSON data."}), 400
+            
+        query_text = data.get("query", "").strip()
         brand = data.get("brand", "").strip()
         model = data.get("model", "").strip()
+        
+        # Log the request parameters
+        logger.info(f"Search request - Query: '{query_text}', Brand: '{brand}', Model: '{model}'")
         
         # Create case-insensitive filters
         brand_filter = brand.lower() if brand else None
         model_filter = model.lower() if model else None
         
         if not query_text:
+            logger.warning("Empty query received")
             return jsonify({"error": "Please provide a description of your car problem."}), 400
             
         # Check for follow-up questions that might be needed for vague queries
@@ -489,24 +504,61 @@ def vehicle_health_page():
 def vehicle_health_api():
     """API endpoint to get vehicle health data."""
     try:
+        import logging
         from utils.ai_insights import get_complete_vehicle_analysis
+        
+        # Set up logging for diagnostics
+        logger = logging.getLogger(__name__)
+        logger.info("Vehicle health API request received")
         
         # Get parameters from request
         vehicle_id = request.args.get("vehicle_id", "default-vehicle")
-        brand = request.args.get("brand", "Unknown")
-        model = request.args.get("model", "Unknown")
-        year = request.args.get("year", "2024")
+        brand = request.args.get("brand", "Unknown").strip()
+        model = request.args.get("model", "Unknown").strip()
+        year = request.args.get("year", "2025")
         condition = request.args.get("condition", "")
         
-        # Get complete analysis
-        analysis = get_complete_vehicle_analysis(vehicle_id, brand, model, year, condition)
+        # Log the request parameters
+        logger.info(f"Vehicle health request - ID: '{vehicle_id}', Brand: '{brand}', Model: '{model}', Year: '{year}'")
         
-        # Return the analysis as JSON
-        return jsonify(analysis)
+        # Validate inputs
+        if not brand or brand == "Unknown":
+            logger.warning("Missing brand parameter in vehicle health request")
+            # We'll still process the request but log the warning
+        
+        if not model or model == "Unknown":
+            logger.warning("Missing model parameter in vehicle health request")
+            # We'll still process the request but log the warning
+        
+        # Get complete analysis with better error handling
+        try:
+            analysis = get_complete_vehicle_analysis(vehicle_id, brand, model, year, condition)
+            
+            # Ensure the vehicle data section contains the provided brand and model
+            if "vehicle_data" in analysis:
+                analysis["vehicle_data"]["brand"] = brand
+                analysis["vehicle_data"]["model"] = model
+                analysis["vehicle_data"]["year"] = year
+            
+            # Return the analysis as JSON
+            return jsonify(analysis)
+            
+        except Exception as analysis_error:
+            logger.error(f"Error generating vehicle analysis: {str(analysis_error)}")
+            return jsonify({
+                "error": "Unable to analyze vehicle health at this time",
+                "vehicle_data": {
+                    "vehicle_id": vehicle_id,
+                    "brand": brand, 
+                    "model": model,
+                    "year": year,
+                    "status": "Error"
+                }
+            }), 500
         
     except Exception as e:
-        print(f"Error in vehicle health API: {str(e)}")
-        return jsonify({"error": "An error occurred while analyzing vehicle health"}), 500
+        logger.error(f"Unexpected error in vehicle health API: {str(e)}")
+        return jsonify({"error": "An unexpected error occurred while analyzing vehicle health"}), 500
 
 if __name__ == "__main__":
     # Use a different port (8080) since port 5000 is used by Streamlit
