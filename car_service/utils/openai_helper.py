@@ -22,7 +22,7 @@ except Exception as e:
 
 def generate_diagnostic_response(query, brand, model, detailed=False):
     """
-    Generate a diagnostic response based on user query about car problems.
+    Generate a comprehensive diagnostic response based on user query about car problems.
     
     Args:
         query (str): User's description of the car problem
@@ -48,10 +48,13 @@ def generate_diagnostic_response(query, brand, model, detailed=False):
         detail_level = "detailed and comprehensive" if detailed else "concise but informative"
         
         system_prompt = f"""
-        You are an expert automotive diagnostic AI specializing in luxury vehicles. 
-        You have deep knowledge of {brand} {model} vehicles and their common issues.
+        You are an expert automotive diagnostic AI specializing in luxury vehicles with over 30 years of experience. 
+        You have deep knowledge of {brand} {model} vehicles and their common issues, including model-specific problems
+        and manufacturer service bulletins.
         
-        Provide a {detail_level} diagnostic response to the user's car problem.
+        Provide a {detail_level} diagnostic response to the user's car problem with extreme accuracy and specificity.
+        Use real part names, specific error codes, and professionally-oriented technical terminology when appropriate.
+        
         Structure your response in valid JSON format with the following structure:
         {{
             "results": [
@@ -61,15 +64,27 @@ def generate_diagnostic_response(query, brand, model, detailed=False):
                     "solution": "Detailed solution steps or recommendations",
                     "estimated_cost": "Cost range in $ (e.g., $50-$200)",
                     "diy_possible": true|false,
+                    "tools_required": ["Tool 1", "Tool 2", "etc"],
+                    "time_estimate": "Expected time to fix (e.g. '30 min', '2-3 hours')",
+                    "parts_needed": ["Part 1", "Part 2", "etc"],
                     "additional_info": "Optional additional information or context"
                 }},
-                // Add more potential issues if applicable
+                // Add 1-2 more potential issues if there could be multiple causes
             ],
             "follow_up_questions": [
                 "Question 1?",
-                "Question 2?"
+                "Question 2?",
+                "Question 3?"
             ]
         }}
+        
+        Make sure to:
+        1. Include all relevant specific part names for the {brand} {model}
+        2. Provide accurate cost estimates based on genuine parts and professional labor rates
+        3. Be specific about which problems can be fixed at home (DIY) vs requiring professional help
+        4. Provide detailed diagnostic steps where appropriate
+        5. Focus on the most likely issues based on the symptoms described
+        6. Include any known Technical Service Bulletins (TSBs) or recalls if relevant
         
         Base your diagnostic response on the best available information for this specific
         brand and model. Be accurate, professional, and helpful.
@@ -83,8 +98,9 @@ def generate_diagnostic_response(query, brand, model, detailed=False):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.5,
-            response_format={"type": "json_object"}
+            temperature=0.4,  # Lower temperature for more consistent, factual responses
+            response_format={"type": "json_object"},
+            max_tokens=1200   # Allow for longer, more detailed responses
         )
         
         # Parse JSON response
@@ -129,14 +145,30 @@ def generate_maintenance_tips(brand, model, year=None):
     try:
         year_info = f" {year}" if year else ""
         
+        system_prompt = f"""
+        You are a certified master technician specializing in {brand} vehicles with 25+ years of experience.
+        Provide 4-6 specific, actionable maintenance tips for a{year_info} {brand} {model}.
+        
+        Your tips should:
+        1. Include model-specific advice that owners may not know
+        2. Reference specific maintenance intervals when applicable
+        3. Mention any common issues that preventative maintenance can help avoid
+        4. Include specific fluids or parts recommended by the manufacturer
+        5. Provide practical tips that a vehicle owner can understand and act upon
+        
+        Return your response as a JSON object with a "tips" array of detailed maintenance tip strings.
+        Format each tip to be concise but informative with specific details.
+        """
+        
         response = client.chat.completions.create(
             model=MODEL,
             messages=[
-                {"role": "system", "content": "You are an automotive maintenance expert. Provide 3-5 specific maintenance tips as a JSON array of strings."},
-                {"role": "user", "content": f"Give me specific maintenance tips for a{year_info} {brand} {model}."}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"What are the most important maintenance tips for a{year_info} {brand} {model} that will keep it running at peak performance and prevent common issues?"}
             ],
-            temperature=0.5,
-            response_format={"type": "json_object"}
+            temperature=0.4,
+            response_format={"type": "json_object"},
+            max_tokens=800
         )
         
         result = json.loads(response.choices[0].message.content)
@@ -163,14 +195,36 @@ def generate_related_issues(brand, model, primary_issue):
         return []
     
     try:
+        system_prompt = f"""
+        You are a diagnostic expert specializing in {brand} vehicles with comprehensive knowledge of their 
+        interconnected systems. When a {brand} {model} has a particular issue, you can identify other 
+        related problems that may be connected due to:
+        
+        1. Shared components or systems
+        2. Cascading failures where one issue causes another
+        3. Common underlying root causes
+        4. Typical wear patterns that occur together
+        5. Model-specific failure points
+        
+        For the issue described, provide 2-3 related problems that an owner should check or be aware of.
+        Each related issue should:
+        - Be specifically related to the primary issue
+        - Include early warning signs to watch for
+        - Explain why/how it's connected to the primary issue
+        - Be relevant specifically to this {brand} {model}
+        
+        Return the results as a JSON array of objects with 'issue' and 'description' fields in a 'related_issues' object.
+        """
+        
         response = client.chat.completions.create(
             model=MODEL,
             messages=[
-                {"role": "system", "content": "You are an automotive diagnostic expert. Return 2-3 related issues that might be connected to the primary issue as a JSON array of objects with 'issue' and 'description' fields."},
-                {"role": "user", "content": f"What issues are commonly related to '{primary_issue}' on a {brand} {model}?"}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"When a {brand} {model} has the following problem: '{primary_issue}', what other related issues should the owner check or be aware of?"}
             ],
-            temperature=0.5,
-            response_format={"type": "json_object"}
+            temperature=0.4,
+            response_format={"type": "json_object"},
+            max_tokens=800
         )
         
         result = json.loads(response.choices[0].message.content)
