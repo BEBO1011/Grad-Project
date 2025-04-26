@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Service Centers | Premium Vehicle Care</title>
+    <title>CService | Premium Service Centers</title>
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -18,8 +18,8 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="/static/images/car_service_logo.jpeg" alt="Luxury Cars">
-                <h2>Elite<span style="font-weight:300">Cars</span></h2>
+                <img src="/static/images/car_service_logo.jpeg" alt="CService">
+                <h2>C<span style="font-weight:300">Service</span></h2>
             </div>
             <nav>
                 <ul>
@@ -102,18 +102,18 @@
                         </select>
                     </div>
                     <div style="display: flex; align-items: flex-end;">
-                        <button class="button-premium" style="width: 100%; margin-top: 0.5rem;">Apply Filters</button>
+                        <button id="applyFilters" class="button-premium" style="width: 100%; margin-top: 0.5rem;">Apply Filters</button>
                     </div>
                 </div>
             </div>
 
             <!-- Service Centers -->
             <h3 class="animate__animated animate__fadeIn" style="animation-delay: 0.3s;">Featured Service Centers</h3>
-            <div class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+            <div id="serviceCentersGrid" class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
                 <!-- Center 1 -->
                 <div class="card">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">EliteCars Downtown</h3>
+                        <h3 style="margin: 0;">CService Downtown</h3>
                         <span class="badge badge-premium">Premium Center</span>
                     </div>
                     <div style="position: relative; height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
@@ -142,7 +142,7 @@
                 <!-- Center 2 -->
                 <div class="card">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">EliteCars Westside</h3>
+                        <h3 style="margin: 0;">CService Westside</h3>
                         <span class="badge badge-certified">Certified</span>
                     </div>
                     <div style="position: relative; height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
@@ -170,7 +170,7 @@
                 <!-- Center 3 -->
                 <div class="card">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">EliteCars Eastside</h3>
+                        <h3 style="margin: 0;">CService Eastside</h3>
                         <span class="badge badge-popular">Highly Rated</span>
                     </div>
                     <div style="position: relative; height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
@@ -382,6 +382,131 @@
                     profileDropdown.classList.remove('show');
                 }
             });
+            
+            // Service Centers Filter Functionality
+            const applyFiltersBtn = document.getElementById('applyFilters');
+            const serviceCentersGrid = document.getElementById('serviceCentersGrid');
+            const serviceCards = Array.from(serviceCentersGrid.querySelectorAll('.card'));
+            
+            // Define service center data with attributes for filtering
+            const serviceCenters = [
+                {
+                    element: serviceCards[0],
+                    name: 'CService Downtown',
+                    region: 'central',
+                    brands: ['mercedes', 'bmw', 'audi', 'porsche'],
+                    services: ['maintenance', 'repair', 'detailing', 'performance'],
+                    rating: 4.9
+                },
+                {
+                    element: serviceCards[1],
+                    name: 'CService Westside',
+                    region: 'west',
+                    brands: ['lexus', 'jaguar', 'land rover'],
+                    services: ['maintenance', 'repair', 'detailing'],
+                    rating: 4.7
+                },
+                {
+                    element: serviceCards[2],
+                    name: 'CService Eastside',
+                    region: 'east',
+                    brands: ['mercedes', 'audi', 'ferrari', 'porsche'],
+                    services: ['maintenance', 'performance', 'repair'],
+                    rating: 4.8
+                }
+            ];
+            
+            // Function to apply filters
+            function applyFilters() {
+                const regionFilter = document.getElementById('region').value;
+                const brandFilter = document.getElementById('brand').value;
+                const serviceFilter = document.getElementById('service').value;
+                const ratingFilter = parseFloat(document.getElementById('rating').value) || 0;
+                
+                console.log(`Applying filters: Region: ${regionFilter}, Brand: ${brandFilter}, Service: ${serviceFilter}, Rating: ${ratingFilter}`);
+                
+                // Apply filters to each service center
+                serviceCenters.forEach(center => {
+                    let visible = true;
+                    
+                    // Apply region filter
+                    if (regionFilter && center.region !== regionFilter) {
+                        visible = false;
+                    }
+                    
+                    // Apply brand filter
+                    if (brandFilter && !center.brands.includes(brandFilter)) {
+                        visible = false;
+                    }
+                    
+                    // Apply service filter
+                    if (serviceFilter && !center.services.includes(serviceFilter)) {
+                        visible = false;
+                    }
+                    
+                    // Apply rating filter
+                    if (ratingFilter > 0 && center.rating < ratingFilter) {
+                        visible = false;
+                    }
+                    
+                    // Show or hide the service center
+                    center.element.style.display = visible ? 'block' : 'none';
+                });
+                
+                // Check if any centers are visible
+                const visibleCenters = serviceCenters.filter(center => 
+                    center.element.style.display !== 'none'
+                );
+                
+                // Show message if no centers match filters
+                const noResultsMsg = document.getElementById('noResultsMsg');
+                if (visibleCenters.length === 0) {
+                    if (!noResultsMsg) {
+                        const msg = document.createElement('div');
+                        msg.id = 'noResultsMsg';
+                        msg.style.textAlign = 'center';
+                        msg.style.padding = '2rem';
+                        msg.style.width = '100%';
+                        msg.innerHTML = `
+                            <i class="fas fa-search" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 1rem;"></i>
+                            <h3>No Service Centers Found</h3>
+                            <p style="color: var(--text-secondary);">Try adjusting your filters to see more results.</p>
+                            <button id="resetFilters" class="button-premium" style="margin-top: 1rem;">Reset Filters</button>
+                        `;
+                        serviceCentersGrid.appendChild(msg);
+                        
+                        // Add event listener to reset button
+                        document.getElementById('resetFilters').addEventListener('click', resetFilters);
+                    }
+                } else if (noResultsMsg) {
+                    noResultsMsg.remove();
+                }
+            }
+            
+            // Function to reset filters
+            function resetFilters() {
+                document.getElementById('region').value = '';
+                document.getElementById('brand').value = '';
+                document.getElementById('service').value = '';
+                document.getElementById('rating').value = '';
+                
+                // Show all service centers
+                serviceCenters.forEach(center => {
+                    center.element.style.display = 'block';
+                });
+                
+                // Remove no results message if it exists
+                const noResultsMsg = document.getElementById('noResultsMsg');
+                if (noResultsMsg) {
+                    noResultsMsg.remove();
+                }
+            }
+            
+            // Add click event listener to apply filters button
+            if (applyFiltersBtn) {
+                applyFiltersBtn.addEventListener('click', applyFilters);
+                console.log("✅ Filter functionality initialized");
+            }
         });
     </script>
     <script src="/static/js/mobile.js"></script>
