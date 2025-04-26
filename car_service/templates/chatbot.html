@@ -397,12 +397,12 @@
                         let errorIcon = "exclamation-triangle";
                         let errorDetails = "Our AI diagnostic service is currently experiencing issues. Our team has been notified.";
                         
-                        // Check if error is related to OpenAI API quota
+                        // Check if error is related to Google Gemini API quota
                         if (error.message && error.message.includes("QUOTA_EXCEEDED")) {
                             errorMessage = "AI diagnostic service quota reached";
                             errorTitle = "AI Service Limit Reached";
                             errorIcon = "clock";
-                            errorDetails = "Our AI diagnostic service has reached its usage limit for the current period. The system is using built-in diagnostics instead. Full AI service will resume shortly.";
+                            errorDetails = "Our Google Gemini AI diagnostic service has reached its usage limit for the current period. The system is using built-in diagnostics instead. Full AI service will resume shortly.";
                         }
                         
                         // Show error notification

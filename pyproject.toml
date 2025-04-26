@@ -10,6 +10,7 @@ dependencies = [
     "flask",
     "flask-cors",
     "geopy",
+    "google-generativeai>=0.8.5",
     "mapbox",
     "mysql-connector-python>=9.3.0",
     "nltk>=3.9.1",

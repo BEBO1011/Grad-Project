@@ -297,7 +297,7 @@ def simulate_translation(text, target_lang="en"):
 def search():
     try:
         import logging
-        from utils.openai_helper import generate_diagnostic_response, generate_maintenance_tips, generate_related_issues
+        from utils.gemini_helper import generate_diagnostic_response, generate_maintenance_tips, generate_related_issues
         
         # Set up logging for diagnostics
         logging.basicConfig(level=logging.INFO)
