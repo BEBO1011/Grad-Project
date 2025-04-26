@@ -202,20 +202,44 @@
         .features {
             padding: 100px 20px;
             background: var(--light-bg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.03) 0%, rgba(212, 175, 55, 0.06) 100%);
+            z-index: 0;
+            pointer-events: none;
         }
         
         .section-title {
             text-align: center;
             margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
         }
         
         .section-title h3 {
             font-family: 'Playfair Display', serif;
             font-size: 2.5rem;
-            color: var(--text-dark);
+            background: linear-gradient(135deg, #d4af37 0%, #f2dc9e 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             position: relative;
             display: inline-block;
             margin-bottom: 1rem;
+            animation: titleShine 2s infinite alternate;
+        }
+        
+        @keyframes titleShine {
+            from { background-position: left; }
+            to { background-position: right; }
         }
         
         .section-title h3:after {
@@ -237,78 +261,339 @@
             line-height: 1.6;
         }
         
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+        .features-container {
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
         
-        .feature-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        /* Feature Tabs */
+        .feature-tabs {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-tab {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 30px;
+            cursor: pointer;
             transition: all 0.3s ease;
             border: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            border-color: rgba(212, 175, 55, 0.2);
+        .feature-tab i {
+            margin-right: 10px;
+            color: #6c757d;
+            transition: all 0.3s ease;
         }
         
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.2) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
+        .feature-tab span {
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
         }
         
-        .feature-icon i {
-            font-size: 2rem;
+        .feature-tab:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .feature-tab.active {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.3) 100%);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+        
+        .feature-tab.active i,
+        .feature-tab.active span {
             color: var(--primary-gold);
         }
         
-        .feature-card h4 {
-            color: var(--text-dark);
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            font-weight: 600;
+        /* Feature Content */
+        .feature-content-container {
+            position: relative;
+            min-height: 500px;
         }
         
-        .feature-card p {
+        .feature-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            z-index: 0;
+        }
+        
+        .feature-content.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            z-index: 1;
+        }
+        
+        .feature-content-inner {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+        
+        .feature-text {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .feature-text h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .feature-text h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--primary-gold);
+        }
+        
+        .feature-text p {
             color: #6c757d;
             line-height: 1.6;
             margin-bottom: 20px;
+            font-size: 1.05rem;
         }
         
-        .feature-link {
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #6c757d;
+            animation: fadeInRight 0.5s ease both;
+            animation-delay: calc(var(--i, 0) * 0.1s);
+        }
+        
+        .feature-list li i {
             color: var(--primary-gold);
-            text-decoration: none;
-            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .feature-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #d4af37 0%, #f2dc9e 50%, #d4af37 100%);
+            color: #14151a;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            align-self: flex-start;
             margin-top: auto;
         }
         
-        .feature-link i {
-            margin-left: 5px;
+        .feature-btn span {
+            margin-right: 8px;
+        }
+        
+        .feature-btn i {
             transition: transform 0.3s ease;
         }
         
-        .feature-link:hover i {
+        .feature-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+        }
+        
+        .feature-btn:hover i {
             transform: translateX(5px);
+        }
+        
+        .feature-image {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(20, 21, 26, 0.9) 0%, rgba(20, 21, 26, 0.8) 100%);
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+        
+        .feature-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.7;
+            transition: all 0.5s ease;
+        }
+        
+        .feature-image:hover img {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
+        
+        .feature-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-gold);
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        .feature-badge span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .feature-badge small {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+        
+        .map-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .map-badge i {
+            font-size: 1.5rem;
+            margin-bottom: 2px;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Mobile Responsive for Features */
+        @media (max-width: 992px) {
+            .feature-content-inner {
+                flex-direction: column;
+            }
+            
+            .feature-image {
+                min-height: 300px;
+            }
+            
+            .feature-badge {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .feature-content-container {
+                min-height: 800px;
+            }
+            
+            .feature-text h2 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .feature-tab {
+                width: calc(50% - 10px);
+                justify-content: center;
+            }
+            
+            .feature-content-container {
+                min-height: 900px;
+            }
+            
+            .feature-text {
+                padding: 30px;
+            }
+            
+            .feature-text h2 {
+                font-size: 1.6rem;
+            }
+            
+            .section-title h3 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .feature-tab {
+                width: 100%;
+            }
+            
+            .feature-content-container {
+                min-height: 950px;
+            }
+            
+            .feature-text {
+                padding: 25px;
+            }
+            
+            .feature-btn {
+                width: 100%;
+            }
         }
         
         /* Authentication Modal */
@@ -647,39 +932,144 @@
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-title">
-            <h3>Exceptional Features</h3>
-            <p>Discover how our premium services can enhance your vehicle ownership experience</p>
+            <h3>Premium Features</h3>
+            <p>Experience luxury automotive care with our innovative services</p>
         </div>
         
-        <div class="features-grid">
-            <!-- Feature 1 -->
-            <div class="feature-card">
-                <div class="feature-icon">
+        <div class="features-container">
+            <!-- Feature Tabs -->
+            <div class="feature-tabs">
+                <div class="feature-tab active" data-tab="ai-diagnostics">
                     <i class="fas fa-robot"></i>
+                    <span>AI Diagnostics</span>
                 </div>
-                <h4>AI Diagnostic System</h4>
-                <p>Our advanced AI system accurately diagnoses vehicle issues, providing detailed solutions with cost estimates and repair guidance.</p>
-                <a href="/chatbot" class="feature-link">Try It Now <i class="fas fa-arrow-right"></i></a>
-            </div>
-            
-            <!-- Feature 2 -->
-            <div class="feature-card">
-                <div class="feature-icon">
+                <div class="feature-tab" data-tab="maintenance">
                     <i class="fas fa-tools"></i>
+                    <span>Premium Maintenance</span>
                 </div>
-                <h4>Premium Maintenance</h4>
-                <p>Connect with certified service centers specializing in luxury vehicles. Schedule appointments and track service history.</p>
-                <a href="/maintenance-centers" class="feature-link">View Centers <i class="fas fa-arrow-right"></i></a>
+                <div class="feature-tab" data-tab="location">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Location Services</span>
+                </div>
+                <div class="feature-tab" data-tab="monitoring">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Vehicle Monitoring</span>
+                </div>
             </div>
             
-            <!-- Feature 3 -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-map-marked-alt"></i>
+            <!-- Feature Content -->
+            <div class="feature-content-container">
+                <!-- AI Diagnostics Content -->
+                <div class="feature-content active" id="ai-diagnostics">
+                    <div class="feature-content-inner">
+                        <div class="feature-text">
+                            <h2>Advanced AI Diagnostic System</h2>
+                            <p>Our state-of-the-art AI technology revolutionizes vehicle diagnostics by:</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check-circle"></i> Analyzing symptoms with 98% accuracy</li>
+                                <li><i class="fas fa-check-circle"></i> Providing detailed repair solutions</li>
+                                <li><i class="fas fa-check-circle"></i> Estimating costs before servicing</li>
+                                <li><i class="fas fa-check-circle"></i> Supporting multiple languages</li>
+                            </ul>
+                            <p>Simply describe your vehicle issue, and our AI system will identify potential problems, recommend solutions, and connect you with qualified technicians.</p>
+                            <a href="/chatbot" class="feature-btn">
+                                <span>Try AI Diagnostics</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="feature-image">
+                            <img src="/static/images/ai-diagnostics.png" alt="AI Diagnostics" onerror="this.src='/static/images/IMG-20250413-WA0000.jpg'; this.style.opacity=0.7;">
+                            <div class="feature-badge">
+                                <span>98%</span>
+                                <small>Accuracy</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h4>Interactive Location Services</h4>
-                <p>Find nearby service centers, get real-time directions, and contact roadside assistance with our GPS-enabled map service.</p>
-                <a href="/map" class="feature-link">Explore Map <i class="fas fa-arrow-right"></i></a>
+                
+                <!-- Premium Maintenance Content -->
+                <div class="feature-content" id="maintenance">
+                    <div class="feature-content-inner">
+                        <div class="feature-text">
+                            <h2>Premium Maintenance Services</h2>
+                            <p>Connect with our network of certified maintenance centers specializing in luxury vehicles:</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check-circle"></i> Certified technicians for all premium brands</li>
+                                <li><i class="fas fa-check-circle"></i> Digital service history tracking</li>
+                                <li><i class="fas fa-check-circle"></i> OEM parts guarantee</li>
+                                <li><i class="fas fa-check-circle"></i> Priority scheduling for members</li>
+                            </ul>
+                            <p>Schedule appointments, track your maintenance history, and receive reminders for upcoming service needs to keep your vehicle in peak condition.</p>
+                            <a href="/maintenance-centers" class="feature-btn">
+                                <span>Find Service Centers</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="feature-image">
+                            <img src="/static/images/premium-maintenance.png" alt="Premium Maintenance" onerror="this.src='/static/images/IMG-20250413-WA001.jpeg'; this.style.opacity=0.7;">
+                            <div class="feature-badge">
+                                <span>100%</span>
+                                <small>OEM Parts</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Location Services Content -->
+                <div class="feature-content" id="location">
+                    <div class="feature-content-inner">
+                        <div class="feature-text">
+                            <h2>Interactive Location Services</h2>
+                            <p>Our GPS-enabled location services provide comprehensive assistance:</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check-circle"></i> Real-time service center locator</li>
+                                <li><i class="fas fa-check-circle"></i> Turn-by-turn directions</li>
+                                <li><i class="fas fa-check-circle"></i> Instant roadside assistance</li>
+                                <li><i class="fas fa-check-circle"></i> Saved locations for quick access</li>
+                            </ul>
+                            <p>Find the nearest service centers, get precise directions, and contact emergency assistance with just a few taps, ensuring you're never stranded on the road.</p>
+                            <a href="/map" class="feature-btn">
+                                <span>Explore Map Features</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="feature-image">
+                            <img src="/static/images/location-services.png" alt="Location Services" onerror="this.src='/static/images/IMG-20250413-WA002.jpeg'; this.style.opacity=0.7;">
+                            <div class="feature-badge map-badge">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <small>Live GPS</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vehicle Monitoring Content -->
+                <div class="feature-content" id="monitoring">
+                    <div class="feature-content-inner">
+                        <div class="feature-text">
+                            <h2>Real-time Vehicle Monitoring</h2>
+                            <p>Monitor your vehicle's health and performance with advanced analytics:</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check-circle"></i> Engine performance tracking</li>
+                                <li><i class="fas fa-check-circle"></i> Fuel efficiency optimization</li>
+                                <li><i class="fas fa-check-circle"></i> Predictive maintenance alerts</li>
+                                <li><i class="fas fa-check-circle"></i> Custom performance reports</li>
+                            </ul>
+                            <p>Receive real-time data about your vehicle's condition, get alerts for potential issues before they become serious, and track performance metrics over time.</p>
+                            <a href="/vehicle-health" class="feature-btn">
+                                <span>Monitor Your Vehicle</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="feature-image">
+                            <img src="/static/images/vehicle-monitoring.png" alt="Vehicle Monitoring" onerror="this.src='/static/images/IMG-20250413-WA003.jpeg'; this.style.opacity=0.7;">
+                            <div class="feature-badge">
+                                <span>24/7</span>
+                                <small>Monitoring</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -837,6 +1227,54 @@
             if (event.target === document.getElementById('authModal')) {
                 document.getElementById('authModal').style.display = 'none';
             }
+        });
+        
+        // Feature Tabs Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Feature tabs switching
+            const featureTabs = document.querySelectorAll('.feature-tab');
+            const featureContents = document.querySelectorAll('.feature-content');
+            
+            featureTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    featureTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Get the tab ID
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Hide all content sections
+                    featureContents.forEach(content => {
+                        content.classList.remove('active');
+                        
+                        // Apply animation to list items when shown
+                        const listItems = content.querySelectorAll('.feature-list li');
+                        listItems.forEach((item, index) => {
+                            item.style.setProperty('--i', index);
+                        });
+                    });
+                    
+                    // Show content for selected tab
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Apply initial animation to first tab's list items
+            const initialListItems = document.querySelector('.feature-content.active').querySelectorAll('.feature-list li');
+            initialListItems.forEach((item, index) => {
+                item.style.setProperty('--i', index);
+            });
+            
+            // Handle image loading
+            const featureImages = document.querySelectorAll('.feature-image img');
+            featureImages.forEach(img => {
+                img.addEventListener('error', function() {
+                    this.style.opacity = 0.7;
+                });
+            });
         });
     </script>
     <script src="/static/js/mobile.js"></script>

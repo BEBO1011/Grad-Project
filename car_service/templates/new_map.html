@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CService | Interactive Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css">
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.css">
+    <style>
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-dark);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .map-container {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            background-color: var(--card-bg);
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        #map {
+            width: 100%; 
+            height: 500px;
+            transition: all 0.3s ease;
+        }
+        
+        .map-fullscreen #map {
+            height: 85vh;
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .map-control-btn {
+            background-color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .map-control-btn:hover {
+            background-color: #f4f4f4;
+        }
+        
+        .map-control-btn i {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .mapboxgl-ctrl-bottom-right {
+            margin-bottom: 20px;
+        }
+        
+        .location-panel {
+            padding: 1.5rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .location-panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .location-panel-header i {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(212, 175, 55, 0.15);
+            color: var(--primary-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .location-panel-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-dark);
+        }
+        
+        .location-panel-body {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .location-input {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .location-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .location-input .custom-select {
+            position: relative;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .custom-select select {
+            display: none;
+        }
+        
+        .select-selected {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .select-selected:after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--primary-gold);
+            margin-left: 10px;
+            transition: transform 0.3s;
+        }
+        
+        .select-selected.select-arrow-active:after {
+            transform: rotate(180deg);
+        }
+        
+        .select-items {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .select-items div {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .select-items div:last-child {
+            border-bottom: none;
+        }
+        
+        .select-items div:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+        
+        .select-hide {
+            display: none;
+        }
+        
+        .select-items div.same-as-selected {
+            background-color: rgba(212, 175, 55, 0.2);
+        }
+        
+        .location-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .info-card-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+        
+        .info-card-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .location-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-gold);
+            color: #fff;
+        }
+        
+        .btn-secondary {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-dark);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-gold);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .place-type-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .place-type-tab {
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        
+        .place-type-tab.active {
+            background-color: rgba(212, 175, 55, 0.15);
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+        }
+        
+        .place-type-tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        
+        .place-type-tab i {
+            margin-right: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            #map {
+                height: 350px;
+            }
+            
+            .location-panel-body {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .location-input {
+                min-width: 100%;
+            }
+            
+            .location-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .info-card-value {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Loading animation for the map */
+        .map-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 12px;
+        }
+        
+        .map-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-gold);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Custom marker styles */
+        .custom-marker {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-marker:hover {
+            transform: scale(1.1);
+        }
+        
+        .custom-marker i {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="/static/images/car_service_logo.jpeg" alt="CService Logo">
+            <h1>CService</h1>
+        </div>
+        
+        <button class="mobile-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-items">
+            <a href="/" class="nav-item">Home</a>
+            <a href="/maintenance-centers" class="nav-item">Service Centers</a>
+            <a href="/map" class="nav-item active">Map</a>
+            <a href="/chatbot" class="nav-item">AI Diagnostics</a>
+        </div>
+        
+        <div class="user-icons">
+            <span id="notifications"><i class="fas fa-bell"></i></span>
+            <span id="profile"><i class="fas fa-user"></i></span>
+        </div>
+    </header>
+    
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="nav-group">
+                <h3 class="nav-group-title">Main Menu</h3>
+                <ul class="nav-list">
+                    <li><a href="/home"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="/vehicle-health"><i class="fas fa-heartbeat"></i> Vehicle Health</a></li>
+                    <li><a href="/chatbot"><i class="fas fa-robot"></i> AI Diagnostics</a></li>
+                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Service Centers</a></li>
+                    <li><a href="/map" class="active"><i class="fas fa-map-marker-alt"></i> Interactive Map</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <h3 class="nav-group-title">Account</h3>
+                <ul class="nav-list">
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#"><i class="fas fa-chart-line"></i> Vehicle Performance</a></li>
+                    <li><a href="#"><i class="fas fa-car"></i> My Vehicles</a></li>
+                </ul>
+            </div>
+            
+            <div class="support-card">
+                <h4>Need Help?</h4>
+                <p>Contact our customer support team for assistance with our premium services.</p>
+                <button onclick="location.href='/chatbot'">Contact Support</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-title">
+                <h2><i class="fas fa-map-marker-alt" style="color: var(--primary-gold); margin-right: 10px;"></i> Interactive Map</h2>
+            </div>
+            
+            <div class="location-panel animate__animated animate__fadeIn">
+                <div class="location-panel-header">
+                    <i class="fas fa-search-location"></i>
+                    <h3>Location Search</h3>
+                </div>
+                
+                <div class="location-panel-body">
+                    <div class="location-input">
+                        <label for="starting-point">Starting Point</label>
+                        <div class="custom-select" id="starting-point-container">
+                            <select id="starting-point">
+                                <option value="current" data-icon="fa-location-dot">Current Location</option>
+                                <option value="saved" data-icon="fa-house">Home</option>
+                                <option value="saved2" data-icon="fa-briefcase">Work</option>
+                                <option value="search" data-icon="fa-search">Search for location...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="location-input">
+                        <label for="destination">Destination</label>
+                        <div class="custom-select" id="destination-container">
+                            <select id="destination">
+                                <option value="nearest-service" data-icon="fa-tools">Nearest Service Center</option>
+                                <option value="center1" data-icon="fa-car">CService Premium Center</option>
+                                <option value="center2" data-icon="fa-oil-can">QuickLube Auto Center</option>
+                                <option value="center3" data-icon="fa-wrench">Elite Auto Care</option>
+                                <option value="search" data-icon="fa-search">Search for location...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="place-type-tabs">
+                    <div class="place-type-tab active"><i class="fas fa-car"></i> Driving</div>
+                    <div class="place-type-tab"><i class="fas fa-walking"></i> Walking</div>
+                    <div class="place-type-tab"><i class="fas fa-bicycle"></i> Cycling</div>
+                    <div class="place-type-tab"><i class="fas fa-bus"></i> Transit</div>
+                </div>
+                
+                <div class="location-actions">
+                    <button class="btn btn-primary" id="get-directions">
+                        <i class="fas fa-route"></i> Get Directions
+                    </button>
+                    <button class="btn btn-secondary" id="get-location">
+                        <i class="fas fa-location-crosshairs"></i> Use My Location
+                    </button>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <div id="map"></div>
+                <div class="map-controls">
+                    <button class="map-control-btn" id="fullscreen-toggle" title="Toggle Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="map-control-btn" id="recenter-map" title="Recenter Map">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                    <button class="map-control-btn" id="toggle-satellite" title="Toggle Satellite View">
+                        <i class="fas fa-satellite"></i>
+                    </button>
+                </div>
+                <div class="map-loading" id="map-loading">
+                    <div class="map-loading-spinner"></div>
+                </div>
+            </div>
+            
+            <div class="location-panel animate__animated animate__fadeIn" id="location-info-panel" style="display: none;">
+                <div class="location-panel-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>Location Details</h3>
+                </div>
+                
+                <div class="location-info-grid">
+                    <div class="info-card">
+                        <span class="info-card-label">Address</span>
+                        <div class="info-card-value" id="address">Loading...</div>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-card-label">Coordinates</span>
+                        <div class="info-card-value" id="coordinates">Loading...</div>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-card-label">Distance</span>
+                        <div class="info-card-value" id="distance">Loading...</div>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-card-label">Estimated Time</span>
+                        <div class="info-card-value" id="estimated-time">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="location-actions">
+                    <button class="btn btn-primary" id="save-location">
+                        <i class="fas fa-bookmark"></i> Save Location
+                    </button>
+                    <button class="btn btn-secondary" id="share-location">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                    <h4>Notifications</h4>
+                    <a href="#">Mark all as read</a>
+                </div>
+                <div class="notification-body">
+                    <div class="notification-item unread">
+                        <h5>Service Reminder</h5>
+                        <p>Your vehicle is due for scheduled maintenance</p>
+                        <div class="notification-time">2 hours ago</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>Appointment Confirmed</h5>
+                        <p>Your service appointment has been confirmed</p>
+                        <div class="notification-time">Yesterday</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>New Feature Available</h5>
+                        <p>Check out the new vehicle health monitoring tool</p>
+                        <div class="notification-time">3 days ago</div>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <button>View All Notifications</button>
+                </div>
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-header">
+                    <div class="profile-pic">
+                        <img src="/static/images/user-profile.jpg" alt="Profile" onerror="this.src='/static/images/photo_2025-03-31_23-49-16.jpg'">
+                    </div>
+                    <h4>Alex Johnson</h4>
+                    <p>Premium Member</p>
+                </div>
+                <div class="profile-body">
+                    <a href="#" class="profile-link"><i class="fas fa-user"></i> My Profile</a>
+                    <a href="#" class="profile-link"><i class="fas fa-car"></i> My Vehicles</a>
+                    <a href="#" class="profile-link"><i class="fas fa-chart-line"></i> Vehicle Performance</a>
+                    <a href="#" class="profile-link"><i class="fas fa-bell"></i> Notifications</a>
+                    <a href="#" class="profile-link"><i class="fas fa-cog"></i> Settings</a>
+                </div>
+                <div class="profile-footer">
+                    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Include Mapbox GL JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.js"></script>
+    <script src="/static/js/frontend_api.js"></script>
+    <script src="/static/js/mobile.js"></script>
+    <script src="/static/js/theme.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Custom select implementation
+            function initCustomSelects() {
+                let customSelects = document.querySelectorAll('.custom-select');
+                
+                customSelects.forEach(customSelect => {
+                    let select = customSelect.querySelector('select');
+                    let options = select.options;
+                    
+                    // Create the custom select UI
+                    let customSelectDiv = document.createElement('div');
+                    customSelectDiv.className = 'select-selected';
+                    
+                    // Get the initial selected option and its icon
+                    let selectedOption = options[0];
+                    let icon = selectedOption.getAttribute('data-icon');
+                    
+                    customSelectDiv.innerHTML = icon ? 
+                        `<i class="fas ${icon}"></i> ${selectedOption.text}` : 
+                        selectedOption.text;
+                    
+                    customSelect.appendChild(customSelectDiv);
+                    
+                    // Create the options container
+                    let optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'select-items select-hide';
+                    
+                    // Add options to the container
+                    Array.from(options).forEach((option, index) => {
+                        let optionDiv = document.createElement('div');
+                        let optionIcon = option.getAttribute('data-icon');
+                        
+                        optionDiv.innerHTML = optionIcon ? 
+                            `<i class="fas ${optionIcon}"></i> ${option.text}` : 
+                            option.text;
+                        
+                        // Option click event
+                        optionDiv.addEventListener('click', function() {
+                            select.selectedIndex = index;
+                            
+                            // Update display
+                            customSelectDiv.innerHTML = this.innerHTML;
+                            
+                            // Handle selection change
+                            let evt = new Event('change');
+                            select.dispatchEvent(evt);
+                            
+                            // Close dropdown
+                            customSelectDiv.click();
+                            
+                            // Mark as selected
+                            let items = optionsContainer.querySelectorAll('div');
+                            items.forEach(item => {
+                                item.classList.remove('same-as-selected');
+                            });
+                            this.classList.add('same-as-selected');
+                        });
+                        
+                        optionsContainer.appendChild(optionDiv);
+                    });
+                    
+                    customSelect.appendChild(optionsContainer);
+                    
+                    // Toggle dropdown
+                    customSelectDiv.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        this.classList.toggle('select-arrow-active');
+                        optionsContainer.classList.toggle('select-hide');
+                        
+                        // Close all other select dropdowns
+                        document.querySelectorAll('.select-items').forEach(item => {
+                            if (item !== optionsContainer) {
+                                item.classList.add('select-hide');
+                            }
+                        });
+                        
+                        document.querySelectorAll('.select-selected').forEach(selected => {
+                            if (selected !== this) {
+                                selected.classList.remove('select-arrow-active');
+                            }
+                        });
+                    });
+                });
+                
+                // Close dropdowns when clicking outside
+                document.addEventListener('click', function() {
+                    document.querySelectorAll('.select-selected').forEach(selected => {
+                        selected.classList.remove('select-arrow-active');
+                    });
+                    
+                    document.querySelectorAll('.select-items').forEach(items => {
+                        items.classList.add('select-hide');
+                    });
+                });
+            }
+            
+            // Initialize custom selects
+            initCustomSelects();
+            
+            // Initialize place type tabs
+            const placeTabs = document.querySelectorAll('.place-type-tab');
+            placeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    placeTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Toggle map fullscreen mode
+            const mapContainer = document.querySelector('.map-container');
+            const fullscreenToggle = document.getElementById('fullscreen-toggle');
+            let isFullscreen = false;
+            
+            fullscreenToggle.addEventListener('click', function() {
+                isFullscreen = !isFullscreen;
+                mapContainer.classList.toggle('map-fullscreen');
+                this.innerHTML = isFullscreen ? 
+                    '<i class="fas fa-compress"></i>' : 
+                    '<i class="fas fa-expand"></i>';
+                
+                // Resize map to fit new container
+                if (window.mapObj) {
+                    window.setTimeout(() => {
+                        window.mapObj.resize();
+                    }, 300);
+                }
+            });
+            
+            // Handle notifications & profile dropdowns
+            const notificationBtn = document.getElementById('notifications');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const profileBtn = document.getElementById('profile');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    notificationDropdown.classList.toggle('show');
+                    if (profileDropdown && profileDropdown.classList.contains('show')) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            if (profileBtn && profileDropdown) {
+                profileBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                    if (notificationDropdown && notificationDropdown.classList.contains('show')) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                if (notificationDropdown && notificationDropdown.classList.contains('show')) {
+                    notificationDropdown.classList.remove('show');
+                }
+                if (profileDropdown && profileDropdown.classList.contains('show')) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
+            
+            // Function to get user location
+            function getUserLocation(callback) {
+                const loadingElement = document.getElementById('map-loading');
+                loadingElement.style.display = 'flex';
+                
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            const userLat = position.coords.latitude;
+                            const userLon = position.coords.longitude;
+                            console.log("User Location:", userLat, userLon);
+                            loadingElement.style.display = 'none';
+                            callback(userLat, userLon);
+                        },
+                        error => {
+                            console.error("Error getting location:", error);
+                            loadingElement.style.display = 'none';
+                            
+                            // Default location (example coordinates)
+                            const defaultLat = 30.0444;
+                            const defaultLon = 31.2357;
+                            callback(defaultLat, defaultLon);
+                        }
+                    );
+                } else {
+                    console.error("Geolocation is not supported by this browser.");
+                    loadingElement.style.display = 'none';
+                    
+                    // Default location if geolocation is not supported
+                    const defaultLat = 30.0444;
+                    const defaultLon = 31.2357;
+                    callback(defaultLat, defaultLon);
+                }
+            }
+            
+            // Initialize Mapbox
+            mapboxgl.accessToken = 'pk.eyJ1IjoicmFvb3V1ZiIsImEiOiJjbThhczR3dHQwaXNrMmlyNDFiNWNlbXJuIn0.aG1MNazYf9MdCc9w3bT27A';
+            
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/dark-v11', // Dark theme by default
+                center: [31.2357, 30.0444], // Default coordinates (Cairo, Egypt)
+                zoom: 10,
+                attributionControl: false
+            });
+            
+            // Save map instance to window for resize access
+            window.mapObj = map;
+            
+            // Add controls
+            const directions = new MapboxDirections({
+                accessToken: mapboxgl.accessToken,
+                unit: 'metric',
+                profile: 'mapbox/driving',
+                alternatives: true,
+                congestion: true,
+                controls: {
+                    inputs: false, // We're using our custom UI
+                    instructions: true
+                }
+            });
+            
+            map.addControl(directions, 'top-left');
+            map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+            map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+            
+            // Hide loading when map is loaded
+            map.on('load', function() {
+                document.getElementById('map-loading').style.display = 'none';
+                
+                // Add some example service center markers
+                const serviceCenters = [
+                    { name: "CService Premium Center", lng: 31.2357, lat: 30.0644, icon: "car" },
+                    { name: "QuickLube Auto Center", lng: 31.2557, lat: 30.0344, icon: "oil-can" },
+                    { name: "Elite Auto Care", lng: 31.2157, lat: 30.0444, icon: "wrench" }
+                ];
+                
+                serviceCenters.forEach(center => {
+                    // Create custom marker element
+                    const marker = document.createElement('div');
+                    marker.className = 'custom-marker';
+                    marker.innerHTML = `<i class="fas fa-${center.icon}"></i>`;
+                    
+                    // Create popup
+                    const popup = new mapboxgl.Popup({ offset: 25 })
+                        .setHTML(`
+                            <h4 style="margin:0 0 5px;font-weight:600;color:#333;">${center.name}</h4>
+                            <p style="margin:0;color:#666;font-size:12px;">
+                                <i class="fas fa-star" style="color:gold;"></i> 4.8 · Premium Service Center
+                            </p>
+                            <p style="margin:5px 0;color:#666;font-size:12px;">
+                                <i class="fas fa-clock"></i> Open · Closes 8PM
+                            </p>
+                            <button style="background:#d4af37;color:white;border:none;padding:5px 10px;border-radius:4px;font-size:12px;cursor:pointer;margin-top:5px;">View Details</button>
+                        `);
+                    
+                    // Add marker to map
+                    new mapboxgl.Marker(marker)
+                        .setLngLat([center.lng, center.lat])
+                        .setPopup(popup)
+                        .addTo(map);
+                });
+            });
+            
+            // Get user location button
+            document.getElementById('get-location').addEventListener('click', function() {
+                getUserLocation(function(lat, lon) {
+                    map.flyTo({
+                        center: [lon, lat],
+                        zoom: 14,
+                        essential: true
+                    });
+                    
+                    // Add a marker for user location
+                    const userMarker = document.createElement('div');
+                    userMarker.className = 'custom-marker';
+                    userMarker.style.backgroundColor = '#4285F4';
+                    userMarker.innerHTML = '<i class="fas fa-user"></i>';
+                    
+                    new mapboxgl.Marker(userMarker)
+                        .setLngLat([lon, lat])
+                        .setPopup(new mapboxgl.Popup().setHTML('<p><strong>Your Location</strong></p>'))
+                        .addTo(map);
+                        
+                    // Show the location info panel
+                    document.getElementById('location-info-panel').style.display = 'block';
+                    
+                    // Update UI with coordinates
+                    document.getElementById('coordinates').innerText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+                    
+                    // Reverse geocode to get address
+                    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?access_token=${mapboxgl.accessToken}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.features && data.features.length > 0) {
+                                document.getElementById('address').innerText = data.features[0].place_name;
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error getting address:", error);
+                            document.getElementById('address').innerText = "Address not available";
+                        });
+                });
+            });
+            
+            // Get directions button
+            document.getElementById('get-directions').addEventListener('click', function() {
+                // Get selected values
+                const startingPointSelect = document.getElementById('starting-point');
+                const destinationSelect = document.getElementById('destination');
+                const startingPoint = startingPointSelect.value;
+                const destination = destinationSelect.value;
+                
+                if (startingPoint === 'current') {
+                    getUserLocation(function(lat, lon) {
+                        directions.setOrigin([lon, lat]);
+                        
+                        // Set destination based on selection
+                        if (destination === 'nearest-service') {
+                            // Find nearest service center
+                            directions.setDestination([31.2357, 30.0644]); // Example: CService Premium Center
+                        } else if (destination === 'center1') {
+                            directions.setDestination([31.2357, 30.0644]);
+                        } else if (destination === 'center2') {
+                            directions.setDestination([31.2557, 30.0344]);
+                        } else if (destination === 'center3') {
+                            directions.setDestination([31.2157, 30.0444]);
+                        }
+                    });
+                } else if (startingPoint === 'saved') {
+                    // Example of a saved "Home" location
+                    directions.setOrigin([31.2100, 30.0200]);
+                    
+                    if (destination === 'nearest-service') {
+                        directions.setDestination([31.2357, 30.0644]);
+                    } else if (destination === 'center1') {
+                        directions.setDestination([31.2357, 30.0644]);
+                    } else if (destination === 'center2') {
+                        directions.setDestination([31.2557, 30.0344]);
+                    } else if (destination === 'center3') {
+                        directions.setDestination([31.2157, 30.0444]);
+                    }
+                }
+                
+                // Show the location info panel
+                document.getElementById('location-info-panel').style.display = 'block';
+            });
+            
+            // Toggle satellite view
+            let isSatellite = false;
+            document.getElementById('toggle-satellite').addEventListener('click', function() {
+                isSatellite = !isSatellite;
+                map.setStyle(isSatellite ? 
+                    'mapbox://styles/mapbox/satellite-streets-v12' : 
+                    'mapbox://styles/mapbox/dark-v11');
+            });
+            
+            // Recenter map
+            document.getElementById('recenter-map').addEventListener('click', function() {
+                map.flyTo({
+                    center: [31.2357, 30.0444],
+                    zoom: 10,
+                    essential: true
+                });
+            });
+            
+            // Example values for distance and time
+            document.getElementById('distance').innerText = "5.2 km";
+            document.getElementById('estimated-time').innerText = "15 min";
+            
+            // Save location button
+            document.getElementById('save-location').addEventListener('click', function() {
+                // In a real app, this would save to a database
+                const notification = document.createElement('div');
+                notification.className = 'notification success';
+                notification.innerHTML = '<i class="fas fa-check-circle"></i> Location saved successfully!';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }, 3000);
+            });
+            
+            // Share location button
+            document.getElementById('share-location').addEventListener('click', function() {
+                const coordinates = document.getElementById('coordinates').innerText;
+                const address = document.getElementById('address').innerText;
+                
+                // In a real app, this would open a share dialog
+                alert(`Share this location:\n\nAddress: ${address}\nCoordinates: ${coordinates}`);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -99,7 +99,7 @@ def home():
 
 @app.route('/map')
 def map_page():
-    return render_template('map.html')
+    return render_template('new_map.html')
 
 @app.route('/maintenance-centers')
 def maintenance_centers_page():

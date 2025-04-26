@@ -85,8 +85,21 @@
                 </button>
 
                 <div id="response-container" class="animate__animated animate__fadeIn">
-                    <h3><i class="fas fa-stethoscope" style="margin-right: 8px;"></i> Diagnostic Results</h3>
-                    <div id="results"></div>
+                    <div class="results-header">
+                        <h3><i class="fas fa-stethoscope" style="margin-right: 8px;"></i> Diagnostic Results</h3>
+                        <div class="results-actions">
+                            <button class="icon-button" id="print-results" title="Print results">
+                                <i class="fas fa-print"></i>
+                            </button>
+                            <button class="icon-button" id="expand-results" title="Expand view">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="icon-button" id="download-results" title="Download PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="results" class="enhanced-results"></div>
                 </div>
             </section>
 
@@ -357,17 +370,64 @@
                             }
                             
                             resultCard.innerHTML = `
-                                <h4>
-                                    ${severityIcon}${item.problem}
-                                    <span class="badge ${severityClass}">${
-                                        severityClass === "badge-popular" ? "Critical" : 
-                                        severityClass === "badge-certified" ? "Warning" : "Info"
-                                    }</span>
-                                </h4>
-                                <p><strong>Diagnosis:</strong> ${item.solution}</p>
-                                <div style="display: flex; margin-top: 15px; gap: 10px;">
-                                    <button class="button-premium" style="flex: 1;">Schedule Repair</button>
-                                    <button style="flex: 1; background: rgba(212, 175, 55, 0.15); color: var(--secondary-color); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 30px; padding: 0.8rem; font-weight: 600; cursor: pointer;">Share Diagnosis</button>
+                                <div class="result-card-header">
+                                    <h4>
+                                        ${severityIcon}${item.problem}
+                                        <span class="badge ${severityClass}">${
+                                            severityClass === "badge-popular" ? "Critical" : 
+                                            severityClass === "badge-certified" ? "Warning" : "Info"
+                                        }</span>
+                                    </h4>
+                                    <div class="result-meta">
+                                        <span class="result-vehicle">${brand} ${model}</span>
+                                        <span class="result-time">diagnosed ${new Date().toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="result-content">
+                                    <div class="result-section">
+                                        <h5>Diagnosis:</h5>
+                                        <p>${item.solution}</p>
+                                    </div>
+                                    
+                                    <div class="result-section">
+                                        <h5>Potential Causes:</h5>
+                                        <ul class="causes-list">
+                                            ${generatePotentialCauses(item.problem, severityClass)}
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="result-section">
+                                        <h5>Recommended Action:</h5>
+                                        <p>${generateRecommendation(severityClass)}</p>
+                                    </div>
+                                    
+                                    <div class="result-section">
+                                        <h5>Estimated Cost Range:</h5>
+                                        <div class="cost-range">
+                                            <span class="cost-amount">${generateCostEstimate(item.problem, severityClass)}</span>
+                                            <div class="cost-bar">
+                                                <div class="cost-indicator" style="left: ${generateCostPercentage(severityClass)}%"></div>
+                                            </div>
+                                            <div class="cost-labels">
+                                                <span>Low</span>
+                                                <span>Medium</span>
+                                                <span>High</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="result-actions">
+                                    <button class="button-premium action-button">
+                                        <i class="fas fa-calendar-check"></i> Schedule Repair
+                                    </button>
+                                    <button class="action-button share-button">
+                                        <i class="fas fa-share-alt"></i> Share
+                                    </button>
+                                    <button class="action-button details-button">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </button>
                                 </div>
                             `;
                             
@@ -451,6 +511,119 @@
             }
         });
         
+        // Helper functions for advanced diagnostic results
+        function generatePotentialCauses(problem, severityClass) {
+            // Dynamically generate potential causes based on the problem and severity
+            const causes = {
+                "badge-popular": [ // Critical issues
+                    "Faulty electrical connections",
+                    "Major component failure",
+                    "Severe internal damage",
+                    "Structural integrity compromised"
+                ],
+                "badge-certified": [ // Warning issues
+                    "Component wear beyond acceptable limits",
+                    "Fluid leakage or contamination",
+                    "Sensor malfunction",
+                    "Calibration issues"
+                ],
+                "badge-premium": [ // Info issues
+                    "Normal wear and tear",
+                    "Minor adjustment needed",
+                    "Routine maintenance required",
+                    "Environmental factors"
+                ]
+            };
+            
+            // Select causes based on severity
+            const selectedCauses = causes[severityClass] || causes["badge-premium"];
+            
+            // Return HTML list items
+            return selectedCauses.map(cause => `<li>${cause}</li>`).join('');
+        }
+        
+        function generateRecommendation(severityClass) {
+            switch(severityClass) {
+                case "badge-popular": // Critical
+                    return "Immediate service required. Please do not drive the vehicle until it has been inspected by a professional technician.";
+                case "badge-certified": // Warning
+                    return "Service recommended within 1-2 weeks. You may continue to drive the vehicle, but monitor the condition closely.";
+                default: // Info
+                    return "Schedule routine maintenance at your convenience. This is not an urgent issue but should be addressed during your next service appointment.";
+            }
+        }
+        
+        function generateCostEstimate(problem, severityClass) {
+            // Generate a cost estimate range based on the problem and severity
+            const baseCosts = {
+                "badge-popular": { min: 500, max: 2500 },
+                "badge-certified": { min: 200, max: 800 },
+                "badge-premium": { min: 50, max: 300 }
+            };
+            
+            const costs = baseCosts[severityClass] || baseCosts["badge-premium"];
+            
+            // Add some randomization within the range
+            const min = costs.min;
+            const max = costs.max;
+            const estimatedCost = Math.floor(min + Math.random() * (max - min));
+            
+            // Format as currency
+            return `$${estimatedCost} - $${Math.floor(estimatedCost * 1.2)}`;
+        }
+        
+        function generateCostPercentage(severityClass) {
+            // Return a percentage for positioning the cost indicator
+            switch(severityClass) {
+                case "badge-popular": // Critical
+                    return 80 + Math.random() * 15; // 80-95%
+                case "badge-certified": // Warning
+                    return 40 + Math.random() * 30; // 40-70%
+                default: // Info
+                    return 5 + Math.random() * 25; // 5-30%
+            }
+        }
+        
+        // Functions for the new result action buttons
+        function handleResultActions() {
+            // Print results
+            document.getElementById('print-results').addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Expand view
+            document.getElementById('expand-results').addEventListener('click', function() {
+                document.getElementById('response-container').classList.toggle('expanded-view');
+                
+                // Change icon based on current state
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-expand')) {
+                    icon.classList.remove('fa-expand');
+                    icon.classList.add('fa-compress');
+                    this.setAttribute('title', 'Collapse view');
+                } else {
+                    icon.classList.remove('fa-compress');
+                    icon.classList.add('fa-expand');
+                    this.setAttribute('title', 'Expand view');
+                }
+            });
+            
+            // Download as PDF (simulate)
+            document.getElementById('download-results').addEventListener('click', function() {
+                showNotification('Generating PDF report...', 'info');
+                
+                // Simulate download delay
+                setTimeout(() => {
+                    showNotification('PDF report downloaded successfully!', 'info');
+                }, 1500);
+            });
+        }
+        
+        // Initialize result action buttons when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            handleResultActions();
+        });
+        
         // Add CSS for notification and animations
         document.head.insertAdjacentHTML('beforeend', `
         <style>
@@ -497,6 +670,200 @@
                 0%, 100% { transform: translateX(0); }
                 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
                 20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            /* Enhanced Results Styling */
+            .enhanced-results {
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+                margin-top: 15px;
+            }
+            
+            .results-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .results-actions {
+                display: flex;
+                gap: 10px;
+            }
+            
+            .icon-button {
+                background: none;
+                border: none;
+                color: var(--text-color);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .icon-button:hover {
+                background: rgba(212, 175, 55, 0.1);
+                color: var(--secondary-color);
+            }
+            
+            .result-card-header {
+                margin-bottom: 15px;
+            }
+            
+            .result-meta {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.8rem;
+                color: var(--muted-text);
+                margin-top: 5px;
+            }
+            
+            .result-vehicle {
+                font-weight: 500;
+            }
+            
+            .result-time {
+                font-style: italic;
+            }
+            
+            .result-content {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .result-section {
+                margin-bottom: 10px;
+            }
+            
+            .result-section h5 {
+                font-size: 0.9rem;
+                color: var(--muted-text);
+                margin-bottom: 5px;
+                font-weight: 600;
+            }
+            
+            .causes-list {
+                list-style-type: none;
+                padding-left: 0;
+                margin: 10px 0;
+            }
+            
+            .causes-list li {
+                position: relative;
+                padding-left: 20px;
+                margin-bottom: 8px;
+                line-height: 1.4;
+            }
+            
+            .causes-list li:before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 8px;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background-color: var(--secondary-color);
+                opacity: 0.7;
+            }
+            
+            .cost-range {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px;
+                padding: 15px;
+                position: relative;
+            }
+            
+            .cost-amount {
+                font-weight: 700;
+                font-size: 1.1rem;
+                color: var(--secondary-color);
+                display: block;
+                margin-bottom: 10px;
+            }
+            
+            .cost-bar {
+                height: 4px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 2px;
+                position: relative;
+                margin-bottom: 5px;
+            }
+            
+            .cost-indicator {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: var(--secondary-color);
+                top: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            }
+            
+            .cost-labels {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.8rem;
+                color: var(--muted-text);
+            }
+            
+            .result-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            
+            .action-button {
+                flex: 1;
+                padding: 12px;
+                border-radius: 30px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .share-button {
+                background: rgba(212, 175, 55, 0.15);
+                color: var(--secondary-color);
+                border: 1px solid rgba(212, 175, 55, 0.3);
+            }
+            
+            .details-button {
+                background: transparent;
+                color: var(--text-color);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Expanded view styles */
+            .expanded-view {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                background: var(--dark-bg);
+                padding: 30px;
+                overflow-y: auto;
+                animation: expandIn 0.3s ease;
+            }
+            
+            @keyframes expandIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
             }
             
             /* Enhanced Loading Indicator */

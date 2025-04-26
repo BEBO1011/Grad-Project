@@ -3,152 +3,897 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>CService | Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* Settings Page Specific Styles */
+        .settings-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-gold);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .settings-header i {
+            color: var(--primary-gold);
+            margin-right: 0.8rem;
+            font-size: 1.5rem;
+        }
+        
+        .settings-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-dark);
+        }
+        
+        .settings-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            animation: fadeIn 0.5s ease;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .settings-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .settings-section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .settings-section-title i {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(212, 175, 55, 0.15);
+            color: var(--primary-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1rem;
+        }
+        
+        .settings-section-title h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-dark);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .form-group select,
+        .form-group input[type="text"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.8);
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group select:focus,
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .radio-option {
+            position: relative;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .radio-option input[type="radio"] {
+            opacity: 0;
+            position: absolute;
+        }
+        
+        .radio-option label {
+            display: flex;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .radio-option input[type="radio"]:checked + label {
+            background-color: rgba(212, 175, 55, 0.15);
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
+        
+        .radio-option label i {
+            margin-right: 8px;
+        }
+        
+        .toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+        }
+        
+        .toggle-group .toggle-label {
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary-gold);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .color-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .color-option.active {
+            border-color: var(--primary-gold);
+            transform: scale(1.1);
+        }
+        
+        .color-option.gold {
+            background-color: #d4af37;
+        }
+        
+        .color-option.blue {
+            background-color: #4361ee;
+        }
+        
+        .color-option.teal {
+            background-color: #0ea5e9;
+        }
+        
+        .color-option.purple {
+            background-color: #8b5cf6;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-gold);
+            color: #fff;
+            flex: 2;
+        }
+        
+        .btn-secondary {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-dark);
+            flex: 1;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-gold);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            animation: notificationSlide 0.5s forwards;
+        }
+        
+        @keyframes notificationSlide {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .notification.success {
+            border-left: 4px solid var(--green);
+        }
+        
+        .notification.success i {
+            color: var(--green);
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .settings-container {
+                padding: 1.5rem;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .radio-option {
+                width: 100%;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="wrapper">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="/static/images/car_service_logo.jpeg" alt="CService Logo">
+            <h1>CService</h1>
+        </div>
+        
+        <button class="mobile-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-items">
+            <a href="/" class="nav-item">Home</a>
+            <a href="/maintenance-centers" class="nav-item">Service Centers</a>
+            <a href="/map" class="nav-item">Map</a>
+            <a href="/chatbot" class="nav-item">AI Diagnostics</a>
+        </div>
+        
+        <div class="user-icons">
+            <span id="notifications"><i class="fas fa-bell"></i></span>
+            <span id="profile"><i class="fas fa-user"></i></span>
+        </div>
+    </header>
+    
+    <!-- App Container -->
+    <div class="app-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <img src="/static/images/photo_2025-03-31_23-49-16.jpg" alt="Car Logo">
-                <h2>CService</h2>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/map"><i class="fas fa-map"></i> Map</a></li>
-                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Maintenance Centers</a></li>
-                    <li><a href="/settings" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+        <aside class="sidebar" id="sidebar">
+            <div class="nav-group">
+                <h3 class="nav-group-title">Main Menu</h3>
+                <ul class="nav-list">
+                    <li><a href="/home"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="/vehicle-health"><i class="fas fa-heartbeat"></i> Vehicle Health</a></li>
+                    <li><a href="/chatbot"><i class="fas fa-robot"></i> AI Diagnostics</a></li>
+                    <li><a href="/maintenance-centers"><i class="fas fa-tools"></i> Service Centers</a></li>
+                    <li><a href="/map"><i class="fas fa-map-marker-alt"></i> Interactive Map</a></li>
                 </ul>
-            </nav>
-            <div class="help-center">
-                <p>Having Trouble?</p>
-                <button onclick="location.href='/chatbot'">Go To Help Center</button>
-            </div>            
+            </div>
+            
+            <div class="nav-group">
+                <h3 class="nav-group-title">Account</h3>
+                <ul class="nav-list">
+                    <li><a href="/settings" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#"><i class="fas fa-chart-line"></i> Vehicle Performance</a></li>
+                    <li><a href="#"><i class="fas fa-car"></i> My Vehicles</a></li>
+                </ul>
+            </div>
+            
+            <div class="support-card">
+                <h4>Need Help?</h4>
+                <p>Contact our customer support team for assistance with your premium service.</p>
+                <button onclick="location.href='/chatbot'">Contact Support</button>
+            </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="content">
-            <header>
-                <h2>Settings</h2>
-                <div class="user-icons">
-                    <span><i class="fas fa-bell"></i></span>
-                    <span><i class="fas fa-user"></i></span>
+        <main class="main-content">
+            <div class="page-title">
+                <h2><i class="fas fa-cog" style="color: var(--primary-gold); margin-right: 10px;"></i> Settings</h2>
+            </div>
+            
+            <div class="settings-container animate__animated animate__fadeIn">
+                <!-- Interface Settings -->
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        <i class="fas fa-desktop"></i>
+                        <h3>Interface Preferences</h3>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="language">Display Language</label>
+                        <select id="language" class="premium-select">
+                            <option value="en">English (Default)</option>
+                            <option value="ar">Arabic (العربية)</option>
+                            <option value="fr">French (Français)</option>
+                            <option value="es">Spanish (Español)</option>
+                            <option value="de">German (Deutsch)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Theme Mode</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="light-theme" name="thememode" value="light">
+                                <label for="light-theme"><i class="fas fa-sun"></i> Light</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="dark-theme" name="thememode" value="dark" checked>
+                                <label for="dark-theme"><i class="fas fa-moon"></i> Dark</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="auto-theme" name="thememode" value="auto">
+                                <label for="auto-theme"><i class="fas fa-adjust"></i> System</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Accent Color</label>
+                        <div class="color-options">
+                            <div class="color-option gold active" data-color="gold"></div>
+                            <div class="color-option blue" data-color="blue"></div>
+                            <div class="color-option teal" data-color="teal"></div>
+                            <div class="color-option purple" data-color="purple"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Text Size</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="text-small" name="textsize" value="small">
+                                <label for="text-small">Small</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="text-medium" name="textsize" value="medium" checked>
+                                <label for="text-medium">Medium</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="text-large" name="textsize" value="large">
+                                <label for="text-large">Large</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </header>
-
-            <div class="settings-container">
-                <h3>General Settings</h3>
-
-                <label for="language">Language:</label>
-                <select id="language">
-                    <option value="en">English (Default)</option>
-                    <option value="ar">Arabic</option>
-                </select>
-
-                <label for="timezone">Timezone:</label>
-                <select id="timezone">
-                    <option value="UTC">UTC</option>
-                    <option value="GMT+2">GMT+2</option>
-                    <option value="GMT+3">GMT+3</option>
-                </select>
-
-                <div class="time-format">
-                    <label>Time Format:</label>
-                    <input type="radio" id="24h" name="timeformat" value="24h" checked>
-                    <label for="24h">24 Hours</label>
-                    <input type="radio" id="12h" name="timeformat" value="12h">
-                    <label for="12h">12 Hours</label>
+                
+                <!-- Regional Settings -->
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        <i class="fas fa-globe"></i>
+                        <h3>Regional Settings</h3>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timezone">Timezone</label>
+                        <select id="timezone" class="premium-select">
+                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                            <option value="GMT+0">GMT+0 (London, Lisbon)</option>
+                            <option value="GMT+1">GMT+1 (Paris, Berlin, Rome)</option>
+                            <option value="GMT+2">GMT+2 (Cairo, Athens, Istanbul)</option>
+                            <option value="GMT+3">GMT+3 (Moscow, Riyadh, Dubai)</option>
+                            <option value="GMT+4">GMT+4 (Abu Dhabi, Dubai)</option>
+                            <option value="GMT+5">GMT+5 (Islamabad, Karachi)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Time Format</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="24h" name="timeformat" value="24h" checked>
+                                <label for="24h"><i class="fas fa-clock"></i> 24 Hours</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="12h" name="timeformat" value="12h">
+                                <label for="12h"><i class="far fa-clock"></i> 12 Hours (AM/PM)</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Distance Unit</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="kilometers" name="distanceunit" value="km" checked>
+                                <label for="kilometers">Kilometers (km)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="miles" name="distanceunit" value="mi">
+                                <label for="miles">Miles (mi)</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Date Format</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="dmy" name="dateformat" value="dmy" checked>
+                                <label for="dmy">DD/MM/YYYY</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="mdy" name="dateformat" value="mdy">
+                                <label for="mdy">MM/DD/YYYY</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="ymd" name="dateformat" value="ymd">
+                                <label for="ymd">YYYY/MM/DD</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="theme-format">
-                    <label>Theme Mode:</label>
-                    <input type="radio" id="light-theme" name="thememode" value="light" checked>
-                    <label for="light-theme">Light</label>
-                    <input type="radio" id="dark-theme" name="thememode" value="dark">
-                    <label for="dark-theme">Dark</label>
+                
+                <!-- Notification Settings -->
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        <i class="fas fa-bell"></i>
+                        <h3>Notification Preferences</h3>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Service Reminders</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="service-notifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Maintenance Alerts</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maintenance-notifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Special Offers & Promotions</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="promo-notifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Email Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="email-notifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Push Notifications</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="push-notifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
+                
+                <!-- Privacy Settings -->
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Privacy & Data</h3>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Share Location Data</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="share-location" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Share Vehicle Analytics</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="share-analytics" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">Remember Search History</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="remember-search">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-secondary" id="clear-data" style="width: auto;">
+                            <i class="fas fa-trash-alt"></i> Clear Cached Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="save-settings">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                    <button class="btn btn-secondary" id="reset-settings">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                    <h4>Notifications</h4>
+                    <a href="#">Mark all as read</a>
+                </div>
+                <div class="notification-body">
+                    <div class="notification-item unread">
+                        <h5>Service Reminder</h5>
+                        <p>Your vehicle is due for scheduled maintenance</p>
+                        <div class="notification-time">2 hours ago</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>Appointment Confirmed</h5>
+                        <p>Your service appointment has been confirmed</p>
+                        <div class="notification-time">Yesterday</div>
+                    </div>
+                    <div class="notification-item">
+                        <h5>New Feature Available</h5>
+                        <p>Check out the new vehicle health monitoring tool</p>
+                        <div class="notification-time">3 days ago</div>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <button>View All Notifications</button>
+                </div>
+            </div>
 
-                <button id="save-settings">Save Changes</button>
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-header">
+                    <div class="profile-pic">
+                        <img src="/static/images/user-profile.jpg" alt="Profile" onerror="this.src='/static/images/photo_2025-03-31_23-49-16.jpg'">
+                    </div>
+                    <h4>Alex Johnson</h4>
+                    <p>Premium Member</p>
+                </div>
+                <div class="profile-body">
+                    <a href="#" class="profile-link"><i class="fas fa-user"></i> My Profile</a>
+                    <a href="#" class="profile-link"><i class="fas fa-car"></i> My Vehicles</a>
+                    <a href="#" class="profile-link"><i class="fas fa-chart-line"></i> Vehicle Performance</a>
+                    <a href="#" class="profile-link"><i class="fas fa-bell"></i> Notifications</a>
+                    <a href="#" class="profile-link"><i class="fas fa-cog"></i> Settings</a>
+                </div>
+                <div class="profile-footer">
+                    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                </div>
             </div>
         </main>
     </div>
-
-    <script src="/static/js/frontend_api.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const saveButton = document.getElementById("save-settings");
-            
-            // Check for saved theme
-            const savedSettings = localStorage.getItem("userSettings");
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                
-                // Apply saved settings
-                document.getElementById("language").value = settings.language;
-                document.getElementById("timezone").value = settings.timezone;
-                document.querySelector(`input[name="timeformat"][value="${settings.timeFormat}"]`).checked = true;
-                
-                // Apply theme if it exists
-                if (settings.theme) {
-                    document.querySelector(`input[name="thememode"][value="${settings.theme}"]`).checked = true;
-                    if (settings.theme === 'dark') {
-                        document.documentElement.setAttribute('data-theme', 'dark');
-                    } else {
-                        document.documentElement.setAttribute('data-theme', 'light');
-                    }
-                }
-            }
-
-            saveButton.addEventListener("click", function () {
-                const language = document.getElementById("language").value;
-                const timezone = document.getElementById("timezone").value;
-                const timeFormat = document.querySelector('input[name="timeformat"]:checked').value;
-                const theme = document.querySelector('input[name="thememode"]:checked').value;
-
-                const settings = {
-                    language: language,
-                    timezone: timezone,
-                    timeFormat: timeFormat,
-                    theme: theme
-                };
-
-                // Apply theme immediately
-                if (theme === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                }
-
-                localStorage.setItem("userSettings", JSON.stringify(settings));
-                
-                // Show success message with animation
-                const notification = document.createElement('div');
-                notification.className = 'notification success';
-                notification.innerHTML = '<i class="fas fa-check-circle"></i> Settings saved successfully!';
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.style.opacity = '0';
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 500);
-                }, 3000);
-            });
-
-            // Apply theme from localStorage on page load
-            const currentSettings = localStorage.getItem("userSettings");
-            if (currentSettings) {
-                const settings = JSON.parse(currentSettings);
-                if (settings.theme === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-            }
-        });
-    </script>
+    
     <script src="/static/js/mobile.js"></script>
     <script src="/static/js/theme.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // DOM elements
+            const saveButton = document.getElementById('save-settings');
+            const resetButton = document.getElementById('reset-settings');
+            const clearDataButton = document.getElementById('clear-data');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const notificationBtn = document.getElementById('notifications');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const profileBtn = document.getElementById('profile');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            // Default settings
+            const defaultSettings = {
+                language: 'en',
+                timezone: 'UTC',
+                timeFormat: '24h',
+                theme: 'dark',
+                textSize: 'medium',
+                distanceUnit: 'km',
+                dateFormat: 'dmy',
+                accentColor: 'gold',
+                serviceNotifications: true,
+                maintenanceNotifications: true,
+                promoNotifications: true,
+                emailNotifications: true,
+                pushNotifications: true,
+                shareLocation: true,
+                shareAnalytics: true,
+                rememberSearch: false
+            };
+            
+            // Load saved settings or use defaults
+            let userSettings = localStorage.getItem('userSettings') 
+                ? JSON.parse(localStorage.getItem('userSettings')) 
+                : defaultSettings;
+            
+            // Apply saved settings to form
+            function applySettings(settings) {
+                // Apply language
+                document.getElementById('language').value = settings.language || defaultSettings.language;
+                
+                // Apply timezone
+                document.getElementById('timezone').value = settings.timezone || defaultSettings.timezone;
+                
+                // Apply time format
+                document.querySelector(`input[name="timeformat"][value="${settings.timeFormat || defaultSettings.timeFormat}"]`).checked = true;
+                
+                // Apply theme
+                document.querySelector(`input[name="thememode"][value="${settings.theme || defaultSettings.theme}"]`).checked = true;
+                
+                // Apply text size
+                document.querySelector(`input[name="textsize"][value="${settings.textSize || defaultSettings.textSize}"]`).checked = true;
+                
+                // Apply distance unit
+                document.querySelector(`input[name="distanceunit"][value="${settings.distanceUnit || defaultSettings.distanceUnit}"]`).checked = true;
+                
+                // Apply date format
+                document.querySelector(`input[name="dateformat"][value="${settings.dateFormat || defaultSettings.dateFormat}"]`).checked = true;
+                
+                // Apply accent color
+                colorOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if (option.dataset.color === (settings.accentColor || defaultSettings.accentColor)) {
+                        option.classList.add('active');
+                    }
+                });
+                
+                // Apply notification settings
+                document.getElementById('service-notifications').checked = settings.serviceNotifications !== undefined ? settings.serviceNotifications : defaultSettings.serviceNotifications;
+                document.getElementById('maintenance-notifications').checked = settings.maintenanceNotifications !== undefined ? settings.maintenanceNotifications : defaultSettings.maintenanceNotifications;
+                document.getElementById('promo-notifications').checked = settings.promoNotifications !== undefined ? settings.promoNotifications : defaultSettings.promoNotifications;
+                document.getElementById('email-notifications').checked = settings.emailNotifications !== undefined ? settings.emailNotifications : defaultSettings.emailNotifications;
+                document.getElementById('push-notifications').checked = settings.pushNotifications !== undefined ? settings.pushNotifications : defaultSettings.pushNotifications;
+                
+                // Apply privacy settings
+                document.getElementById('share-location').checked = settings.shareLocation !== undefined ? settings.shareLocation : defaultSettings.shareLocation;
+                document.getElementById('share-analytics').checked = settings.shareAnalytics !== undefined ? settings.shareAnalytics : defaultSettings.shareAnalytics;
+                document.getElementById('remember-search').checked = settings.rememberSearch !== undefined ? settings.rememberSearch : defaultSettings.rememberSearch;
+            }
+            
+            // Apply settings on page load
+            applySettings(userSettings);
+            
+            // Handle color option clicks
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Save settings
+            saveButton.addEventListener('click', function() {
+                const newSettings = {
+                    language: document.getElementById('language').value,
+                    timezone: document.getElementById('timezone').value,
+                    timeFormat: document.querySelector('input[name="timeformat"]:checked').value,
+                    theme: document.querySelector('input[name="thememode"]:checked').value,
+                    textSize: document.querySelector('input[name="textsize"]:checked').value,
+                    distanceUnit: document.querySelector('input[name="distanceunit"]:checked').value,
+                    dateFormat: document.querySelector('input[name="dateformat"]:checked').value,
+                    accentColor: document.querySelector('.color-option.active').dataset.color,
+                    serviceNotifications: document.getElementById('service-notifications').checked,
+                    maintenanceNotifications: document.getElementById('maintenance-notifications').checked,
+                    promoNotifications: document.getElementById('promo-notifications').checked,
+                    emailNotifications: document.getElementById('email-notifications').checked,
+                    pushNotifications: document.getElementById('push-notifications').checked,
+                    shareLocation: document.getElementById('share-location').checked,
+                    shareAnalytics: document.getElementById('share-analytics').checked,
+                    rememberSearch: document.getElementById('remember-search').checked
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('userSettings', JSON.stringify(newSettings));
+                
+                // Apply theme immediately
+                document.documentElement.setAttribute('data-theme', newSettings.theme);
+                
+                // Show success notification
+                showNotification('Settings saved successfully!', 'success');
+            });
+            
+            // Reset settings
+            resetButton.addEventListener('click', function() {
+                applySettings(defaultSettings);
+                showNotification('Settings reset to defaults', 'info');
+            });
+            
+            // Clear data
+            clearDataButton.addEventListener('click', function() {
+                const rememberSearch = document.getElementById('remember-search').checked;
+                
+                // Clear all caches except user settings
+                const currentSettings = localStorage.getItem('userSettings');
+                localStorage.clear();
+                localStorage.setItem('userSettings', currentSettings);
+                
+                showNotification('Cached data cleared successfully', 'success');
+            });
+            
+            // Show notification
+            function showNotification(message, type = 'success') {
+                const notif = document.createElement('div');
+                notif.className = `notification ${type}`;
+                
+                let icon = 'check-circle';
+                if (type === 'info') icon = 'info-circle';
+                if (type === 'warning') icon = 'exclamation-circle';
+                
+                notif.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+                document.body.appendChild(notif);
+                
+                setTimeout(() => {
+                    notif.style.opacity = '0';
+                    setTimeout(() => {
+                        notif.remove();
+                    }, 500);
+                }, 3000);
+            }
+            
+            // Notification toggle
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    notificationDropdown.classList.toggle('show');
+                    if (profileDropdown.classList.contains('show')) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // Profile toggle
+            if (profileBtn && profileDropdown) {
+                profileBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                    if (notificationDropdown.classList.contains('show')) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                if (notificationDropdown && notificationDropdown.classList.contains('show')) {
+                    notificationDropdown.classList.remove('show');
+                }
+                if (profileDropdown && profileDropdown.classList.contains('show')) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
+            
+            // Elegant animation for settings sections
+            const sections = document.querySelectorAll('.settings-section');
+            
+            sections.forEach((section, index) => {
+                section.style.animation = `fadeIn 0.5s ease forwards ${index * 0.1}s`;
+                section.style.opacity = '0';
+            });
+        });
+    </script>
+
+    <!-- Frontend API -->
+    <script src="/static/js/frontend_api.js"></script>
 </body>
 </html>
