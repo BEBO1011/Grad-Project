@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-image: url('IMG-20250413-WA0000.jpg'); /* Corrected image path */
+            background-image: url('/static/images/IMG-20250413-WA0000.jpg');
             background-size: cover;
             background-position: top center;
             background-repeat: no-repeat;
@@ -106,11 +106,11 @@
                 </div>
                 <button type="submit" class="btn">Register</button>
             </form>
-            <p class="signin-text">Already have an account? <a href="index.html">Sign in</a></p>
+            <p class="signin-text">Already have an account? <a href="/">Sign in</a></p>
         </div>
     </div>
 
-    <script src="js/frontend_api.js"></script>
+    <script src="/static/js/frontend_api.js"></script>
     <script>
         document.getElementById("signup-form").addEventListener("submit", async function(event) {
             event.preventDefault();
@@ -131,7 +131,7 @@
                 const response = await signup(email, fullName, password, carBrand, carModel, manufacturingYear);
                 if (response && response.success) {
                     alert("Signup successful!");
-                    window.location.href = "index.html"; // Redirect to sign-in page
+                    window.location.href = "/"; // Redirect to sign-in page
                 } else {
                     alert("Signup failed. Try again.");
                 }
