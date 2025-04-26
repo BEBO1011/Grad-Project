@@ -148,14 +148,29 @@ st.markdown("""
     <div class='column feature-card'>
         <h3>🚗 Car Service App</h3>
         <p>Mobile-optimized car diagnostic app with AI-powered solutions</p>
-        <a href='http://localhost:8080' class='custom-button'>Launch Car Service App</a>
+        <a href='//' class='custom-button' id='carAppBtn'>Launch Car Service App</a>
         <br><br>
         <p><strong>Direct access to key features:</strong></p>
         <ul>
-            <li><a href='http://localhost:8080/chatbot'>AI Diagnostic Chatbot</a></li>
-            <li><a href='http://localhost:8080/maintenance-centers'>Maintenance Centers</a></li>
-            <li><a href='http://localhost:8080/map'>Interactive Map</a></li>
+            <li><a href='//' id='chatbotBtn'>AI Diagnostic Chatbot</a></li>
+            <li><a href='//' id='centersBtn'>Maintenance Centers</a></li>
+            <li><a href='//' id='mapBtn'>Interactive Map</a></li>
         </ul>
+        
+        <script>
+            // Generate the correct URLs based on the current host
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get the host without the port
+                const hostParts = window.location.host.split(':');
+                const hostname = hostParts[0];
+                
+                // Update the URLs with the correct hostname and port 8080
+                document.getElementById('carAppBtn').href = 'http://' + hostname + ':8080';
+                document.getElementById('chatbotBtn').href = 'http://' + hostname + ':8080/chatbot';
+                document.getElementById('centersBtn').href = 'http://' + hostname + ':8080/maintenance-centers';
+                document.getElementById('mapBtn').href = 'http://' + hostname + ':8080/map';
+            });
+        </script>
     </div>
     
     <div class='column feature-card'>
@@ -306,7 +321,7 @@ with screenshot_col1:
     • Beautiful responsive interface optimized for mobile
     • Multi-language support including Arabic
     """)
-    st.markdown("**URL:** [Open Chatbot](http://localhost:8080/chatbot)")
+    st.markdown("**URL:** <a href='#' id='chatbotUrl'>Open Chatbot</a>", unsafe_allow_html=True)
 
 with screenshot_col2:
     st.subheader("Vehicle Health Monitoring Dashboard")
@@ -320,7 +335,7 @@ with screenshot_col2:
     • Interactive visualization of health trends
     • Brand and model-specific insights
     """)
-    st.markdown("**URL:** [Open Vehicle Health Monitor](http://localhost:8080/vehicle-health)")
+    st.markdown("**URL:** <a href='#' id='healthUrl'>Open Vehicle Health Monitor</a>", unsafe_allow_html=True)
 
 st.sidebar.title("Navigation")
 
@@ -338,12 +353,37 @@ st.sidebar.markdown("""
 # Car Service App Navigation
 st.sidebar.markdown("### Car Service App (Port 8080)")
 st.sidebar.markdown("""
-- [Car App Home](http://localhost:8080)
-- [Diagnostic Chatbot](http://localhost:8080/chatbot)
-- [Maintenance Centers](http://localhost:8080/maintenance-centers)
-- [Interactive Map](http://localhost:8080/map)
-- [User Settings](http://localhost:8080/settings)
-""")
+<div id="sidebarLinks">
+- <a href="#" id="homeLink">Car App Home</a>
+- <a href="#" id="chatbotLink">Diagnostic Chatbot</a>
+- <a href="#" id="centersLink">Maintenance Centers</a>
+- <a href="#" id="mapLink">Interactive Map</a>
+- <a href="#" id="settingsLink">User Settings</a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the host without the port
+    const hostParts = window.location.host.split(':');
+    const hostname = hostParts[0];
+    
+    // Update sidebar links
+    document.getElementById('homeLink').href = 'http://' + hostname + ':8080';
+    document.getElementById('chatbotLink').href = 'http://' + hostname + ':8080/chatbot';
+    document.getElementById('centersLink').href = 'http://' + hostname + ':8080/maintenance-centers';
+    document.getElementById('mapLink').href = 'http://' + hostname + ':8080/map';
+    document.getElementById('settingsLink').href = 'http://' + hostname + ':8080/settings';
+    
+    // Update the other links we added earlier
+    if(document.getElementById('chatbotUrl')) {
+        document.getElementById('chatbotUrl').href = 'http://' + hostname + ':8080/chatbot';
+    }
+    if(document.getElementById('healthUrl')) {
+        document.getElementById('healthUrl').href = 'http://' + hostname + ':8080/vehicle-health';
+    }
+});
+</script>
+""", unsafe_allow_html=True)
 
 # About section
 st.sidebar.markdown("---")

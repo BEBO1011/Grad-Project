@@ -32,12 +32,41 @@ try:
             genai.configure(api_key=GOOGLE_API_KEY)
             gemini_client = genai
             logger.info("Google Gemini client initialized successfully!")
+            
+            # Test the API configuration with a simple request
+            try:
+                # Simple test - try to generate a basic response
+                test_model = gemini_client.GenerativeModel(model_name="gemini-pro")
+                test_response = test_model.generate_content("Hello, are you working?")
+                logger.info("Gemini API test successful")
+                GEMINI_AVAILABLE = True
+            except Exception as test_error:
+                error_msg = str(test_error)
+                logger.warning(f"Gemini API test failed: {error_msg}")
+                
+                # Check for model availability error
+                if "is not found" in error_msg:
+                    # Try alternative model name
+                    try:
+                        test_model = gemini_client.GenerativeModel(model_name="gemini-1.0-pro")
+                        test_response = test_model.generate_content("Hello, are you working?")
+                        logger.info("Gemini API test successful with alternative model")
+                        GEMINI_AVAILABLE = True
+                    except Exception as alt_error:
+                        logger.warning(f"Alternative model test failed: {alt_error}")
+                        GEMINI_AVAILABLE = False
+                else:
+                    GEMINI_AVAILABLE = False
+                
         except Exception as e:
             logger.error(f"Error initializing Google Gemini client: {e}")
+            GEMINI_AVAILABLE = False
     else:
         logger.warning("Google API key not found in environment variables")
+        GEMINI_AVAILABLE = False
 except ImportError:
     logger.warning("Google Gemini module import failed. Using fallback diagnostics.")
+    GEMINI_AVAILABLE = False
 
 # Sample diagnostic data for common car problems
 SAMPLE_DIAGNOSTICS = {
@@ -243,14 +272,46 @@ def generate_gemini_diagnostic(issue_description: str, brand: str, model: str, d
             "temperature": 0.4,
             "top_p": 0.8,
             "top_k": 40,
-            "max_output_tokens": 2048,
+            "max_output_tokens": 1024,
         }
         
-        # Get Gemini Pro model
-        model = gemini_client.GenerativeModel(
-            model_name="gemini-pro",  # Using gemini-pro as it's more widely available
-            generation_config=generation_config
-        )
+        # Try different Gemini model names
+        try:
+            # No need to list models, just try models in order
+            model_names_to_try = ["gemini-pro", "gemini-1.0-pro", "gemini-1.5-pro"]
+            model = None
+            last_error = None
+            
+            for model_name in model_names_to_try:
+                try:
+                    logger.info(f"Attempting to use model: {model_name}")
+                    model = gemini_client.GenerativeModel(
+                        model_name=model_name,
+                        generation_config=generation_config
+                    )
+                    # Test if this model works
+                    test_response = model.generate_content("Test")
+                    logger.info(f"Successfully connected to model: {model_name}")
+                    break  # Found a working model, exit the loop
+                except Exception as e:
+                    logger.warning(f"Model {model_name} failed: {e}")
+                    last_error = e
+                    continue  # Try next model
+            
+            # If all models failed, raise the last error
+            if model is None:
+                if last_error:
+                    raise last_error
+                else:
+                    raise Exception("All Gemini models failed to initialize")
+        except Exception as model_error:
+            logger.error(f"Error selecting model: {model_error}")
+            # Fall back to a simple known model
+            logger.info("Falling back to default model: gemini-pro")
+            model = gemini_client.GenerativeModel(
+                model_name="gemini-pro",
+                generation_config=generation_config
+            )
         
         # Construct prompt
         prompt = f"""

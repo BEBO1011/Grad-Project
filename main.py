@@ -30,8 +30,25 @@ This application provides a mobile-friendly interface for:
 """)
 
 # Display URL for the Flask application
-st.info("Open the car service app at: [http://0.0.0.0:8080](http://0.0.0.0:8080)")
-st.info("Access the chatbot directly at: [http://0.0.0.0:8080/chatbot](http://0.0.0.0:8080/chatbot)")
+st.markdown("""
+<div>
+    <p>Open the car service app at: <a href="#" id="carAppUrl">http://0.0.0.0:8080</a></p>
+    <p>Access the chatbot directly at: <a href="#" id="chatbotUrlDirect">http://0.0.0.0:8080/chatbot</a></p>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const hostParts = window.location.host.split(':');
+        const hostname = hostParts[0];
+        
+        document.getElementById("carAppUrl").href = "http://" + hostname + ":8080";
+        document.getElementById("carAppUrl").innerText = "http://" + hostname + ":8080";
+        
+        document.getElementById("chatbotUrlDirect").href = "http://" + hostname + ":8080/chatbot";
+        document.getElementById("chatbotUrlDirect").innerText = "http://" + hostname + ":8080/chatbot";
+    });
+</script>
+""", unsafe_allow_html=True)
 
 # Start the Flask app on page load
 if "flask_started" not in st.session_state:
