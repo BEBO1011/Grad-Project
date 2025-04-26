@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CService | Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --dark-gold: #a98c2b;
+            --light-gold: #f2dc9e;
+            --text-dark: #333333;
+            --text-secondary: #666666;
+            --text-light: #f8f8f8;
+            --card-bg: #ffffff;
+            --card-bg-dark: #1e1e1e;
+            --card-hover: #f9f9f9;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+            --green: #34c759;
+            --red: #ff3b30;
+            --orange: #ff9500;
+            --blue: #007aff;
+        }
+        
+        [data-theme="dark"] {
+            --text-dark: #f8f8f8;
+            --text-secondary: #b0b0b0;
+            --text-light: #333333;
+            --card-bg: #2a2a2a;
+            --card-bg-dark: #1e1e1e;
+            --card-hover: #323232;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] body {
+            background-color: #1a1a1a;
+        }
+
+        /* Main Layout */
+        .settings-page-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .global-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--dark-gold), var(--primary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-gold);
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
+
+        .nav-link.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background-color: var(--primary-gold);
+            border-radius: 2px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(245, 245, 245, 0.8);
+            color: var(--text-dark);
+            border: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        [data-theme="dark"] .icon-button {
+            background-color: rgba(40, 40, 40, 0.8);
+        }
+
+        .icon-button:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold);
+            transform: translateY(-2px);
+        }
+
+        .icon-button i {
+            font-size: 1.1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-gold);
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-md);
+            padding: 2.5rem 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+            margin-top: 70px;
+            height: calc(100vh - 70px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 90;
+            transition: transform 0.3s ease;
+            border-right: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .sidebar-section {
+            margin-bottom: 2.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+            padding-left: 1rem;
+            position: relative;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-title:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: linear-gradient(180deg, var(--primary-gold), rgba(212, 175, 55, 0.3));
+            border-radius: 3px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.3rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(245, 245, 245, 0.6);
+            color: var(--primary-gold);
+        }
+
+        [data-theme="dark"] .nav-item a:hover {
+            background-color: rgba(40, 40, 40, 0.6);
+        }
+
+        .nav-item a.active {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            color: var(--primary-gold);
+            font-weight: 600;
+            border-left: 3px solid var(--primary-gold);
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item a:hover i,
+        .nav-item a.active i {
+            color: var(--primary-gold);
+        }
+
+        .premium-card {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: #fff;
+            margin: 0 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-card:before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, rgba(212, 175, 55, 0) 70%);
+            border-radius: 50%;
+            top: -80px;
+            right: -80px;
+            z-index: 0;
+        }
+
+        .premium-card h4 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .premium-card p {
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .premium-card button {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
+            border: none;
+            color: #fff;
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .premium-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            margin-top: 70px;
+            margin-left: 280px;
+            width: calc(100% - 280px);
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin: 0;
+            background: linear-gradient(45deg, var(--text-dark), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .page-description {
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin-top: 0.8rem;
+            font-size: 1rem;
+        }
+
+        /* Settings Cards */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .settings-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .settings-card-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.01) 100%);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .settings-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+            color: var(--primary-gold);
+            font-size: 1.4rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover .settings-card-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .settings-card-title {
+            flex: 1;
+        }
+
+        .settings-card-title h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .settings-card-title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0.3rem 0 0 0;
+        }
+
+        .settings-card-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23d4af37' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        /* Radio Buttons */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .radio-tile {
+            flex: 1;
+            min-width: 120px;
+            position: relative;
+        }
+
+        .radio-tile input[type="radio"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .radio-tile-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .radio-tile-icon {
+            margin-bottom: 0.7rem;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .radio-tile-info {
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .radio-tile input[type="radio"]:checked + .radio-tile-label {
+            border-color: var(--primary-gold);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .radio-tile input[type="radio"]:checked + .radio-tile-label .radio-tile-icon {
+            color: var(--primary-gold);
+            transform: scale(1.1);
+        }
+
+        .radio-tile input[type="radio"]:checked + .radio-tile-label .radio-tile-info {
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
+
+        /* Color Swatches */
+        .color-swatches {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-swatch.active {
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 2px var(--primary-gold);
+        }
+
+        .color-swatch.active:after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .gold-swatch {
+            background: linear-gradient(135deg, #d4af37 0%, #f2dc9e 50%, #d4af37 100%);
+        }
+
+        .blue-swatch {
+            background: linear-gradient(135deg, #4361ee 0%, #738eef 50%, #4361ee 100%);
+        }
+
+        .teal-swatch {
+            background: linear-gradient(135deg, #0ea5e9 0%, #7dd3fc 50%, #0ea5e9 100%);
+        }
+
+        .purple-swatch {
+            background: linear-gradient(135deg, #8b5cf6 0%, #c4b5fd 50%, #8b5cf6 100%);
+        }
+
+        .red-swatch {
+            background: linear-gradient(135deg, #ef4444 0%, #fca5a5 50%, #ef4444 100%);
+        }
+
+        /* Toggle Switches */
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 12px;
+            background-color: rgba(245, 245, 245, 0.5);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        [data-theme="dark"] .toggle-container {
+            background-color: rgba(40, 40, 40, 0.5);
+        }
+
+        .toggle-container:hover {
+            background-color: rgba(245, 245, 245, 0.8);
+            border-color: rgba(212, 175, 55, 0.1);
+            transform: translateY(-2px);
+        }
+
+        [data-theme="dark"] .toggle-container:hover {
+            background-color: rgba(40, 40, 40, 0.8);
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0 0 0.3rem 0;
+            color: var(--text-dark);
+        }
+
+        .toggle-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 28px;
+            margin: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 34px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-gold);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(28px);
+        }
+
+        /* Save Area */
+        .save-area {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(42, 42, 42, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .save-area:before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0) 70%);
+            border-radius: 50%;
+            top: -150px;
+            right: -150px;
+        }
+
+        .save-area-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .save-area-icon {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-gold);
+            font-size: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .save-area-text {
+            flex: 1;
+        }
+
+        .save-area-text h3 {
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0 0 0.7rem 0;
+        }
+
+        .save-area-text p {
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0 0 1.5rem 0;
+        }
+
+        .save-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .settings-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 110;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .settings-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+
+            .save-area-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .save-buttons {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .global-header {
+                padding: 0 1.5rem;
+            }
+
+            .logo h1 {
+                font-size: 1.4rem;
+            }
+
+            .user-controls {
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .radio-tile {
+                min-width: 100%;
+            }
+
+            .save-area {
+                padding: 1.5rem;
+                margin-top: 2rem;
+            }
+
+            .save-area-text h3 {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .global-header {
+                padding: 0 1rem;
+                height: 60px;
+            }
+
+            .logo img {
+                height: 32px;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .sidebar {
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+            }
+
+            .main-content {
+                margin-top: 60px;
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.6rem;
+            }
+
+            .settings-card-header {
+                padding: 1rem;
+            }
+
+            .settings-card-body {
+                padding: 1rem;
+            }
+
+            .settings-card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .settings-card-title h3 {
+                font-size: 1.1rem;
+            }
+
+            .save-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            animation: notificationSlide 0.5s forwards;
+            border-left: 4px solid var(--primary-gold);
+        }
+
+        @keyframes notificationSlide {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification i {
+            color: var(--primary-gold);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Global Header -->
+    <header class="global-header">
+        <div class="logo">
+            <img src="/static/images/car_service_logo.jpeg" alt="CService Logo">
+            <h1>CService</h1>
+        </div>
+
+        <div class="nav-controls">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/maintenance-centers" class="nav-link">Service Centers</a>
+                <a href="/map" class="nav-link">Map</a>
+                <a href="/chatbot" class="nav-link">AI Diagnostics</a>
+            </div>
+        </div>
+
+        <div class="user-controls">
+            <button class="icon-button" id="notificationsBtn" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </button>
+            <button class="icon-button" id="themeToggleBtn" title="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="user-avatar" id="profileBtn">
+                <img src="/static/images/user-profile.jpg" alt="Profile" onerror="this.src='/static/images/photo_2025-03-31_23-49-16.jpg'">
+            </div>
+        </div>
+    </header>
+
+    <div class="settings-page-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <h2 class="sidebar-title">Main Menu</h2>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/home"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/vehicle-health"><i class="fas fa-heartbeat"></i> Vehicle Health</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/chatbot"><i class="fas fa-robot"></i> AI Diagnostics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/maintenance-centers"><i class="fas fa-tools"></i> Service Centers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/map"><i class="fas fa-map-marker-alt"></i> Interactive Map</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h2 class="sidebar-title">Account</h2>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/settings" class="active"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"><i class="fas fa-chart-line"></i> Vehicle Performance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"><i class="fas fa-car"></i> My Vehicles</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"><i class="fas fa-history"></i> Service History</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="premium-card">
+                <h4>Need Help?</h4>
+                <p>Contact our customer support team for assistance with your premium service.</p>
+                <button onclick="location.href='/chatbot'">Contact Support</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Settings</h1>
+            </div>
+            <p class="page-description">Personalize your CService experience by configuring your preferences. All settings sync automatically across your devices.</p>
+
+            <div class="settings-grid">
+                <!-- Appearance Card -->
+                <div class="settings-card fade-in" style="animation-delay: 0.1s">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <div class="settings-card-title">
+                            <h3>Appearance</h3>
+                            <p>Customize how CService looks</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-group">
+                            <label>Theme Mode</label>
+                            <div class="radio-group">
+                                <div class="radio-tile">
+                                    <input type="radio" id="light-theme" name="thememode" value="light">
+                                    <label for="light-theme" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-sun"></i>
+                                        </div>
+                                        <div class="radio-tile-info">Light</div>
+                                    </label>
+                                </div>
+                                <div class="radio-tile">
+                                    <input type="radio" id="dark-theme" name="thememode" value="dark" checked>
+                                    <label for="dark-theme" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-moon"></i>
+                                        </div>
+                                        <div class="radio-tile-info">Dark</div>
+                                    </label>
+                                </div>
+                                <div class="radio-tile">
+                                    <input type="radio" id="auto-theme" name="thememode" value="auto">
+                                    <label for="auto-theme" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-adjust"></i>
+                                        </div>
+                                        <div class="radio-tile-info">System</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <div class="color-swatches">
+                                <div class="color-swatch gold-swatch active" data-color="gold"></div>
+                                <div class="color-swatch blue-swatch" data-color="blue"></div>
+                                <div class="color-swatch teal-swatch" data-color="teal"></div>
+                                <div class="color-swatch purple-swatch" data-color="purple"></div>
+                                <div class="color-swatch red-swatch" data-color="red"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Text Size</label>
+                            <div class="radio-group">
+                                <div class="radio-tile">
+                                    <input type="radio" id="text-small" name="textsize" value="small">
+                                    <label for="text-small" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-text-height fa-xs"></i>
+                                        </div>
+                                        <div class="radio-tile-info">Small</div>
+                                    </label>
+                                </div>
+                                <div class="radio-tile">
+                                    <input type="radio" id="text-medium" name="textsize" value="medium" checked>
+                                    <label for="text-medium" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-text-height"></i>
+                                        </div>
+                                        <div class="radio-tile-info">Medium</div>
+                                    </label>
+                                </div>
+                                <div class="radio-tile">
+                                    <input type="radio" id="text-large" name="textsize" value="large">
+                                    <label for="text-large" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-text-height fa-lg"></i>
+                                        </div>
+                                        <div class="radio-tile-info">Large</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language & Region Card -->
+                <div class="settings-card fade-in" style="animation-delay: 0.2s">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="settings-card-title">
+                            <h3>Language & Region</h3>
+                            <p>Configure regional preferences</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-group">
+                            <label for="language">Display Language</label>
+                            <select id="language" class="form-control form-select">
+                                <option value="en">English (Default)</option>
+                                <option value="ar">Arabic (العربية)</option>
+                                <option value="fr">French (Français)</option>
+                                <option value="es">Spanish (Español)</option>
+                                <option value="de">German (Deutsch)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label>
+                            <select id="timezone" class="form-control form-select">
+                                <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                <option value="GMT+0">GMT+0 (London, Lisbon)</option>
+                                <option value="GMT+1">GMT+1 (Paris, Berlin, Rome)</option>
+                                <option value="GMT+2">GMT+2 (Cairo, Athens, Istanbul)</option>
+                                <option value="GMT+3">GMT+3 (Moscow, Riyadh, Dubai)</option>
+                                <option value="GMT+4">GMT+4 (Abu Dhabi, Dubai)</option>
+                                <option value="GMT+5">GMT+5 (Islamabad, Karachi)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date Format</label>
+                            <div class="radio-group">
+                                <div class="radio-tile">
+                                    <input type="radio" id="dmy" name="dateformat" value="dmy" checked>
+                                    <label for="dmy" class="radio-tile-label">
+                                        <div class="radio-tile-info">DD/MM/YYYY</div>
+                                    </label>
+                                </div>
+                                <div class="radio-tile">
+                                    <input type="radio" id="mdy" name="dateformat" value="mdy">
+                                    <label for="mdy" class="radio-tile-label">
+                                        <div class="radio-tile-info">MM/DD/YYYY</div>
+                                    </label>
+                                </div>
+                                <div class="radio-tile">
+                                    <input type="radio" id="ymd" name="dateformat" value="ymd">
+                                    <label for="ymd" class="radio-tile-label">
+                                        <div class="radio-tile-info">YYYY/MM/DD</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Measurement Units</label>
+                            <div class="radio-group">
+                                <div class="radio-tile">
+                                    <input type="radio" id="kilometers" name="distanceunit" value="km" checked>
+                                    <label for="kilometers" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-ruler"></i>
+                                        </div>
+                                        <div class="radio-tile-info">Metric (km)</div>
+                                    </label>
+                                </div>
+                                <div class="radio-tile">
+                                    <input type="radio" id="miles" name="distanceunit" value="mi">
+                                    <label for="miles" class="radio-tile-label">
+                                        <div class="radio-tile-icon">
+                                            <i class="fas fa-road"></i>
+                                        </div>
+                                        <div class="radio-tile-info">Imperial (mi)</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Card -->
+                <div class="settings-card fade-in" style="animation-delay: 0.3s">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="settings-card-title">
+                            <h3>Notifications</h3>
+                            <p>Manage alerts and reminders</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Service Reminders</h4>
+                                <p class="toggle-description">Receive timely reminders for scheduled maintenance</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="service-notifications" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Maintenance Alerts</h4>
+                                <p class="toggle-description">Get notified about detected vehicle issues</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="maintenance-notifications" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Special Offers</h4>
+                                <p class="toggle-description">Stay informed about promotions and deals</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="promo-notifications" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Email Notifications</h4>
+                                <p class="toggle-description">Receive alerts via email</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="email-notifications" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Push Notifications</h4>
+                                <p class="toggle-description">Receive alerts on your mobile device</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="push-notifications" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Card -->
+                <div class="settings-card fade-in" style="animation-delay: 0.4s">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="settings-card-title">
+                            <h3>Privacy & Security</h3>
+                            <p>Manage your data and privacy</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Location Services</h4>
+                                <p class="toggle-description">Allow access to your location for better service</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="share-location" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Usage Analytics</h4>
+                                <p class="toggle-description">Help improve the app by sharing usage data</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="share-analytics" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <h4 class="toggle-title">Remember Searches</h4>
+                                <p class="toggle-description">Save your search history for quicker access</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="remember-search">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <button class="btn btn-outline" id="clear-data" style="width: 100%; background-color: rgba(255, 59, 48, 0.1); color: var(--red); border-color: rgba(255, 59, 48, 0.2);">
+                                <i class="fas fa-trash-alt"></i> Clear Cached Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Area -->
+            <div class="save-area fade-in" style="animation-delay: 0.5s;">
+                <div class="save-area-content">
+                    <div class="save-area-icon pulse">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="save-area-text">
+                        <h3>Save Your Preferences</h3>
+                        <p>Your settings will be securely saved and automatically synchronized across all your devices.</p>
+                        <div class="save-buttons">
+                            <button class="btn btn-primary" id="save-settings">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <button class="btn btn-outline" id="reset-settings">
+                                <i class="fas fa-undo"></i> Reset to Default
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification" style="display: none;">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">Settings saved successfully!</span>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // DOM elements
+            const saveButton = document.getElementById('save-settings');
+            const resetButton = document.getElementById('reset-settings');
+            const clearDataButton = document.getElementById('clear-data');
+            const colorSwatches = document.querySelectorAll('.color-swatch');
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            // Default settings
+            const defaultSettings = {
+                language: 'en',
+                timezone: 'UTC',
+                timeFormat: '24h',
+                theme: 'dark',
+                textSize: 'medium',
+                distanceUnit: 'km',
+                dateFormat: 'dmy',
+                accentColor: 'gold',
+                serviceNotifications: true,
+                maintenanceNotifications: true,
+                promoNotifications: true,
+                emailNotifications: true,
+                pushNotifications: true,
+                shareLocation: true,
+                shareAnalytics: true,
+                rememberSearch: false
+            };
+            
+            // Load saved settings or use defaults
+            let userSettings = localStorage.getItem('userSettings') 
+                ? JSON.parse(localStorage.getItem('userSettings')) 
+                : defaultSettings;
+            
+            // Apply saved settings to form
+            function applySettings(settings) {
+                // Apply language
+                document.getElementById('language').value = settings.language || defaultSettings.language;
+                
+                // Apply timezone
+                document.getElementById('timezone').value = settings.timezone || defaultSettings.timezone;
+                
+                // Apply theme
+                if(settings.theme) {
+                    document.querySelector(`input[name="thememode"][value="${settings.theme}"]`).checked = true;
+                    document.documentElement.setAttribute('data-theme', settings.theme);
+                    updateThemeToggleIcon(settings.theme);
+                }
+                
+                // Apply text size
+                if(settings.textSize) {
+                    document.querySelector(`input[name="textsize"][value="${settings.textSize}"]`).checked = true;
+                }
+                
+                // Apply distance unit
+                if(settings.distanceUnit) {
+                    document.querySelector(`input[name="distanceunit"][value="${settings.distanceUnit}"]`).checked = true;
+                }
+                
+                // Apply date format
+                if(settings.dateFormat) {
+                    document.querySelector(`input[name="dateformat"][value="${settings.dateFormat}"]`).checked = true;
+                }
+                
+                // Apply accent color
+                colorSwatches.forEach(swatch => {
+                    swatch.classList.remove('active');
+                    if (swatch.classList.contains(`${settings.accentColor}-swatch`)) {
+                        swatch.classList.add('active');
+                    }
+                });
+                
+                // Apply notification settings
+                document.getElementById('service-notifications').checked = settings.serviceNotifications !== undefined ? settings.serviceNotifications : defaultSettings.serviceNotifications;
+                document.getElementById('maintenance-notifications').checked = settings.maintenanceNotifications !== undefined ? settings.maintenanceNotifications : defaultSettings.maintenanceNotifications;
+                document.getElementById('promo-notifications').checked = settings.promoNotifications !== undefined ? settings.promoNotifications : defaultSettings.promoNotifications;
+                document.getElementById('email-notifications').checked = settings.emailNotifications !== undefined ? settings.emailNotifications : defaultSettings.emailNotifications;
+                document.getElementById('push-notifications').checked = settings.pushNotifications !== undefined ? settings.pushNotifications : defaultSettings.pushNotifications;
+                
+                // Apply privacy settings
+                document.getElementById('share-location').checked = settings.shareLocation !== undefined ? settings.shareLocation : defaultSettings.shareLocation;
+                document.getElementById('share-analytics').checked = settings.shareAnalytics !== undefined ? settings.shareAnalytics : defaultSettings.shareAnalytics;
+                document.getElementById('remember-search').checked = settings.rememberSearch !== undefined ? settings.rememberSearch : defaultSettings.rememberSearch;
+            }
+            
+            // Apply settings on page load
+            applySettings(userSettings);
+            
+            // Update theme toggle icon based on current theme
+            function updateThemeToggleIcon(theme) {
+                if (theme === 'dark') {
+                    themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+            }
+            
+            // Theme toggle functionality
+            themeToggleBtn.addEventListener('click', function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                document.querySelector(`input[name="thememode"][value="${newTheme}"]`).checked = true;
+                updateThemeToggleIcon(newTheme);
+                
+                // Update settings
+                userSettings.theme = newTheme;
+                localStorage.setItem('userSettings', JSON.stringify(userSettings));
+            });
+            
+            // Mobile menu toggle
+            mobileMenuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+            
+            // Handle color swatch selection
+            colorSwatches.forEach(swatch => {
+                swatch.addEventListener('click', function() {
+                    colorSwatches.forEach(s => s.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Show notification
+            function showNotification(message, type = 'success') {
+                notificationText.textContent = message;
+                notification.style.display = 'flex';
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1';
+                    }, 300);
+                }, 3000);
+            }
+            
+            // Save settings
+            saveButton.addEventListener('click', function() {
+                const newSettings = {
+                    language: document.getElementById('language').value,
+                    timezone: document.getElementById('timezone').value,
+                    theme: document.querySelector('input[name="thememode"]:checked').value,
+                    textSize: document.querySelector('input[name="textsize"]:checked').value,
+                    distanceUnit: document.querySelector('input[name="distanceunit"]:checked').value,
+                    dateFormat: document.querySelector('input[name="dateformat"]:checked').value,
+                    accentColor: document.querySelector('.color-swatch.active').dataset.color,
+                    serviceNotifications: document.getElementById('service-notifications').checked,
+                    maintenanceNotifications: document.getElementById('maintenance-notifications').checked,
+                    promoNotifications: document.getElementById('promo-notifications').checked,
+                    emailNotifications: document.getElementById('email-notifications').checked,
+                    pushNotifications: document.getElementById('push-notifications').checked,
+                    shareLocation: document.getElementById('share-location').checked,
+                    shareAnalytics: document.getElementById('share-analytics').checked,
+                    rememberSearch: document.getElementById('remember-search').checked
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('userSettings', JSON.stringify(newSettings));
+                
+                // Apply theme immediately
+                document.documentElement.setAttribute('data-theme', newSettings.theme);
+                updateThemeToggleIcon(newSettings.theme);
+                
+                // Show success notification
+                showNotification('Settings saved successfully!');
+                
+                // Add button animation
+                saveButton.classList.add('pulse');
+                setTimeout(() => {
+                    saveButton.classList.remove('pulse');
+                }, 1000);
+            });
+            
+            // Reset settings
+            resetButton.addEventListener('click', function() {
+                applySettings(defaultSettings);
+                localStorage.setItem('userSettings', JSON.stringify(defaultSettings));
+                document.documentElement.setAttribute('data-theme', defaultSettings.theme);
+                updateThemeToggleIcon(defaultSettings.theme);
+                showNotification('Settings reset to defaults');
+            });
+            
+            // Clear data
+            clearDataButton.addEventListener('click', function() {
+                // Keep user settings but clear other data
+                const currentSettings = localStorage.getItem('userSettings');
+                
+                // Simulate clearing caches
+                setTimeout(() => {
+                    showNotification('Cached data cleared successfully');
+                }, 500);
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 992 && 
+                    !event.target.closest('.sidebar') && 
+                    !event.target.closest('.mobile-menu-toggle') &&
+                    sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+            
+            // Demo notification for notification button
+            document.getElementById('notificationsBtn').addEventListener('click', function() {
+                showNotification('You have 3 new notifications');
+            });
+        });
+    </script>
+</body>
+</html>

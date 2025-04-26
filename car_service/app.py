@@ -111,7 +111,7 @@ def chatbot():
 
 @app.route('/settings')
 def settings():
-    return render_template('settings.html')
+    return render_template('settings_new.html')
 
 @app.route('/center-details')
 def center_details():
