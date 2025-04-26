@@ -748,6 +748,145 @@ h4 {
     animation: fadeIn 0.5s ease-out forwards;
 }
 
+/* ENHANCED DIAGNOSTIC CARDS */
+.diagnostic-card {
+    position: relative;
+    padding-top: 2.5rem;
+    border-left: none !important;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.diagnostic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.severity-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.5rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.diagnostic-card h4 {
+    margin-top: 0.5rem;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+}
+
+.diagnostic-card .solution {
+    margin: 1rem 0;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.diagnostic-details {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.cost-estimate {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.cost-estimate i {
+    margin-right: 0.3rem;
+}
+
+.badge.diy-possible {
+    background: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.badge.diy-professional {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.additional-info {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+/* RELATED ISSUES SECTION */
+.related-issues-section, 
+.maintenance-tips-section, 
+.follow-up-section {
+    background: var(--light-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.related-issues-section h4, 
+.maintenance-tips-section h4,
+.follow-up-section h4 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.related-issues-list li, 
+.maintenance-tips-list li,
+.follow-up-list li {
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.related-issues-list li:before, 
+.maintenance-tips-list li:before {
+    content: '•';
+    color: var(--secondary-color);
+    position: absolute;
+    left: 0;
+    font-size: 1.2rem;
+}
+
+.follow-up-list li {
+    padding-left: 0;
+}
+
+.follow-up-question {
+    display: block;
+    padding: 0.8rem 1rem;
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid var(--secondary-color);
+}
+
+.follow-up-question:hover {
+    background: rgba(212, 175, 55, 0.2);
+    transform: translateX(5px);
+}
+
 /* RESPONSIVE DESIGN */
 @media screen and (max-width: 1024px) {
     .sidebar {

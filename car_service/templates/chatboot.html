@@ -248,16 +248,89 @@ For example: 'My car won't start' or 'Strange noise when braking'"></textarea>
                     // Display results
                     data.results.forEach(item => {
                         const resultCard = document.createElement("div");
-                        resultCard.className = "card";
+                        resultCard.className = "card diagnostic-card";
+                        
+                        // Choose severity color
+                        let severityColor = "#f39c12"; // Default warning color
+                        if (item.problem_severity === "Critical") {
+                            severityColor = "#e74c3c"; // Red for critical
+                        } else if (item.problem_severity === "Minor") {
+                            severityColor = "#2ecc71"; // Green for minor
+                        }
+                        
+                        // Generate DIY badge
+                        const diyBadge = item.diy_possible ? 
+                            `<span class="badge diy-possible">DIY Possible</span>` : 
+                            `<span class="badge diy-professional">Professional Help Recommended</span>`;
+                        
                         resultCard.innerHTML = `
+                            <div class="severity-indicator" style="background-color: ${severityColor}">
+                                ${item.problem_severity || "Warning"}
+                            </div>
                             <h4>${item.problem}</h4>
-                            <p><strong>Solution:</strong> ${item.solution}</p>
+                            <p class="solution"><strong>Solution:</strong> ${item.solution}</p>
+                            <div class="diagnostic-details">
+                                <p class="cost-estimate"><i class="fas fa-dollar-sign"></i> <strong>Estimated Cost:</strong> ${item.estimated_cost || "Varies"}</p>
+                                ${diyBadge}
+                            </div>
+                            ${item.additional_info ? `<p class="additional-info"><strong>Additional Info:</strong> ${item.additional_info}</p>` : ''}
                         `;
                         resultsContainer.appendChild(resultCard);
                     });
+                    
+                    // Add related issues if available
+                    if (data.related_issues && data.related_issues.length > 0) {
+                        const relatedIssuesSection = document.createElement("div");
+                        relatedIssuesSection.className = "related-issues-section";
+                        relatedIssuesSection.innerHTML = `
+                            <h4>Related Issues to Check</h4>
+                            <ul class="related-issues-list">
+                                ${data.related_issues.map(issue => 
+                                    `<li>
+                                        <strong>${issue.issue}</strong>: ${issue.description}
+                                    </li>`
+                                ).join('')}
+                            </ul>
+                        `;
+                        resultsContainer.appendChild(relatedIssuesSection);
+                    }
+                    
+                    // Add maintenance tips if available
+                    if (data.maintenance_tips && data.maintenance_tips.length > 0) {
+                        const maintenanceSection = document.createElement("div");
+                        maintenanceSection.className = "maintenance-tips-section";
+                        maintenanceSection.innerHTML = `
+                            <h4>Preventive Maintenance Recommendations</h4>
+                            <ul class="maintenance-tips-list">
+                                ${data.maintenance_tips.map(tip => 
+                                    `<li>${tip}</li>`
+                                ).join('')}
+                            </ul>
+                        `;
+                        resultsContainer.appendChild(maintenanceSection);
+                    }
+                    
+                    // Add follow-up questions if available
+                    if (data.follow_up_questions && data.follow_up_questions.length > 0) {
+                        const followUpSection = document.createElement("div");
+                        followUpSection.className = "follow-up-section";
+                        followUpSection.innerHTML = `
+                            <h4>For a better diagnosis, consider the following:</h4>
+                            <ul class="follow-up-list">
+                                ${data.follow_up_questions.map(question => 
+                                    `<li>
+                                        <a href="#" class="follow-up-question" onclick="document.getElementById('query').value += ' - ${question.replace(/\?/g, '')}'; return false;">
+                                            ${question}
+                                        </a>
+                                    </li>`
+                                ).join('')}
+                            </ul>
+                        `;
+                        resultsContainer.appendChild(followUpSection);
+                    }
 
                     responseContainer.style.display = "block";
-                    console.log("✅ Solutions displayed successfully!");
+                    console.log("✅ Enhanced diagnostic information displayed successfully!");
 
                 } catch (error) {
                     console.error("❌ Error fetching solutions:", error);

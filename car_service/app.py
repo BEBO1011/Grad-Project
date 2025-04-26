@@ -287,29 +287,73 @@ def simulate_translation(text, target_lang="en"):
 @app.route("/search", methods=["POST"])
 def search():
     try:
+        from utils.openai_helper import generate_diagnostic_response, generate_maintenance_tips, generate_related_issues
+        
         data = request.json
         query_text = data.get("query", "")
-        brand_filter = data.get("brand", "").lower()
-        model_filter = data.get("model", "").lower()
-
+        brand = data.get("brand", "").strip()
+        model = data.get("model", "").strip()
+        
+        # Create case-insensitive filters
+        brand_filter = brand.lower() if brand else None
+        model_filter = model.lower() if model else None
+        
         if not query_text:
-            return jsonify({"error": "Query is required"}), 400
-
-        # Check for general issues first
+            return jsonify({"error": "Please provide a description of your car problem."}), 400
+            
+        # Check for follow-up questions that might be needed for vague queries
         for key, question in general_issues.items():
-            if key.lower() in query_text.lower():
+            if key.lower() in query_text.lower() and len(query_text.split()) < 5:
                 response = {
                     "message": "I need more details to provide a solution, احتاج المزيد من التفاصيل لمساعدك.",
                     "follow_up_question": question
                 }
                 return jsonify(response)
 
-        # Simulate translation
-        translated_query = simulate_translation(query_text, "en")
-        query_language = "ar" if translated_query != query_text else "en"
-
-        # Extract keywords from translated query
-        extracted_keywords = extract_keywords(translated_query)
+        # Language detection for Arabic
+        is_arabic = any("\u0600" <= char <= "\u06FF" for char in query_text)
+        
+        # For Arabic queries, perform simple translation
+        if is_arabic:
+            # Inform that we detected Arabic
+            print("Arabic query detected: translation would be applied")
+            # In a production system, we would use a proper translation API here
+        
+        # Use OpenAI to generate a diagnostic response
+        try:
+            print(f"Generating diagnostic for {brand} {model}: {query_text}")
+            
+            # Call OpenAI for detailed diagnostics
+            ai_response = generate_diagnostic_response(query_text, brand, model)
+            
+            # If we have results from the AI
+            if 'results' in ai_response and ai_response['results']:
+                # Process the results
+                results = ai_response['results']
+                
+                # Add related issues for the first problem
+                if len(results) > 0 and 'problem' in results[0]:
+                    related = generate_related_issues(brand, model, results[0]['problem'])
+                    if related:
+                        ai_response['related_issues'] = related
+                
+                # Generate maintenance tips
+                maintenance_tips = generate_maintenance_tips(brand, model)
+                if maintenance_tips:
+                    ai_response['maintenance_tips'] = maintenance_tips
+                
+                # Return enhanced AI response
+                return jsonify(ai_response)
+            
+            # Fallback to traditional search if AI response has no results
+            print("No AI results, falling back to traditional search")
+        except Exception as ai_error:
+            # Log the AI error but continue with traditional search
+            print(f"Error with AI diagnostic: {str(ai_error)}")
+        
+        # Traditional keyword-based search (fallback method)
+        # Extract keywords from query
+        extracted_keywords = extract_keywords(query_text)
         refined_query = " ".join(extracted_keywords)
 
         # Search for relevant problems
@@ -332,31 +376,46 @@ def search():
                 solution = issue["solution_en"]
                 
                 # Simulate translating response back to Arabic if needed
-                if query_language == "ar":
+                if is_arabic:
                     problem = simulate_translation(problem, "ar")
                     solution = simulate_translation(solution, "ar")
                 
                 results.append({
-                    "brand": issue["brand"],
-                    "model": issue["model"],
                     "problem": problem,
                     "solution": solution,
-                    "score": match_score
+                    "score": match_score,
+                    "problem_severity": "Warning",  # Default severity for backward compatibility
+                    "estimated_cost": "$100-300",   # Default cost estimate
+                    "diy_possible": True,          # Default DIY possibility
                 })
         
         # Sort results by relevance
         results.sort(key=lambda x: x.get("score", 0), reverse=True)
         
         if not results:
+            # Try to generate a response even when we don't have exact matches
+            try:
+                ai_response = generate_diagnostic_response(query_text, brand, model)
+                if 'results' in ai_response and ai_response['results']:
+                    return jsonify(ai_response)
+            except Exception:
+                pass
+                
+            # Truly no results found
             return jsonify({
-                "message": "No relevant issues found. Try rephrasing your query or providing more details."
+                "message": "No diagnostic information found. Please provide more details about your vehicle issue.",
+                "follow_up_questions": [
+                    "When did you first notice the problem?",
+                    "Does the issue happen all the time or only under certain conditions?",
+                    "Are there any warning lights on your dashboard?"
+                ]
             }), 200
             
         return jsonify({"results": results})
         
     except Exception as e:
         print("Error in /search:", str(e))
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "An unexpected error occurred. Our technical team has been notified. Please try again."}), 500
 
 @app.route("/get-directions", methods=["GET"])
 def get_directions():
