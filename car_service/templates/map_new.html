@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="/static/css/styles.css">
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css">
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
         :root {
             --primary-gold: #d4af37;
@@ -1084,7 +1084,7 @@
                         </div>
                         
                         <div class="location-cards" id="locationResults">
-                            <div class="location-card" data-lat="30.0444" data-lng="31.2357">
+                            <div class="location-card" data-id="1" data-lat="30.0444" data-lng="31.2357">
                                 <div class="location-icon">
                                     <i class="fas fa-tools"></i>
                                 </div>
@@ -1095,7 +1095,7 @@
                                 </div>
                             </div>
                             
-                            <div class="location-card" data-lat="30.0500" data-lng="31.2300">
+                            <div class="location-card" data-id="2" data-lat="30.0500" data-lng="31.2300">
                                 <div class="location-icon">
                                     <i class="fas fa-tools"></i>
                                 </div>
@@ -1106,7 +1106,7 @@
                                 </div>
                             </div>
                             
-                            <div class="location-card" data-lat="30.0550" data-lng="31.2400">
+                            <div class="location-card" data-id="3" data-lat="30.0550" data-lng="31.2400">
                                 <div class="location-icon">
                                     <i class="fas fa-tools"></i>
                                 </div>
@@ -1200,8 +1200,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.3.1/mapbox-gl-directions.js"></script>
     <script src="/static/js/frontend_api.js"></script>
     <script src="/static/js/mobile.js"></script>
     <script src="/static/js/theme.js"></script>
@@ -1224,184 +1222,119 @@
             const getDirectionsBtn = document.getElementById('getDirections');
             const shareLocationBtn = document.getElementById('shareLocation');
             
-            // Mapbox setup
-            mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+            // Initialize Leaflet map
+            // Cairo coordinates: [30.0444, 31.2357] (lat, lng)
+            const mymap = L.map('map').setView([30.0444, 31.2357], 12);
             
-            const mapInstance = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/dark-v11',
-                center: [31.2357, 30.0444], // Cairo coordinates
-                zoom: 12,
-                pitch: 40
-            });
+            // Add tile layer (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(mymap);
             
-            // Create a MapboxDirections instance
-            const directions = new MapboxDirections({
-                accessToken: mapboxgl.accessToken,
-                unit: 'metric',
-                profile: 'mapbox/driving-v1',
-                alternatives: true,
-                congestion: true,
-                controls: {
-                    instructions: false
+            // Custom marker icon for service centers
+            const createCustomIcon = (iconUrl, iconSize) => {
+                return L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background: linear-gradient(135deg, #d4af37, #a98c2b); width: ${iconSize[0]}px; height: ${iconSize[1]}px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border: 2px solid white;"><i class="fas fa-tools"></i></div>`,
+                    iconSize: iconSize
+                });
+            };
+            
+            // Create user location marker icon with pulse effect
+            const createUserLocationIcon = () => {
+                // Add pulse animation keyframes if they don't exist
+                if (!document.getElementById('pulse-animation')) {
+                    const styleEl = document.createElement('style');
+                    styleEl.id = 'pulse-animation';
+                    styleEl.textContent = `
+                        @keyframes pulse {
+                            0% {
+                                transform: scale(0.5);
+                                opacity: 1;
+                            }
+                            100% {
+                                transform: scale(2);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(styleEl);
                 }
-            });
-            
-            mapInstance.addControl(directions, 'top-left');
-            
-            // Hide the MapboxDirections UI by default
-            const directionsControl = document.querySelector('.mapboxgl-ctrl-directions');
-            if (directionsControl) {
-                directionsControl.style.display = 'none';
-            }
-            
-            // Add navigation control (zoom buttons)
-            const navControl = new mapboxgl.NavigationControl({
-                showCompass: false
-            });
-            
-            // Initialize map
-            mapInstance.on('load', function() {
-                // Add 3D buildings
-                mapInstance.addLayer({
-                    'id': '3d-buildings',
-                    'source': 'composite',
-                    'source-layer': 'building',
-                    'filter': ['==', 'extrude', 'true'],
-                    'type': 'fill-extrusion',
-                    'minzoom': 14,
-                    'paint': {
-                        'fill-extrusion-color': '#aaa',
-                        'fill-extrusion-height': [
-                            'interpolate', ['linear'], ['zoom'],
-                            14, 0,
-                            16, ['get', 'height']
-                        ],
-                        'fill-extrusion-base': [
-                            'interpolate', ['linear'], ['zoom'],
-                            14, 0,
-                            16, ['get', 'min_height']
-                        ],
-                        'fill-extrusion-opacity': 0.6
-                    }
+                
+                return L.divIcon({
+                    className: 'user-location-marker',
+                    html: `
+                        <div style="position: relative;">
+                            <div style="position: absolute; top: -18px; left: -18px; width: 36px; height: 36px; border-radius: 50%; background-color: rgba(66, 133, 244, 0.3); animation: pulse 2s infinite;"></div>
+                            <div style="position: relative; top: -10px; left: -10px; width: 20px; height: 20px; border-radius: 50%; background-color: #4285F4; border: 3px solid white; box-shadow: 0 0 10px rgba(66, 133, 244, 0.6); z-index: 10;"></div>
+                        </div>
+                    `,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
                 });
+            };
+            
+            // Add service center markers
+            const maintenanceCenters = [
+                { id: 1, name: "AutoFix Center", location: [30.0444, 31.2357], address: "123 Main St, Cairo" },
+                { id: 2, name: "Pro Mechanics", location: [30.0500, 31.2300], address: "456 Oak Ave, Cairo" },
+                { id: 3, name: "Expert Car Services", location: [30.0550, 31.2400], address: "789 Pine Rd, Cairo" }
+            ];
+            
+            // Create marker for each maintenance center
+            const centerMarkers = {};
+            maintenanceCenters.forEach(center => {
+                const marker = L.marker(center.location, { 
+                    icon: createCustomIcon(null, [40, 40])
+                }).addTo(mymap);
                 
-                // Add maintenance centers as markers
-                const maintenanceCenters = [
-                    { id: 1, name: "AutoFix Center", coordinates: [31.2357, 30.0444] },
-                    { id: 2, name: "Pro Mechanics", coordinates: [31.2300, 30.0500] },
-                    { id: 3, name: "Expert Car Services", coordinates: [31.2400, 30.0550] }
-                ];
+                // Add popup with center info
+                marker.bindPopup(`
+                    <h3 style="margin: 0 0 5px; font-family: 'Playfair Display', serif;">${center.name}</h3>
+                    <p style="margin: 0; font-size: 12px;">Premium Service Center</p>
+                `);
                 
-                maintenanceCenters.forEach(center => {
-                    // Create custom marker element
-                    const markerEl = document.createElement('div');
-                    markerEl.className = 'custom-marker';
-                    markerEl.style.width = '40px';
-                    markerEl.style.height = '40px';
-                    markerEl.style.background = 'linear-gradient(135deg, var(--primary-gold), var(--dark-gold))';
-                    markerEl.style.borderRadius = '50%';
-                    markerEl.style.display = 'flex';
-                    markerEl.style.alignItems = 'center';
-                    markerEl.style.justifyContent = 'center';
-                    markerEl.style.color = '#fff';
-                    markerEl.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
-                    markerEl.style.cursor = 'pointer';
-                    markerEl.style.border = '2px solid #fff';
-                    markerEl.innerHTML = '<i class="fas fa-tools" style="font-size: 18px;"></i>';
+                // Store marker reference for later use
+                centerMarkers[center.id] = marker;
+                
+                // Add click event to marker
+                marker.on('click', function() {
+                    // Update details sidebar
+                    document.getElementById('detailName').textContent = center.name;
+                    document.getElementById('detailAddress').textContent = center.address;
                     
-                    // Add marker popup
-                    const popup = new mapboxgl.Popup({ offset: 25 })
-                        .setHTML(`<h3 style="margin: 0 0 5px; font-family: 'Playfair Display', serif;">${center.name}</h3>
-                                <p style="margin: 0; font-size: 12px;">Premium Service Center</p>`);
-                    
-                    // Add marker to map
-                    new mapboxgl.Marker({
-                        element: markerEl,
-                        anchor: 'bottom'
-                    })
-                    .setLngLat(center.coordinates)
-                    .setPopup(popup)
-                    .addTo(mapInstance);
+                    // Highlight corresponding card
+                    locationCards.forEach(card => {
+                        if (parseInt(card.dataset.id) === center.id) {
+                            locationCards.forEach(c => c.classList.remove('selected'));
+                            card.classList.add('selected');
+                        }
+                    });
                 });
-                
-                // Get user's current location
-                getUserLocation();
             });
             
-            // Function to get user's location
+            // Get user's current location
             function getUserLocation() {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
-                            const { longitude, latitude } = position.coords;
+                            const { latitude, longitude } = position.coords;
+                            const userLocation = [latitude, longitude];
                             
-                            // Add a marker for user's location
-                            const userLocationEl = document.createElement('div');
-                            userLocationEl.className = 'user-location-marker';
-                            userLocationEl.style.width = '22px';
-                            userLocationEl.style.height = '22px';
-                            userLocationEl.style.borderRadius = '50%';
-                            userLocationEl.style.backgroundColor = '#4285F4';
-                            userLocationEl.style.border = '3px solid white';
-                            userLocationEl.style.boxShadow = '0 0 10px rgba(66, 133, 244, 0.6)';
-                            userLocationEl.style.position = 'relative';
-                            userLocationEl.style.zIndex = '2';
+                            // Add marker for user's location
+                            const userMarker = L.marker(userLocation, {
+                                icon: createUserLocationIcon()
+                            }).addTo(mymap);
                             
-                            // Create pulse effect
-                            const pulseEl = document.createElement('div');
-                            pulseEl.style.position = 'absolute';
-                            pulseEl.style.top = '-10px';
-                            pulseEl.style.left = '-10px';
-                            pulseEl.style.width = '40px';
-                            pulseEl.style.height = '40px';
-                            pulseEl.style.borderRadius = '50%';
-                            pulseEl.style.backgroundColor = 'rgba(66, 133, 244, 0.3)';
-                            pulseEl.style.zIndex = '1';
-                            pulseEl.style.animation = 'pulse 2s infinite';
-                            
-                            // Add pulse animation keyframes
-                            if (!document.getElementById('pulse-animation')) {
-                                const styleEl = document.createElement('style');
-                                styleEl.id = 'pulse-animation';
-                                styleEl.textContent = `
-                                    @keyframes pulse {
-                                        0% {
-                                            transform: scale(0.5);
-                                            opacity: 1;
-                                        }
-                                        100% {
-                                            transform: scale(2);
-                                            opacity: 0;
-                                        }
-                                    }
-                                `;
-                                document.head.appendChild(styleEl);
-                            }
-                            
-                            // Create popup for user location
-                            const popup = new mapboxgl.Popup({ offset: 25 })
-                                .setHTML(`<h3 style="margin: 0 0 5px; font-family: 'Playfair Display', serif; color: #4285F4;">Your Location</h3>
-                                        <p style="margin: 0; font-size: 12px;">Current position</p>`);
-                            
-                            // Add marker with pulse to map
-                            const markerContainer = document.createElement('div');
-                            markerContainer.appendChild(pulseEl);
-                            markerContainer.appendChild(userLocationEl);
-                            
-                            new mapboxgl.Marker({
-                                element: markerContainer,
-                                anchor: 'center'
-                            })
-                            .setLngLat([longitude, latitude])
-                            .setPopup(popup)
-                            .addTo(mapInstance);
+                            // Add popup with user location info
+                            userMarker.bindPopup(`
+                                <h3 style="margin: 0 0 5px; font-family: 'Playfair Display', serif; color: #4285F4;">Your Location</h3>
+                                <p style="margin: 0; font-size: 12px;">Current position</p>
+                            `);
                             
                             // Center map on user's location
-                            mapInstance.flyTo({
-                                center: [longitude, latitude],
-                                zoom: 14
-                            });
+                            mymap.setView(userLocation, 14, { animate: true });
                             
                             // Update location cards with distance from user's location
                             updateDistances(latitude, longitude);
@@ -1418,6 +1351,9 @@
                     );
                 }
             }
+            
+            // Initialize with user location
+            getUserLocation();
             
             // Calculate distances between user and locations
             function updateDistances(userLat, userLng) {
@@ -1454,8 +1390,6 @@
                 return deg * (Math.PI/180);
             }
             
-            // Event listeners
-            
             // Toggle mobile menu
             mobileMenuToggle.addEventListener('click', function() {
                 sidebar.classList.toggle('active');
@@ -1472,12 +1406,22 @@
                 } else {
                     this.innerHTML = '<i class="fas fa-chevron-right"></i>';
                 }
+                
+                // Update map size after sidebar toggle
+                setTimeout(() => {
+                    mymap.invalidateSize();
+                }, 300);
             });
             
             // Mobile sidebar toggle
             if (mobileSidebarToggle) {
                 mobileSidebarToggle.addEventListener('click', function() {
                     infoSidebar.classList.toggle('hidden');
+                    
+                    // Update map size after sidebar toggle
+                    setTimeout(() => {
+                        mymap.invalidateSize();
+                    }, 300);
                 });
             }
             
@@ -1488,12 +1432,10 @@
                 
                 document.documentElement.setAttribute('data-theme', newTheme);
                 
-                // Update map style based on theme
+                // Update theme icon
                 if (newTheme === 'dark') {
-                    mapInstance.setStyle('mapbox://styles/mapbox/dark-v11');
                     themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
                 } else {
-                    mapInstance.setStyle('mapbox://styles/mapbox/light-v11');
                     themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
                 }
                 
@@ -1503,11 +1445,11 @@
             
             // Map control buttons
             zoomIn.addEventListener('click', function() {
-                mapInstance.zoomIn();
+                mymap.zoomIn();
             });
             
             zoomOut.addEventListener('click', function() {
-                mapInstance.zoomOut();
+                mymap.zoomOut();
             });
             
             currentLocation.addEventListener('click', function() {
@@ -1531,6 +1473,7 @@
                 card.addEventListener('click', function() {
                     const lat = parseFloat(this.dataset.lat);
                     const lng = parseFloat(this.dataset.lng);
+                    const id = parseInt(this.dataset.id);
                     const name = this.querySelector('.location-name').textContent;
                     const address = this.querySelector('.location-address').textContent;
                     
@@ -1538,11 +1481,13 @@
                     document.getElementById('detailName').textContent = name;
                     document.getElementById('detailAddress').textContent = address;
                     
-                    // Fly to the location
-                    mapInstance.flyTo({
-                        center: [lng, lat],
-                        zoom: 15
-                    });
+                    // Center map on location
+                    mymap.setView([lat, lng], 15, { animate: true });
+                    
+                    // Open marker popup if exists
+                    if (centerMarkers[id]) {
+                        centerMarkers[id].openPopup();
+                    }
                     
                     // Highlight selected card
                     locationCards.forEach(c => c.classList.remove('selected'));
@@ -1561,24 +1506,8 @@
                     transportOptions.forEach(opt => opt.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // Update directions profile based on selected transport mode
+                    // Update route info based on selected transport mode
                     const mode = this.dataset.mode;
-                    let profile = 'mapbox/driving-v1';
-                    
-                    switch(mode) {
-                        case 'walking':
-                            profile = 'mapbox/walking-v1';
-                            break;
-                        case 'cycling':
-                            profile = 'mapbox/cycling-v1';
-                            break;
-                        default:
-                            profile = 'mapbox/driving-v1';
-                    }
-                    
-                    directions.setProfile(profile);
-                    
-                    // Update route info (this would normally come from the API)
                     updateRouteInfo(mode);
                 });
             });
@@ -1613,6 +1542,7 @@
             // Get directions button
             getDirectionsBtn.addEventListener('click', function() {
                 const nameElement = document.getElementById('detailName');
+                
                 if (nameElement) {
                     const locationName = nameElement.textContent;
                     
@@ -1626,35 +1556,54 @@
                     });
                     
                     if (selectedLat && selectedLng) {
-                        // Show directions control
-                        const directionsControl = document.querySelector('.mapboxgl-ctrl-directions');
-                        if (directionsControl) {
-                            directionsControl.style.display = 'block';
-                        }
-                        
                         // Get user's current location for origin
                         if (navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition(
                                 (position) => {
-                                    const { longitude, latitude } = position.coords;
+                                    const { latitude, longitude } = position.coords;
                                     
-                                    // Set origin to user's location
-                                    directions.setOrigin([longitude, latitude]);
+                                    // Clear previous routes
+                                    mymap.eachLayer(function(layer) {
+                                        if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                                            mymap.removeLayer(layer);
+                                        }
+                                    });
                                     
-                                    // Set destination to selected location
-                                    directions.setDestination([selectedLng, selectedLat]);
+                                    // Draw a simple route line (in a real app, this would be a proper route)
+                                    const routeLine = L.polyline([
+                                        [latitude, longitude],
+                                        [selectedLat, selectedLng]
+                                    ], {
+                                        color: '#d4af37',
+                                        weight: 5,
+                                        opacity: 0.7,
+                                        dashArray: '10, 10',
+                                        lineJoin: 'round'
+                                    }).addTo(mymap);
+                                    
+                                    // Fit map to show the entire route
+                                    mymap.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+                                    
+                                    // Calculate and display route info
+                                    const distance = calculateDistance(
+                                        latitude, longitude, 
+                                        selectedLat, selectedLng
+                                    );
+                                    document.getElementById('routeDistance').textContent = `${distance.toFixed(1)} km`;
+                                    
+                                    // Estimate time based on selected transport mode
+                                    const activeMode = document.querySelector('.transport-option.active');
+                                    if (activeMode) {
+                                        updateRouteInfo(activeMode.dataset.mode);
+                                    }
                                 },
                                 (error) => {
                                     console.error("Error getting location:", error);
-                                    // Fallback to Cairo center as origin
-                                    directions.setOrigin([31.2357, 30.0444]);
-                                    directions.setDestination([selectedLng, selectedLat]);
+                                    alert("Unable to get your current location. Please try again.");
                                 }
                             );
                         } else {
-                            // Fallback for browsers that don't support geolocation
-                            directions.setOrigin([31.2357, 30.0444]);
-                            directions.setDestination([selectedLng, selectedLat]);
+                            alert("Geolocation is not supported by your browser.");
                         }
                     }
                 }
@@ -1699,9 +1648,8 @@
             if (savedTheme) {
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 
-                // Update map style based on theme
+                // Update theme icon
                 if (savedTheme === 'dark') {
-                    mapInstance.setStyle('mapbox://styles/mapbox/dark-v11');
                     themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
                 }
             }
@@ -1718,12 +1666,8 @@
             
             // Handle window resize
             window.addEventListener('resize', function() {
-                // Adjust UI based on screen size
-                if (window.innerWidth <= 768) {
-                    // Mobile view adjustments
-                } else {
-                    // Desktop view adjustments
-                }
+                // Invalidate map size when window is resized
+                mymap.invalidateSize();
             });
         });
     </script>
