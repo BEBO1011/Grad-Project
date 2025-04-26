@@ -48,13 +48,13 @@
         
         .settings-container {
             background-color: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: var(--shadow-sm), 0 10px 30px rgba(0, 0, 0, 0.05);
-            padding: 2.5rem;
+            border-radius: 18px;
+            box-shadow: var(--shadow-sm), 0 15px 40px rgba(0, 0, 0, 0.08);
+            padding: 3rem;
             animation: fadeIn 0.5s ease;
             max-width: 1200px;
             margin: 0 auto;
-            border: 1px solid rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.15);
             position: relative;
             overflow: hidden;
         }
@@ -64,17 +64,17 @@
             position: absolute;
             top: 0;
             right: 0;
-            width: 180px;
-            height: 180px;
+            width: 220px;
+            height: 220px;
             background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0) 70%);
             border-radius: 50%;
             z-index: 0;
         }
         
         .settings-section {
-            margin-bottom: 3rem;
-            padding-bottom: 2.5rem;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            margin-bottom: 3.5rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
             position: relative;
             z-index: 1;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -89,7 +89,7 @@
             position: absolute;
             bottom: -1px;
             left: 0;
-            width: 60px;
+            width: 80px;
             height: 1px;
             background: linear-gradient(90deg, var(--primary-gold) 0%, rgba(212, 175, 55, 0) 100%);
         }
@@ -107,8 +107,18 @@
         .settings-section-title {
             display: flex;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             position: relative;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+        }
+        
+        /* New grid layout for sections */
+        .settings-section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
         
         .settings-section-title i {
@@ -483,17 +493,78 @@
             background: linear-gradient(135deg, #8b5cf6 0%, #c4b5fd 50%, #8b5cf6 100%);
         }
         
+        /* Theme selection container */
+        .theme-selection-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background-color: rgba(245, 245, 245, 0.2);
+            border-radius: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+        }
+        
+        .theme-radio-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .theme-option {
+            flex: 1;
+        }
+        
+        .theme-option label {
+            padding: 1.2rem 0.8rem;
+        }
+        
+        /* Format radio group */
+        .format-radio-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+        }
+        
+        /* Unit radio group */
+        .unit-radio-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        /* Toggle containers */
+        .toggles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .toggles-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .data-clear-container {
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
         .button-group {
             display: flex;
-            gap: 1.2rem;
-            margin-top: 3rem;
+            gap: 1.5rem;
+            margin-top: 3.5rem;
             position: relative;
+            justify-content: center;
         }
         
         .button-group:before {
             content: '';
             position: absolute;
-            top: -1.5rem;
+            top: -1.8rem;
             left: 0;
             right: 0;
             height: 1px;
@@ -703,59 +774,63 @@
                         <h3>Interface Preferences</h3>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="language">Display Language</label>
-                        <select id="language" class="premium-select">
-                            <option value="en">English (Default)</option>
-                            <option value="ar">Arabic (العربية)</option>
-                            <option value="fr">French (Français)</option>
-                            <option value="es">Spanish (Español)</option>
-                            <option value="de">German (Deutsch)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Theme Mode</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="light-theme" name="thememode" value="light">
-                                <label for="light-theme"><i class="fas fa-sun"></i> Light</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="dark-theme" name="thememode" value="dark" checked>
-                                <label for="dark-theme"><i class="fas fa-moon"></i> Dark</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="auto-theme" name="thememode" value="auto">
-                                <label for="auto-theme"><i class="fas fa-adjust"></i> System</label>
+                    <div class="settings-section-grid">
+                        <div class="form-group">
+                            <label for="language">Display Language</label>
+                            <select id="language" class="premium-select">
+                                <option value="en">English (Default)</option>
+                                <option value="ar">Arabic (العربية)</option>
+                                <option value="fr">French (Français)</option>
+                                <option value="es">Spanish (Español)</option>
+                                <option value="de">German (Deutsch)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Text Size</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="text-small" name="textsize" value="small">
+                                    <label for="text-small">Small</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="text-medium" name="textsize" value="medium" checked>
+                                    <label for="text-medium">Medium</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="text-large" name="textsize" value="large">
+                                    <label for="text-large">Large</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Accent Color</label>
-                        <div class="color-options">
-                            <div class="color-option gold active" data-color="gold"></div>
-                            <div class="color-option blue" data-color="blue"></div>
-                            <div class="color-option teal" data-color="teal"></div>
-                            <div class="color-option purple" data-color="purple"></div>
+                    <div class="theme-selection-container">
+                        <div class="form-group theme-options">
+                            <label>Theme Mode</label>
+                            <div class="radio-group theme-radio-group">
+                                <div class="radio-option theme-option">
+                                    <input type="radio" id="light-theme" name="thememode" value="light">
+                                    <label for="light-theme"><i class="fas fa-sun"></i> Light</label>
+                                </div>
+                                <div class="radio-option theme-option">
+                                    <input type="radio" id="dark-theme" name="thememode" value="dark" checked>
+                                    <label for="dark-theme"><i class="fas fa-moon"></i> Dark</label>
+                                </div>
+                                <div class="radio-option theme-option">
+                                    <input type="radio" id="auto-theme" name="thememode" value="auto">
+                                    <label for="auto-theme"><i class="fas fa-adjust"></i> System</label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Text Size</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="text-small" name="textsize" value="small">
-                                <label for="text-small">Small</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="text-medium" name="textsize" value="medium" checked>
-                                <label for="text-medium">Medium</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="text-large" name="textsize" value="large">
-                                <label for="text-large">Large</label>
+                        
+                        <div class="form-group accent-colors">
+                            <label>Accent Color</label>
+                            <div class="color-options">
+                                <div class="color-option gold active" data-color="gold"></div>
+                                <div class="color-option blue" data-color="blue"></div>
+                                <div class="color-option teal" data-color="teal"></div>
+                                <div class="color-option purple" data-color="purple"></div>
                             </div>
                         </div>
                     </div>
@@ -768,61 +843,65 @@
                         <h3>Regional Settings</h3>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="timezone">Timezone</label>
-                        <select id="timezone" class="premium-select">
-                            <option value="UTC">UTC (Coordinated Universal Time)</option>
-                            <option value="GMT+0">GMT+0 (London, Lisbon)</option>
-                            <option value="GMT+1">GMT+1 (Paris, Berlin, Rome)</option>
-                            <option value="GMT+2">GMT+2 (Cairo, Athens, Istanbul)</option>
-                            <option value="GMT+3">GMT+3 (Moscow, Riyadh, Dubai)</option>
-                            <option value="GMT+4">GMT+4 (Abu Dhabi, Dubai)</option>
-                            <option value="GMT+5">GMT+5 (Islamabad, Karachi)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Time Format</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="24h" name="timeformat" value="24h" checked>
-                                <label for="24h"><i class="fas fa-clock"></i> 24 Hours</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="12h" name="timeformat" value="12h">
-                                <label for="12h"><i class="far fa-clock"></i> 12 Hours (AM/PM)</label>
+                    <div class="settings-section-grid">
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label>
+                            <select id="timezone" class="premium-select">
+                                <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                <option value="GMT+0">GMT+0 (London, Lisbon)</option>
+                                <option value="GMT+1">GMT+1 (Paris, Berlin, Rome)</option>
+                                <option value="GMT+2">GMT+2 (Cairo, Athens, Istanbul)</option>
+                                <option value="GMT+3">GMT+3 (Moscow, Riyadh, Dubai)</option>
+                                <option value="GMT+4">GMT+4 (Abu Dhabi, Dubai)</option>
+                                <option value="GMT+5">GMT+5 (Islamabad, Karachi)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Date Format</label>
+                            <div class="radio-group format-radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="dmy" name="dateformat" value="dmy" checked>
+                                    <label for="dmy">DD/MM/YYYY</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="mdy" name="dateformat" value="mdy">
+                                    <label for="mdy">MM/DD/YYYY</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="ymd" name="dateformat" value="ymd">
+                                    <label for="ymd">YYYY/MM/DD</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Distance Unit</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="kilometers" name="distanceunit" value="km" checked>
-                                <label for="kilometers">Kilometers (km)</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="miles" name="distanceunit" value="mi">
-                                <label for="miles">Miles (mi)</label>
+                    <div class="settings-section-grid">
+                        <div class="form-group">
+                            <label>Time Format</label>
+                            <div class="radio-group unit-radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="24h" name="timeformat" value="24h" checked>
+                                    <label for="24h"><i class="fas fa-clock"></i> 24 Hours</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="12h" name="timeformat" value="12h">
+                                    <label for="12h"><i class="far fa-clock"></i> 12 Hours (AM/PM)</label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Date Format</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="dmy" name="dateformat" value="dmy" checked>
-                                <label for="dmy">DD/MM/YYYY</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="mdy" name="dateformat" value="mdy">
-                                <label for="mdy">MM/DD/YYYY</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="ymd" name="dateformat" value="ymd">
-                                <label for="ymd">YYYY/MM/DD</label>
+                        
+                        <div class="form-group">
+                            <label>Distance Unit</label>
+                            <div class="radio-group unit-radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="kilometers" name="distanceunit" value="km" checked>
+                                    <label for="kilometers"><i class="fas fa-ruler"></i> Kilometers (km)</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="miles" name="distanceunit" value="mi">
+                                    <label for="miles"><i class="fas fa-road"></i> Miles (mi)</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -835,44 +914,50 @@
                         <h3>Notification Preferences</h3>
                     </div>
                     
-                    <div class="toggle-group">
-                        <span class="toggle-label">Service Reminders</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="service-notifications" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-group">
-                        <span class="toggle-label">Maintenance Alerts</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="maintenance-notifications" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-group">
-                        <span class="toggle-label">Special Offers & Promotions</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="promo-notifications" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-group">
-                        <span class="toggle-label">Email Notifications</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="email-notifications" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-group">
-                        <span class="toggle-label">Push Notifications</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="push-notifications" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
+                    <div class="toggles-container">
+                        <div class="toggles-column">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Service Reminders</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="service-notifications" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="toggle-group">
+                                <span class="toggle-label">Maintenance Alerts</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="maintenance-notifications" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="toggle-group">
+                                <span class="toggle-label">Special Offers & Promotions</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="promo-notifications" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="toggles-column">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Email Notifications</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="email-notifications" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="toggle-group">
+                                <span class="toggle-label">Push Notifications</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="push-notifications" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -883,34 +968,40 @@
                         <h3>Privacy & Data</h3>
                     </div>
                     
-                    <div class="toggle-group">
-                        <span class="toggle-label">Share Location Data</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="share-location" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-group">
-                        <span class="toggle-label">Share Vehicle Analytics</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="share-analytics" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-group">
-                        <span class="toggle-label">Remember Search History</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="remember-search">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <button class="btn btn-secondary" id="clear-data" style="width: auto;">
-                            <i class="fas fa-trash-alt"></i> Clear Cached Data
-                        </button>
+                    <div class="toggles-container">
+                        <div class="toggles-column">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Share Location Data</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="share-location" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="toggle-group">
+                                <span class="toggle-label">Share Vehicle Analytics</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="share-analytics" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="toggles-column">
+                            <div class="toggle-group">
+                                <span class="toggle-label">Remember Search History</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="remember-search">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group data-clear-container">
+                                <button class="btn btn-secondary" id="clear-data">
+                                    <span><i class="fas fa-trash-alt"></i> Clear Cached Data</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
