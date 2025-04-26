@@ -369,3 +369,193 @@ def generate_rule_based_diagnostic(issue_description: str, brand: str, model: st
         "follow_up_questions": follow_up_questions[:3],  # Limit to 3 questions
         "maintenance_tips": maintenance_tips[:5]  # Limit to 5 tips
     }
+
+def generate_maintenance_tips(brand: str, model: str) -> List[str]:
+    """
+    Generate maintenance tips based on car brand and model
+    
+    Args:
+        brand: Car brand/manufacturer
+        model: Car model
+        
+    Returns:
+        List of maintenance tips
+    """
+    # Generic maintenance tips
+    generic_tips = [
+        "Regular oil changes every 5,000-7,500 miles",
+        "Rotate tires every 6,000-8,000 miles",
+        "Replace air filter annually",
+        "Check fluid levels monthly",
+        "Keep tires properly inflated",
+        "Clean battery terminals periodically",
+        "Replace wiper blades twice a year",
+        "Follow your vehicle's maintenance schedule",
+        "Address warning lights promptly",
+        "Use the recommended grade of fuel and oil"
+    ]
+    
+    # Brand-specific tips
+    brand_tips = {
+        "Mercedes": [
+            "Use only synthetic oil specifically recommended for Mercedes engines",
+            "Check AdBlue levels regularly if your model has a diesel engine",
+            "Monitor air suspension system for proper operation"
+        ],
+        "BMW": [
+            "Check for coolant leaks around the expansion tank",
+            "Monitor valve cover gasket for oil leaks",
+            "Have the VANOS system inspected regularly"
+        ],
+        "Audi": [
+            "Inspect timing chain tensioners regularly on older models",
+            "Check DSG transmission fluid at recommended intervals",
+            "Monitor PCV system for potential issues"
+        ],
+        "Toyota": [
+            "Inspect water pump and timing belt on older models",
+            "Check hybrid battery health if applicable",
+            "Monitor transmission fluid condition"
+        ],
+        "Fiat": [
+            "Check for oil consumption between services",
+            "Monitor clutch wear if manual transmission",
+            "Inspect suspension components regularly"
+        ]
+    }
+    
+    # Select tips
+    selected_tips = random.sample(generic_tips, 3)
+    
+    # Add brand-specific tips if available
+    if brand in brand_tips:
+        selected_tips.extend(random.sample(brand_tips[brand], min(2, len(brand_tips[brand]))))
+    
+    return selected_tips
+
+def generate_related_issues(brand: str, model: str, problem: str) -> List[Dict[str, str]]:
+    """
+    Generate related issues based on the current problem
+    
+    Args:
+        brand: Car brand/manufacturer
+        model: Car model
+        problem: Current problem description
+        
+    Returns:
+        List of related issues
+    """
+    # Common related issues by system
+    related_issues_by_system = {
+        "engine": [
+            {
+                "issue": "Oil Leaks",
+                "description": "Oil leaks from the valve cover gasket, oil pan, or timing cover can lead to low oil pressure and engine damage."
+            },
+            {
+                "issue": "Coolant Leaks",
+                "description": "Coolant leaks from hoses, the radiator, or water pump can cause engine overheating."
+            },
+            {
+                "issue": "Timing Belt/Chain Failure",
+                "description": "A worn timing belt/chain can lead to engine misfires, poor performance, or catastrophic engine damage."
+            }
+        ],
+        "battery": [
+            {
+                "issue": "Alternator Problems",
+                "description": "A failing alternator can lead to battery drainage and electrical system issues."
+            },
+            {
+                "issue": "Corroded Battery Terminals",
+                "description": "Corrosion on battery terminals can prevent proper charging and cause starting issues."
+            },
+            {
+                "issue": "Parasitic Drain",
+                "description": "Electrical components drawing power when the car is off can drain the battery."
+            }
+        ],
+        "transmission": [
+            {
+                "issue": "Fluid Leaks",
+                "description": "Transmission fluid leaks can lead to overheating and gear slippage."
+            },
+            {
+                "issue": "Torque Converter Issues",
+                "description": "A failing torque converter can cause shuddering, slipping, or overheating."
+            },
+            {
+                "issue": "Solenoid Problems",
+                "description": "Faulty transmission solenoids can cause irregular shifting or transmission failure."
+            }
+        ],
+        "brakes": [
+            {
+                "issue": "Warped Rotors",
+                "description": "Warped brake rotors can cause vibration when braking and reduced braking efficiency."
+            },
+            {
+                "issue": "Brake Fluid Leaks",
+                "description": "Brake fluid leaks can lead to spongy brake pedal feel and brake failure."
+            },
+            {
+                "issue": "Caliper Sticking",
+                "description": "Stuck brake calipers can cause uneven pad wear and pull to one side when braking."
+            }
+        ],
+        "tires": [
+            {
+                "issue": "Alignment Problems",
+                "description": "Poor wheel alignment can cause uneven tire wear and pulling to one side."
+            },
+            {
+                "issue": "Suspension Wear",
+                "description": "Worn suspension components can lead to uneven tire wear and poor handling."
+            },
+            {
+                "issue": "Valve Stem Leaks",
+                "description": "Leaking valve stems can cause gradual tire pressure loss."
+            }
+        ],
+        "fuel": [
+            {
+                "issue": "Clogged Fuel Injectors",
+                "description": "Clogged injectors can cause rough idling, misfires, and reduced fuel efficiency."
+            },
+            {
+                "issue": "Failing Fuel Pump",
+                "description": "A failing fuel pump can cause engine sputtering, stalling, or failure to start."
+            },
+            {
+                "issue": "Dirty Fuel Filter",
+                "description": "A clogged fuel filter can restrict fuel flow and cause performance issues."
+            }
+        ]
+    }
+    
+    # Determine which system the problem relates to
+    problem_lower = problem.lower()
+    detected_system = None
+    
+    if any(keyword in problem_lower for keyword in ["oil", "engine", "overheat", "coolant", "temperature"]):
+        detected_system = "engine"
+    elif any(keyword in problem_lower for keyword in ["battery", "electrical", "volt", "charge"]):
+        detected_system = "battery"
+    elif any(keyword in problem_lower for keyword in ["transmission", "gear", "shift"]):
+        detected_system = "transmission"
+    elif any(keyword in problem_lower for keyword in ["brake", "stop", "pedal"]):
+        detected_system = "brakes"
+    elif any(keyword in problem_lower for keyword in ["tire", "wheel", "pressure"]):
+        detected_system = "tires"
+    elif any(keyword in problem_lower for keyword in ["fuel", "gas", "injection"]):
+        detected_system = "fuel"
+    
+    # If no system detected, return a random selection of issues
+    if not detected_system:
+        all_issues = []
+        for system_issues in related_issues_by_system.values():
+            all_issues.extend(system_issues)
+        return random.sample(all_issues, min(3, len(all_issues)))
+    
+    # Return related issues for the detected system
+    return related_issues_by_system[detected_system]

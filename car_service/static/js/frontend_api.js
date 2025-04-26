@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:5000";
+const API_BASE_URL = "";
 
 
 // Get all WhatsApp buttons with the class "whatsapp-btn"
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/api/maintenance-centers");
+        const response = await fetch("/api/maintenance-centers");
         const centers = await response.json();
         console.log("Loaded maintenance centers:", centers);
 
@@ -111,7 +111,7 @@ async function signup(email, name, password, carBrand, carModel, year) {
 // Sign In Function DONE
 async function signin(email, password) {
     try {
-        const response = await fetch("http://127.0.0.1:5000/signin", { 
+        const response = await fetch("/signin", { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -174,7 +174,7 @@ async function handleNearestCenter(lat, lon) {
     }
 
     try {
-        const response = await fetch(`http://127.0.0.1:5000/nearest-maintenance-center?lat=${lat}&lon=${lon}`);
+        const response = await fetch(`/nearest-maintenance-center?lat=${lat}&lon=${lon}`);
         console.log("🟢 Response status:", response.status);  // ✅ Check response status
 
         const data = await response.json();

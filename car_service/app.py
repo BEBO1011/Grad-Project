@@ -107,7 +107,7 @@ def maintenance_centers_page():
 
 @app.route('/chatbot')
 def chatbot():
-    return render_template('chatboot.html')  # Note the typo in original filename
+    return render_template('chatbot.html')
 
 @app.route('/settings')
 def settings():
