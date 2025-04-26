@@ -1,28 +1,22 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_cors import CORS
 import os
 import json
 import re
-import spacy
-import nltk
+import secrets
 from argon2 import PasswordHasher
 import geopy.distance
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Initialize Flask app
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)  # Secure session key
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 CORS(app)
 
 # Initialize security hasher
 ph = PasswordHasher()
-
-# Load English NLP model
-try:
-    nlp = spacy.load("en_core_web_sm")
-except:
-    import spacy.cli
-    spacy.cli.download("en_core_web_sm")
-    nlp = spacy.load("en_core_web_sm")
 
 # Sample car issue data for the chatbot
 car_issues = [
@@ -262,26 +256,41 @@ general_issues = {
     "مشكلة في مكيف الهواء": "هل ينفث مكيف الهواء هواءً ساخنًا، أو يصدر ضوضاء، أو لا يعمل؟"
 }
 
-# Keyword extraction function for chatbot
+# Simplified keyword extraction without requiring spaCy
 def extract_keywords(text):
-    doc = nlp(text)
-    keywords = [token.text.lower() for token in doc if token.pos_ in ["NOUN", "VERB", "ADJ"]]
-    return keywords if keywords else text.split()  # Fallback to simple split if no keywords
+    """Extract potential keywords from text using simple splitting and filtering."""
+    # Convert to lowercase and split by whitespace
+    words = text.lower().split()
+    
+    # Filter out very short words (likely prepositions, articles, etc.)
+    keywords = [word for word in words if len(word) > 2]
+    
+    # If no keywords found, fall back to original text split
+    return keywords if keywords else text.lower().split()
 
-# Translation simulation (since we don't have actual API access)
+# Language detection and translation simulation
+def detect_language(text):
+    """Detect if text is Arabic or English."""
+    # Check if text contains Arabic characters (Unicode range U+0600 to U+06FF)
+    is_arabic = any("\u0600" <= char <= "\u06FF" for char in text)
+    return "ar" if is_arabic else "en"
+
 def simulate_translation(text, target_lang="en"):
     """Simulate translation by checking if text appears to be in Arabic."""
-    # Check if text contains Arabic characters (Unicode range)
-    is_arabic = any("\u0600" <= char <= "\u06FF" for char in text)
+    source_lang = detect_language(text)
     
-    if is_arabic and target_lang == "en":
-        # Simulate translating from Arabic to English
-        return "Translated text from Arabic to English: " + text
-    elif not is_arabic and target_lang == "ar":
-        # Simulate translating from English to Arabic
-        return "نص مترجم من الإنجليزية إلى العربية: " + text
+    # No need to translate if already in target language
+    if source_lang == target_lang:
+        return text
+        
+    if source_lang == "ar" and target_lang == "en":
+        # Placeholder for Arabic to English translation
+        return f"[AR→EN: {text}]"
+    elif source_lang == "en" and target_lang == "ar":
+        # Placeholder for English to Arabic translation
+        return f"[EN→AR: {text}]"
     else:
-        # No translation needed
+        # No translation needed or unsupported language pair
         return text
 
 @app.route("/search", methods=["POST"])
