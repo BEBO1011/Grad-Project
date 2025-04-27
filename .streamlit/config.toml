@@ -1,11 +1,4 @@
 [server]
 headless = true
 address = "0.0.0.0"
-port = 5000
-
-[theme]
-primaryColor = "#d4af37" # Gold color for luxury feel
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F0F2F6"
-textColor = "#14151a" # Darker text color
-font = "serif"
+port = 8501

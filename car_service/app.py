@@ -4,9 +4,13 @@ import os
 import json
 import re
 import secrets
-from argon2 import PasswordHasher
-import geopy.distance
+from geopy.distance import geodesic
 from datetime import datetime, timedelta
+import random
+
+# Import database modules
+from database import init_db
+import db_utils
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -15,8 +19,8 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 CORS(app)
 
-# Initialize security hasher
-ph = PasswordHasher()
+# Initialize database
+init_db()
 
 # Sample car issue data for the chatbot
 car_issues = [
@@ -70,13 +74,14 @@ car_owners = [
     {"id": 2, "name": "Mohamed", "personal_number": "01012345678", "latitude": 30.0520, "longitude": 31.2410}
 ]
 
-# Sample registered users
+# This will be replaced with database queries
+# Legacy user array for backward compatibility until fully migrated
 users = [
     {
         "id": 1,
         "email": "user@example.com",
         "name": "Test User",
-        "password": ph.hash("Password123!"),
+        "password": "argon2$Password123!",  # This is a dummy hash; we'll use db authentication
         "car_brand": "Toyota",
         "car_model": "Corolla",
         "manufacturing_year": 2020
@@ -119,9 +124,130 @@ def center_details():
 
 # API ENDPOINTS
 
+@app.route('/api/user/vehicles', methods=['GET'])
+def get_user_vehicles():
+    """Get all vehicles for a user from the database."""
+    try:
+        user_id = request.args.get("user_id")
+        
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+            
+        # Get vehicles from database
+        vehicles = db_utils.get_user_vehicles(user_id)
+        
+        # Convert to JSON-serializable format
+        vehicle_list = [vehicle.to_dict() for vehicle in vehicles]
+        
+        return jsonify(vehicle_list)
+    except Exception as e:
+        print(f"Error fetching user vehicles: {str(e)}")
+        return jsonify({"error": "Failed to fetch vehicles"}), 500
+
 @app.route('/api/maintenance-centers', methods=['GET'])
 def get_maintenance_centers():
-    return jsonify(maintenance_centers)
+    try:
+        # Get centers from database
+        centers = db_utils.get_maintenance_centers()
+        
+        # Convert to JSON-serializable format
+        center_list = [center.to_dict() for center in centers]
+        
+        return jsonify(center_list)
+    except Exception as e:
+        print(f"Error fetching maintenance centers: {str(e)}")
+        return jsonify({"error": "Failed to fetch maintenance centers"}), 500
+        
+@app.route('/api/maintenance-center/<int:center_id>', methods=['GET'])
+def get_maintenance_center(center_id):
+    """Get details for a specific maintenance center."""
+    try:
+        # Get center from database
+        center = db_utils.get_center_by_id(center_id)
+        
+        if not center:
+            return jsonify({"error": "Maintenance center not found"}), 404
+            
+        # Get services for this center
+        services = db_utils.get_center_services(center_id)
+        
+        # Convert to JSON-serializable format
+        center_data = center.to_dict()
+        service_list = [service.to_dict() for service in services]
+        
+        # Add services to center data
+        center_data['services'] = service_list
+        
+        return jsonify(center_data)
+    except Exception as e:
+        print(f"Error fetching maintenance center: {str(e)}")
+        return jsonify({"error": "Failed to fetch maintenance center details"}), 500
+
+@app.route('/api/user/profile', methods=['GET'])
+def get_user_profile():
+    """Get user profile information."""
+    try:
+        user_id = request.args.get("user_id")
+        
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+            
+        # Get user profile from database
+        user = db_utils.get_user_by_id(user_id)
+        
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+            
+        # Get user's vehicles
+        vehicles = db_utils.get_user_vehicles(user_id)
+        vehicle_list = [vehicle.to_dict() for vehicle in vehicles]
+        
+        # Convert to JSON-serializable format and include vehicles
+        user_data = user.to_dict()
+        user_data['vehicles'] = vehicle_list
+        
+        return jsonify(user_data)
+    except Exception as e:
+        print(f"Error fetching user profile: {str(e)}")
+        return jsonify({"error": "Failed to fetch user profile"}), 500
+        
+@app.route('/api/user/profile', methods=['PUT'])
+def update_user_profile():
+    """Update user profile information."""
+    try:
+        data = request.json
+        user_id = data.get("user_id")
+        
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+            
+        # Get updateable fields from request
+        name = data.get("name")
+        phone = data.get("phone")
+        preferred_language = data.get("preferred_language")
+        profile_picture = data.get("profile_picture")
+        
+        # Update user profile in database
+        user, error = db_utils.update_user_profile(
+            user_id=user_id,
+            name=name,
+            phone=phone,
+            preferred_language=preferred_language,
+            profile_picture=profile_picture
+        )
+        
+        if error:
+            return jsonify({"error": error}), 400
+            
+        return jsonify({
+            "success": True,
+            "message": "Profile updated successfully",
+            "user": user.to_dict()
+        })
+        
+    except Exception as e:
+        print(f"Error updating user profile: {str(e)}")
+        return jsonify({"error": "Failed to update user profile"}), 500
 
 @app.route('/nearest-owner', methods=['GET'])
 def get_nearest_owner():
@@ -129,30 +255,66 @@ def get_nearest_owner():
         user_lat = float(request.args.get("lat"))
         user_lon = float(request.args.get("lon"))
 
-        # Find the nearest car owner using Haversine formula
-        nearest_owner = None
-        min_distance = float('inf')
-        
-        for owner in car_owners:
-            owner_location = (owner["latitude"], owner["longitude"])
-            user_location = (user_lat, user_lon)
-            distance = geopy.distance.geodesic(user_location, owner_location).km
+        # Get all users from database
+        session = db_utils.get_session()
+        try:
+            users = session.query(db_utils.User).filter(db_utils.User.is_active == True).all()
             
-            if distance < min_distance:
-                min_distance = distance
-                nearest_owner = owner
-        
-        if nearest_owner:
-            return jsonify({
-                "name": nearest_owner["name"],
-                "phone": nearest_owner["personal_number"],
-                "latitude": nearest_owner["latitude"],
-                "longitude": nearest_owner["longitude"],
-                "distance_km": round(min_distance, 2)
-            })
-        else:
-            return jsonify({"message": "No car owners found."}), 404
+            if not users:
+                return jsonify({"message": "No active users found."}), 404
+                
+            # Find users with saved locations
+            users_with_locations = []
+            for user in users:
+                # Get user's saved locations
+                locations = db_utils.get_user_saved_locations(user.id)
+                if locations:
+                    # Use the first location (or favorite if available)
+                    favorite_location = next((loc for loc in locations if loc.is_favorite), locations[0])
+                    users_with_locations.append({
+                        "user": user,
+                        "location": favorite_location
+                    })
+            
+            if not users_with_locations:
+                return jsonify({"message": "No users with saved locations found."}), 404
+                
+            # Find the nearest user using Haversine formula
+            nearest_owner = None
+            min_distance = float('inf')
+            
+            for user_data in users_with_locations:
+                user = user_data["user"]
+                location = user_data["location"]
+                
+                owner_location = (location.latitude, location.longitude)
+                user_location = (user_lat, user_lon)
+                distance = geodesic(user_location, owner_location).km
+                
+                if distance < min_distance:
+                    min_distance = distance
+                    nearest_owner = {
+                        "user": user,
+                        "location": location,
+                        "distance": distance
+                    }
+            
+            if nearest_owner:
+                return jsonify({
+                    "name": nearest_owner["user"].name,
+                    "phone": nearest_owner["user"].phone or "Not available",
+                    "latitude": nearest_owner["location"].latitude,
+                    "longitude": nearest_owner["location"].longitude,
+                    "distance_km": round(nearest_owner["distance"], 2)
+                })
+            else:
+                return jsonify({"message": "No nearby owners found."}), 404
+                
+        finally:
+            session.close()
+            
     except Exception as e:
+        print(f"Error finding nearest owner: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 # Strong password validation
@@ -185,28 +347,33 @@ def signup():
         if password_error:
             return jsonify({"error": password_error}), 400
         
-        # Hash the password with Argon2
-        hashed_password = ph.hash(password)
-
-        # Check if email already exists
-        for user in users:
-            if user["email"] == email:
-                return jsonify({"error": "Email already exists"}), 400
-
-        # Create new user
-        new_user = {
-            "id": len(users) + 1,
-            "email": email,
-            "name": name,
-            "password": hashed_password,
-            "car_brand": car_brand,
-            "car_model": car_model,
-            "manufacturing_year": manufacturing_year
-        }
+        # Create the user in the database
+        user, error = db_utils.create_user(name, email, password)
+        if error:
+            return jsonify({"error": error}), 400
+            
+        # Add vehicle for the user
+        vehicle, error = db_utils.add_vehicle(
+            user.id, 
+            car_brand, 
+            car_model, 
+            int(manufacturing_year) if manufacturing_year else 2020
+        )
         
-        users.append(new_user)
+        if error:
+            return jsonify({"error": f"User created but failed to add vehicle: {error}"}), 400
+            
+        # Set up session data
+        session['user_id'] = user.id
+        session['name'] = user.name
+        session['email'] = user.email
         
-        return jsonify({"message": "User registered successfully", "success": True}), 201
+        return jsonify({
+            "message": "User registered successfully", 
+            "success": True,
+            "user_id": user.id,
+            "name": user.name
+        }), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -221,20 +388,23 @@ def signin():
         if not email or not password:
             return jsonify({"error": "Email and password are required"}), 400
 
-        # Find user by email
-        user = next((u for u in users if u["email"] == email), None)
-
+        # Authenticate user with database
+        user, error = db_utils.authenticate_user(email, password)
+        
+        if error:
+            return jsonify({"error": "Invalid email or password"}), 401
+            
         if user:
-            try:
-                # Verify the password using Argon2
-                ph.verify(user["password"], password)
-                return jsonify({
-                    "message": "Login successful", 
-                    "user_id": user["id"], 
-                    "name": user["name"]
-                }), 200
-            except:
-                return jsonify({"error": "Invalid email or password"}), 401
+            # Set up session data
+            session['user_id'] = user.id
+            session['name'] = user.name
+            session['email'] = user.email
+            
+            return jsonify({
+                "message": "Login successful", 
+                "user_id": user.id, 
+                "name": user.name
+            }), 200
         else:
             return jsonify({"error": "Invalid email or password"}), 401
         
@@ -476,6 +646,72 @@ def get_directions():
 
     return jsonify(directions)
 
+@app.route("/api/book-appointment", methods=["POST"])
+def book_appointment():
+    """Book a maintenance appointment."""
+    try:
+        data = request.json
+        user_id = data.get("user_id")
+        vehicle_id = data.get("vehicle_id")
+        center_id = data.get("center_id")
+        service_id = data.get("service_id")
+        appointment_date_str = data.get("appointment_date")
+        notes = data.get("notes")
+        
+        # Validate required inputs
+        if not user_id or not vehicle_id or not center_id or not appointment_date_str:
+            return jsonify({"error": "User ID, vehicle ID, center ID and appointment date are required"}), 400
+            
+        # Parse appointment date
+        try:
+            appointment_date = datetime.fromisoformat(appointment_date_str.replace('Z', '+00:00'))
+        except ValueError:
+            return jsonify({"error": "Invalid appointment date format. Please use ISO format (YYYY-MM-DDTHH:MM:SS)"}), 400
+            
+        # Book appointment in database
+        appointment, error = db_utils.book_appointment(
+            user_id=user_id,
+            vehicle_id=vehicle_id,
+            center_id=center_id,
+            service_id=service_id,
+            appointment_date=appointment_date,
+            notes=notes
+        )
+        
+        if error:
+            return jsonify({"error": error}), 400
+            
+        return jsonify({
+            "success": True,
+            "message": "Appointment booked successfully",
+            "appointment": appointment.to_dict()
+        })
+        
+    except Exception as e:
+        print(f"Error booking appointment: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/user/appointments", methods=["GET"])
+def get_user_appointments():
+    """Get appointments for a user."""
+    try:
+        user_id = request.args.get("user_id")
+        status = request.args.get("status")  # Optional
+        
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+            
+        # Get appointments from database
+        appointments = db_utils.get_user_appointments(user_id, status)
+        
+        # Convert to JSON-serializable format
+        appointment_list = [appointment.to_dict() for appointment in appointments]
+        
+        return jsonify(appointment_list)
+    except Exception as e:
+        print(f"Error fetching user appointments: {str(e)}")
+        return jsonify({"error": "Failed to fetch appointments"}), 500
+
 @app.route("/save-location", methods=["POST"])
 def save_location():
     """Save user's location."""
@@ -487,12 +723,33 @@ def save_location():
         
         if not user_id or latitude is None or longitude is None:
             return jsonify({"error": "User ID, latitude, and longitude are required"}), 400
+        
+        # Get additional data if available
+        location_name = data.get("name", "My Location")
+        address = data.get("address", "")
+        is_favorite = data.get("is_favorite", False)
+        
+        # Save location to database
+        location, error = db_utils.save_user_location(
+            user_id=user_id,
+            name=location_name,
+            latitude=latitude,
+            longitude=longitude,
+            address=address,
+            is_favorite=is_favorite
+        )
+        
+        if error:
+            return jsonify({"error": error}), 400
             
-        # In a real application, this would update a database
-        # For now, just return success
-        return jsonify({"message": "Location saved successfully"})
+        return jsonify({
+            "success": True,
+            "message": "Location saved successfully",
+            "location": location.to_dict()
+        })
         
     except Exception as e:
+        print(f"Error saving location: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/vehicle-health")
@@ -512,35 +769,86 @@ def vehicle_health_api():
         logger.info("Vehicle health API request received")
         
         # Get parameters from request
-        vehicle_id = request.args.get("vehicle_id", "default-vehicle")
-        brand = request.args.get("brand", "Unknown").strip()
-        model = request.args.get("model", "Unknown").strip()
-        year = request.args.get("year", "2025")
-        condition = request.args.get("condition", "")
+        vehicle_id = request.args.get("vehicle_id")
+        user_id = request.args.get("user_id")
         
-        # Log the request parameters
-        logger.info(f"Vehicle health request - ID: '{vehicle_id}', Brand: '{brand}', Model: '{model}', Year: '{year}'")
+        if not vehicle_id:
+            logger.warning("Missing vehicle_id parameter in vehicle health request")
+            return jsonify({"error": "Vehicle ID is required"}), 400
         
-        # Validate inputs
-        if not brand or brand == "Unknown":
-            logger.warning("Missing brand parameter in vehicle health request")
-            # We'll still process the request but log the warning
-        
-        if not model or model == "Unknown":
-            logger.warning("Missing model parameter in vehicle health request")
-            # We'll still process the request but log the warning
-        
-        # Get complete analysis with better error handling
+        # Get vehicle data from database
         try:
+            # First try to get vehicle health data from database
+            health_data = db_utils.get_vehicle_health_history(vehicle_id, limit=1)
+            
+            # Then try to get vehicle details
+            vehicle = db_utils.get_vehicle_by_id(vehicle_id)
+            
+            if not vehicle:
+                logger.warning(f"Vehicle with ID {vehicle_id} not found")
+                return jsonify({"error": "Vehicle not found"}), 404
+                
+            # Use vehicle data for analysis
+            brand = vehicle.brand
+            model = vehicle.model
+            year = str(vehicle.year)
+            
+            # If we have health data, use it to enhance the analysis
+            condition = ""
+            if health_data and len(health_data) > 0:
+                latest_data = health_data[0]
+                # Build condition string based on health data
+                conditions = []
+                
+                if latest_data.check_engine_light:
+                    conditions.append("check engine light on")
+                    
+                if latest_data.oil_level and latest_data.oil_level < 30:
+                    conditions.append("low oil level")
+                    
+                if latest_data.coolant_level and latest_data.coolant_level < 30:
+                    conditions.append("low coolant level")
+                    
+                if latest_data.engine_temperature and latest_data.engine_temperature > 100:
+                    conditions.append("high engine temperature")
+                    
+                condition = ", ".join(conditions)
+            
+            # Log the request parameters
+            logger.info(f"Vehicle health request - ID: '{vehicle_id}', Brand: '{brand}', Model: '{model}', Year: '{year}'")
+            
+            # Get complete analysis with better error handling
             analysis = get_complete_vehicle_analysis(vehicle_id, brand, model, year, condition)
             
-            # Ensure the vehicle data section contains the provided brand and model
+            # Enhance analysis with actual vehicle data
             if "vehicle_data" in analysis:
                 analysis["vehicle_data"]["brand"] = brand
                 analysis["vehicle_data"]["model"] = model
                 analysis["vehicle_data"]["year"] = year
+                analysis["vehicle_data"]["vehicle_id"] = vehicle_id
+                
+                if health_data and len(health_data) > 0:
+                    latest_data = health_data[0]
+                    analysis["vehicle_data"]["mileage"] = latest_data.mileage
+                    
+                    # Add health metrics
+                    if "health_metrics" not in analysis:
+                        analysis["health_metrics"] = {}
+                        
+                    analysis["health_metrics"]["engine_status"] = latest_data.engine_status or "Good"
+                    analysis["health_metrics"]["oil_level"] = latest_data.oil_level or 85
+                    analysis["health_metrics"]["coolant_level"] = latest_data.coolant_level or 92
+                    analysis["health_metrics"]["brake_fluid"] = latest_data.brake_fluid_level or 78
+                    analysis["health_metrics"]["tire_pressure"] = {
+                        "front_left": latest_data.tire_pressure_front_left or 32.5,
+                        "front_right": latest_data.tire_pressure_front_right or 32.0,
+                        "rear_left": latest_data.tire_pressure_rear_left or 32.8,
+                        "rear_right": latest_data.tire_pressure_rear_right or 32.2
+                    }
+                    analysis["health_metrics"]["battery_health"] = latest_data.battery_health or 90
+                    analysis["health_metrics"]["fuel_level"] = latest_data.fuel_level or 65
             
-            # Return the analysis as JSON
+            # Return the enhanced analysis as JSON
             return jsonify(analysis)
             
         except Exception as analysis_error:
@@ -549,17 +857,15 @@ def vehicle_health_api():
                 "error": "Unable to analyze vehicle health at this time",
                 "vehicle_data": {
                     "vehicle_id": vehicle_id,
-                    "brand": brand, 
-                    "model": model,
-                    "year": year,
                     "status": "Error"
                 }
             }), 500
         
     except Exception as e:
-        logger.error(f"Unexpected error in vehicle health API: {str(e)}")
+        print(f"Unexpected error in vehicle health API: {str(e)}")
         return jsonify({"error": "An unexpected error occurred while analyzing vehicle health"}), 500
 
 if __name__ == "__main__":
-    # Use a different port (8080) since port 5000 is used by Streamlit
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    # Use environment variable PORT if provided, otherwise default to 8080
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port, debug=True)
