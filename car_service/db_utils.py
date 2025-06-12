@@ -1,4 +1,5 @@
 import random
+from sqlalchemy import extract
 import string
 import datetime
 from database import (
@@ -6,6 +7,7 @@ from database import (
     MaintenanceAppointment, MaintenanceRecord, SavedLocation,
     VehicleHealthData, ChatSession, ChatMessage
 )
+from sqlalchemy import func
 
 def get_user_by_email(email):
     """Get a user by their email address"""
@@ -55,6 +57,7 @@ def update_user_profile(user_id, name=None, phone=None, preferred_language=None,
 def create_user(name, email, password, phone=None, language="en"):
     """Create a new user"""
     session = get_session()
+    print('CREATE')
     try:
         # Check if user already exists
         existing_user = session.query(User).filter(User.email == email).first()
@@ -71,11 +74,13 @@ def create_user(name, email, password, phone=None, language="en"):
             last_login=datetime.datetime.utcnow()
         )
         user.set_password(password)
-        
         session.add(user)
+        session.flush()
         session.commit()
+        print("User ID after creation:", user.id)
         return user, None
     except Exception as e:
+        print(e)
         session.rollback()
         return None, str(e)
     finally:
@@ -93,7 +98,11 @@ def authenticate_user(email, password):
         user.last_login = datetime.datetime.utcnow()
         session.commit()
         
-        return user, None
+        return {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email
+        }, None
     except Exception as e:
         return None, str(e)
     finally:
@@ -217,7 +226,16 @@ def book_appointment(user_id, vehicle_id, center_id, service_id, appointment_dat
         
         session.add(appointment)
         session.commit()
-        return appointment, None
+        return {
+            "id": appointment.id,
+            "user_id": appointment.user_id,
+            "vehicle_id": appointment.vehicle_id,
+            "center_id": appointment.center_id,
+            "service_id": appointment.service_id,
+            "appointment_date": appointment.appointment_date.isoformat(),
+            "status": appointment.status,
+            "notes": appointment.notes
+        }, None
     except Exception as e:
         session.rollback()
         return None, str(e)
@@ -259,7 +277,18 @@ def save_user_location(user_id, name, latitude, longitude, address=None, is_favo
         
         session.add(location)
         session.commit()
-        return location, None
+        # Convert to dict BEFORE session is closed
+        location_dict = {
+            'id': location.id,
+            'user_id': location.user_id,
+            'name': location.name,
+            'address': location.address,
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            'is_favorite': location.is_favorite
+        }
+        
+        return location_dict, None
     except Exception as e:
         session.rollback()
         return None, str(e)
@@ -392,5 +421,105 @@ def end_chat_session(session_key):
     except Exception:
         session.rollback()
         return False
+    finally:
+        session.close()
+
+def get_total_users():
+    """Get total number of users."""
+    session = get_session()
+    try:
+        return session.query(User).count()
+    finally:
+        session.close()
+
+def get_active_appointments():
+    """Get number of active appointments."""
+    session = get_session()
+    try:
+        return session.query(MaintenanceAppointment).filter(
+            MaintenanceAppointment.status.in_(['pending', 'confirmed'])
+        ).count()
+    finally:
+        session.close()
+
+def get_monthly_revenue():
+    """Get total revenue for current month."""
+    session = get_session()
+    try:
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+        
+        return session.query(func.sum(MaintenanceAppointment.cost)).filter(
+            extract('month', MaintenanceAppointment.created_at) == current_month,
+            extract('year', MaintenanceAppointment.created_at) == current_year
+        ).scalar() or 0
+    finally:
+        session.close()
+
+def get_total_centers():
+    """Get total number of service centers."""
+    session = get_session()
+    try:
+        return session.query(MaintenanceCenter).count()
+    finally:
+        session.close()
+
+def get_recent_appointments(limit=10):
+    """Get recent appointments with user and vehicle details."""
+    session = get_session()
+    try:
+        return session.query(MaintenanceAppointment).join(User).join(Vehicle).order_by(
+            MaintenanceAppointment.created_at.desc()
+        ).limit(limit).all()
+    finally:
+        session.close()
+
+def get_recent_user_activity(limit=10):
+    """Get recent user activities."""
+    session = get_session()
+    try:
+        return session.query(MaintenanceRecord).order_by(
+            MaintenanceRecord.created_at.desc()
+        ).limit(limit).all()
+    finally:
+        session.close()
+
+def get_monthly_statistics():
+    """Get monthly statistics for users, appointments, and revenue."""
+    session = get_session()
+    try:
+        current_year = datetime.now().year
+        
+        # Get monthly user registrations
+        user_stats = session.query(
+            extract('month', User.created_at).label('month'),
+            func.count(User.id).label('count')
+        ).filter(
+            extract('year', User.created_at) == current_year
+        ).group_by('month').all()
+        
+        # Get monthly appointments
+        appointment_stats = session.query(
+            extract('month', MaintenanceAppointment.created_at).label('month'),
+            func.count(MaintenanceAppointment.id).label('count')
+        ).filter(
+            extract('year', MaintenanceAppointment.created_at) == current_year
+        ).group_by('month').all()
+        
+        # Get monthly revenue
+        revenue_stats = session.query(
+            extract('month', MaintenanceAppointment.created_at).label('month'),
+            func.sum(MaintenanceAppointment.cost).label('total')
+        ).filter(
+            extract('year', MaintenanceAppointment.created_at) == current_year
+        ).group_by('month').all()
+        
+        # Format the data
+        months = range(1, 13)
+        return {
+            'users': [next((stat.count for stat in user_stats if stat.month == month), 0) for month in months],
+            'appointments': [next((stat.count for stat in appointment_stats if stat.month == month), 0) for month in months],
+            'revenue': [next((stat.total for stat in revenue_stats if stat.month == month), 0) for month in months]
+        }
     finally:
         session.close()

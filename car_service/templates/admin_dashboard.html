@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | CService</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="/static/images/car_service_logo.jpeg" alt="CService Logo">
+                <h2>CService</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-users"></i> Users</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-calendar-check"></i> Appointments</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-car"></i> Vehicles</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-tools"></i> Service Centers</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    
+                    <div class="admin-profile">
+                        <img src="/static/images/user-profile.jpg" alt="Admin" onerror="this.src='/static/images/photo_2025-03-31_23-49-16.jpg'">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Users</h3>
+                            <div class="stat-number">2,543</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 12% this month
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon appointments">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Active Appointments</h3>
+                            <div class="stat-number">156</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 8% this week
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Monthly Revenue</h3>
+                            <div class="stat-number">$45,678</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 15% this month
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon centers">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Service Centers</h3>
+                            <div class="stat-number">24</div>
+                            <div class="stat-change neutral">
+                                <i class="fas fa-minus"></i> No change
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Recent Appointments -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent Appointments</h3>
+                            <button class="view-all">View All</button>
+                        </div>
+                        
+                        <div class="appointments-list">
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <h4>John Doe</h4>
+                                    <p><i class="fas fa-car"></i> Mercedes-Benz S-Class</p>
+                                    <p><i class="fas fa-clock"></i> Today, 2:30 PM</p>
+                                </div>
+                                <span class="appointment-status pending">Pending</span>
+                            </div>
+                            
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <h4>Sarah Smith</h4>
+                                    <p><i class="fas fa-car"></i> BMW X5</p>
+                                    <p><i class="fas fa-clock"></i> Today, 4:00 PM</p>
+                                </div>
+                                <span class="appointment-status confirmed">Confirmed</span>
+                            </div>
+                            
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <h4>Mike Johnson</h4>
+                                    <p><i class="fas fa-car"></i> Audi A6</p>
+                                    <p><i class="fas fa-clock"></i> Tomorrow, 10:00 AM</p>
+                                </div>
+                                <span class="appointment-status confirmed">Confirmed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Activity -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent User Activity</h3>
+                            <button class="view-all">View All</button>
+                        </div>
+                        
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <p>New user registration</p>
+                                    <span>2 minutes ago</span>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <p>New appointment scheduled</p>
+                                    <span>15 minutes ago</span>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <p>New vehicle added</p>
+                                    <span>1 hour ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Statistics -->
+                    <div class="dashboard-card full-width">
+                        <div class="card-header">
+                            <h3>Monthly Statistics</h3>
+                            <div class="chart-controls">
+                                <button class="active">Users</button>
+                                <button>Appointments</button>
+                                <button>Revenue</button>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="monthlyStats"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Chart.js
+        const ctx = document.getElementById('monthlyStats').getContext('2d');
+        const gradientFill = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientFill.addColorStop(0, 'rgba(212, 175, 55, 0.5)');
+        gradientFill.addColorStop(1, 'rgba(212, 175, 55, 0.05)');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'New Users',
+                    data: [150, 230, 180, 290, 200, 250],
+                    backgroundColor: gradientFill,
+                    borderColor: '#d4af37',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#d4af37',
+                    pointBorderColor: '#14151a',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#14151a',
+                        titleColor: '#d4af37',
+                        bodyColor: '#ffffff',
+                        borderColor: '#d4af37',
+                        borderWidth: 1
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

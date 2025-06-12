@@ -1,4 +1,4 @@
-const API_BASE_URL = ""; // Empty string for same-domain relative paths
+const API_BASE_URL = "http://127.0.0.1:8082"; // Empty string for same-domain relative paths
 
 
 // Get all WhatsApp buttons with the class "whatsapp-btn"
@@ -111,7 +111,7 @@ async function signup(email, name, password, carBrand, carModel, year) {
 // Sign In Function DONE
 async function signin(email, password) {
     try {
-        const response = await fetch("/signin", { 
+        const response = await fetch(`${API_BASE_URL}/signin`, { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -126,8 +126,13 @@ async function signin(email, password) {
         console.log("Signin response:", data); // ✅ Debugging
 
         if (data.message === "Login successful") {  // ✅ Check message from API
+            // Store user data in localStorage
+            localStorage.setItem('userId', data.user_id);
+            localStorage.setItem('userName', data.name);
+            localStorage.setItem('userEmail', data.email);
+            
             alert(`Welcome, ${data.name}!`);
-            window.location.href = "home.html"; // Redirect user to homepage
+            window.location.href = "/home"; // Redirect user to homepage
         } else {
             alert("Sign in failed. Check your credentials.");
         }
@@ -233,5 +238,104 @@ async function sendLocationToBackend(lat, lon) {
         }
     } catch (error) {
         console.error("Error saving location:", error);
+    }
+}
+
+// Book Appointment
+async function bookAppointment(userId, vehicleId, centerId, serviceId, appointmentDate, notes) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/book-appointment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                vehicle_id: vehicleId,
+                center_id: centerId,
+                service_id: serviceId,
+                appointment_date: appointmentDate,
+                notes: notes
+            })
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError({ status: 401 });
+                return;
+            }
+            throw new Error('Failed to book appointment');
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error('Error booking appointment:', error);
+        throw error;
+    }
+}
+
+// Add this function at the top level
+function handleAuthError(error) {
+    if (error.status === 401) {
+        // Clear any existing user data
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        
+        // Show error popup
+        const errorMessage = error.message || "Please sign in to access this feature";
+        window.location.href = `/login?error=${encodeURIComponent(errorMessage)}`;
+    }
+}
+
+// Update the fetch calls in loadUserVehicles
+async function loadUserVehicles() {
+    try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            throw new Error('User not logged in');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/user/vehicles?user_id=${userId}`);
+        if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError({ status: 401 });
+                return;
+            }
+            throw new Error('Failed to load vehicles');
+        }
+        const vehicles = await response.json();
+        const vehicleSelect = document.getElementById('vehicleSelect');
+        vehicleSelect.innerHTML = '<option value="">Select a vehicle</option>';
+        vehicles.forEach(vehicle => {
+            vehicleSelect.innerHTML += `<option value="${vehicle.id}">${vehicle.make} ${vehicle.model} (${vehicle.year})</option>`;
+        });
+    } catch (error) {
+        console.error('Error loading vehicles:', error);
+        alert('Failed to load vehicles. Please try again.');
+    }
+}
+
+// Update the fetch calls in loadCenterServices
+async function loadCenterServices(centerId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/maintenance-center/${centerId}`);
+        if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError({ status: 401 });
+                return;
+            }
+            throw new Error('Failed to load services');
+        }
+        const center = await response.json();
+        const serviceSelect = document.getElementById('serviceSelect');
+        serviceSelect.innerHTML = '<option value="">Select a service</option>';
+        center.services.forEach(service => {
+            serviceSelect.innerHTML += `<option value="${service.id}">${service.name} - $${service.price}</option>`;
+        });
+    } catch (error) {
+        console.error('Error loading services:', error);
+        alert('Failed to load services. Please try again.');
     }
 }

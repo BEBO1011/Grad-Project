@@ -6,8 +6,10 @@ from sqlalchemy.orm import relationship, sessionmaker
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
-engine = create_engine(DATABASE_URL)
+DATABASE_URL = os.environ.get('mysql+pymysql://root@localhost:3306/car_service')
+engine = create_engine('mysql+pymysql://root@localhost:3306/car_service')
+
+# engine = create_engine('mysql+mysqlconnector://root:@127.0.0.1:3306/car_service')
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 

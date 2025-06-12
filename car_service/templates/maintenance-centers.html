@@ -111,7 +111,7 @@
             <h3 class="animate__animated animate__fadeIn" style="animation-delay: 0.3s;">Featured Service Centers</h3>
             <div id="serviceCentersGrid" class="card-grid animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
                 <!-- Center 1 -->
-                <div class="card">
+                <div class="card" data-center-id="1">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
                         <h3 style="margin: 0;">CService Downtown</h3>
                         <span class="badge badge-premium">Premium Center</span>
@@ -140,7 +140,7 @@
                 </div>
                 
                 <!-- Center 2 -->
-                <div class="card">
+                <div class="card" data-center-id="2">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
                         <h3 style="margin: 0;">CService Westside</h3>
                         <span class="badge badge-certified">Certified</span>
@@ -168,13 +168,13 @@
                 </div>
                 
                 <!-- Center 3 -->
-                <div class="card">
+                <div class="card" data-center-id="3">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
                         <h3 style="margin: 0;">CService Eastside</h3>
                         <span class="badge badge-popular">Highly Rated</span>
                     </div>
                     <div style="position: relative; height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
-                        <img src="/static/images/IMG-20250413-WA005.jpeg" alt="Eastside Center" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="/static/images/maintenance_center_new_background.png" alt="Eastside Center" style="width: 100%; height: 100%; object-fit: cover;">
                         <div style="position: absolute; top: 10px; right: 10px; background: rgba(20, 21, 26, 0.7); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.8rem;">
                             <i class="fas fa-star"></i> 4.8 (112 reviews)
                         </div>
@@ -321,9 +321,48 @@
                     <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
                 </div>
             </div>
+
+            <!-- Appointment Booking Modal -->
+            <div id="appointmentModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Book Appointment</h3>
+                        <button class="close-modal" onclick="closeAppointmentModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form id="appointmentForm">
+                        <div class="form-group">
+                            <label for="vehicleSelect">Select Vehicle</label>
+                            <select id="vehicleSelect" required>
+                                <option value="">Select your vehicle...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceSelect">Select Service</label>
+                            <select id="serviceSelect" required>
+                                <option value="">Select a service...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentDate">Appointment Date & Time</label>
+                            <input type="datetime-local" id="appointmentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentNotes">Additional Notes</label>
+                            <textarea id="appointmentNotes" rows="3" placeholder="Any specific requirements or concerns..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="button-premium">Confirm Booking</button>
+                            <button type="button" class="button-secondary" onclick="closeAppointmentModal()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </main>
     </div>
 
+    <script src="../static/js/frontend_api.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log("✅ Page Loaded - Running Service Centers Script");
@@ -506,6 +545,126 @@
             if (applyFiltersBtn) {
                 applyFiltersBtn.addEventListener('click', applyFilters);
                 console.log("✅ Filter functionality initialized");
+            }
+        });
+
+        // Store the selected center ID
+        let selectedCenterId = null;
+
+        // Function to open the appointment modal
+        function openAppointmentModal(centerId) {
+            selectedCenterId = centerId;
+            document.getElementById('appointmentModal').style.display = 'flex';
+            loadUserVehicles();
+            loadCenterServices(centerId);
+        }
+
+        // Function to close the appointment modal
+        function closeAppointmentModal() {
+            document.getElementById('appointmentModal').style.display = 'none';
+            selectedCenterId = null;
+        }
+
+        // Function to load user's vehicles
+        async function loadUserVehicles() {
+            try {
+                const userId = localStorage.getItem('userId');
+                if (!userId) {
+                    alert('Please sign in to book an appointment');
+                    closeAppointmentModal();
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/api/user/vehicles?user_id=${userId}`);
+                const vehicles = await response.json();
+                
+                const vehicleSelect = document.getElementById('vehicleSelect');
+                vehicleSelect.innerHTML = '<option value="">Select your vehicle...</option>';
+                
+                vehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.id;
+                    option.textContent = `${vehicle.brand} ${vehicle.model} (${vehicle.year})`;
+                    vehicleSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading vehicles:', error);
+                alert('Failed to load vehicles. Please try again.');
+            }
+        }
+
+        // Function to load center services
+        async function loadCenterServices(centerId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/maintenance-center/${centerId}`);
+                const center = await response.json();
+                
+                const serviceSelect = document.getElementById('serviceSelect');
+                serviceSelect.innerHTML = '<option value="">Select a service...</option>';
+                
+                center.services.forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.id;
+                    option.textContent = `${service.name} - $${service.price}`;
+                    serviceSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading services:', error);
+                alert('Failed to load services. Please try again.');
+            }
+        }
+
+        // Handle appointment form submission
+        document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('Please sign in to book an appointment');
+                return;
+            }
+            
+            const vehicleId = document.getElementById('vehicleSelect').value;
+            const serviceId = document.getElementById('serviceSelect').value;
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const notes = document.getElementById('appointmentNotes').value;
+            
+            if (!vehicleId || !serviceId || !appointmentDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            try {
+                const response = await bookAppointment(
+                    userId,
+                    vehicleId,
+                    selectedCenterId,
+                    serviceId,
+                    appointmentDate,
+                    notes
+                );
+                
+                if (response.success) {
+                    alert('Appointment booked successfully!');
+                    closeAppointmentModal();
+                } else {
+                    alert(response.error || 'Failed to book appointment. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error booking appointment:', error);
+                alert('An error occurred while booking the appointment. Please try again.');
+            }
+        });
+
+        // Add click handlers to all "Book Appointment" buttons
+        document.querySelectorAll('.button-premium').forEach(button => {
+            if (button.textContent.trim() === 'Book Appointment') {
+                button.addEventListener('click', function() {
+                    // Get the center ID from the parent card
+                    const card = this.closest('.card');
+                    const centerId = card.dataset.centerId;
+                    openAppointmentModal(centerId);
+                });
             }
         });
     </script>

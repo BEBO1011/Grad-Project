@@ -7,20 +7,42 @@ import secrets
 from geopy.distance import geodesic
 from datetime import datetime, timedelta
 import random
-
+import db_utils
+from sqlalchemy import create_engine
+from functools import wraps
 # Import database modules
 from database import init_db
-import db_utils
+
+# Correct PostgreSQL connection string format
+engine = create_engine("postgresql://username:password@localhost:5432/mydatabase")
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, 
+    static_folder='static',
+    static_url_path='/static'
+)
 app.secret_key = secrets.token_hex(16)  # Secure session key
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+app.config['SESSION_COOKIE_SECURE'] = True  # For HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 CORS(app)
 
 # Initialize database
 init_db()
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        print(session)
+        if 'user_id' not in session:
+            return jsonify({
+                "error": "Please sign in to access this feature",
+                "message": "Please sign in to access this feature"
+            }), 401
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Sample car issue data for the chatbot
 car_issues = [
@@ -88,6 +110,18 @@ users = [
     }
 ]
 
+# Admin authentication middleware
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session or not session.get('is_admin'):
+            return jsonify({
+                "error": "Admin access required",
+                "message": "Please sign in as an admin to access this feature"
+            }), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
 # ROUTES
 
 @app.route('/')
@@ -99,36 +133,52 @@ def signup_page():
     return render_template('signup.html')
 
 @app.route('/home')
+@login_required
 def home():
     return render_template('home_new.html')
 
 @app.route('/map')
+@login_required
 def map_page():
     return render_template('map_new.html')
 
 @app.route('/maintenance-centers')
+@login_required
 def maintenance_centers_page():
     return render_template('maintenance-centers.html')
 
 @app.route('/chatbot')
+@login_required
 def chatbot():
     return render_template('chatbot.html')
 
 @app.route('/settings')
+@login_required
 def settings():
     return render_template('settings_new.html')
 
 @app.route('/center-details')
+@login_required
 def center_details():
     return render_template('center-details.html')
+
+@app.route('/login')
+def login_page():
+    return render_template('login.html')
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
 
 # API ENDPOINTS
 
 @app.route('/api/user/vehicles', methods=['GET'])
+@login_required
 def get_user_vehicles():
     """Get all vehicles for a user from the database."""
     try:
-        user_id = request.args.get("user_id")
+        user_id = session.get('user_id')  # Get user_id from session instead of request
         
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
@@ -145,6 +195,7 @@ def get_user_vehicles():
         return jsonify({"error": "Failed to fetch vehicles"}), 500
 
 @app.route('/api/maintenance-centers', methods=['GET'])
+@login_required
 def get_maintenance_centers():
     try:
         # Get centers from database
@@ -159,6 +210,7 @@ def get_maintenance_centers():
         return jsonify({"error": "Failed to fetch maintenance centers"}), 500
         
 @app.route('/api/maintenance-center/<int:center_id>', methods=['GET'])
+@login_required
 def get_maintenance_center(center_id):
     """Get details for a specific maintenance center."""
     try:
@@ -184,10 +236,11 @@ def get_maintenance_center(center_id):
         return jsonify({"error": "Failed to fetch maintenance center details"}), 500
 
 @app.route('/api/user/profile', methods=['GET'])
+@login_required
 def get_user_profile():
     """Get user profile information."""
     try:
-        user_id = request.args.get("user_id")
+        user_id = session.get('user_id')  # Get user_id from session instead of request
         
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
@@ -338,10 +391,8 @@ def signup():
         car_brand = data.get("car_brand")
         car_model = data.get("car_model")
         manufacturing_year = data.get("manufacturing_year")
-
         if not email or not name or not password or not car_brand or not car_model or not manufacturing_year:
             return jsonify({"error": "All fields are required"}), 400
-        
         # Check if strong password or not 
         password_error = is_strong_password(password)
         if password_error:
@@ -393,17 +444,17 @@ def signin():
         
         if error:
             return jsonify({"error": "Invalid email or password"}), 401
-            
+
         if user:
             # Set up session data
-            session['user_id'] = user.id
-            session['name'] = user.name
-            session['email'] = user.email
+            session['user_id'] = user["id"]
+            session['name'] = user["name"]
+            session['email'] = user["email"]
             
             return jsonify({
                 "message": "Login successful", 
-                "user_id": user.id, 
-                "name": user.name
+                "user_id": user["id"], 
+                "name": user["name"]
             }), 200
         else:
             return jsonify({"error": "Invalid email or password"}), 401
@@ -657,7 +708,6 @@ def book_appointment():
         service_id = data.get("service_id")
         appointment_date_str = data.get("appointment_date")
         notes = data.get("notes")
-        
         # Validate required inputs
         if not user_id or not vehicle_id or not center_id or not appointment_date_str:
             return jsonify({"error": "User ID, vehicle ID, center ID and appointment date are required"}), 400
@@ -677,14 +727,13 @@ def book_appointment():
             appointment_date=appointment_date,
             notes=notes
         )
-        
         if error:
             return jsonify({"error": error}), 400
             
         return jsonify({
             "success": True,
             "message": "Appointment booked successfully",
-            "appointment": appointment.to_dict()
+            "appointment": appointment
         })
         
     except Exception as e:
@@ -745,7 +794,7 @@ def save_location():
         return jsonify({
             "success": True,
             "message": "Location saved successfully",
-            "location": location.to_dict()
+            "location": location
         })
         
     except Exception as e:
@@ -865,7 +914,89 @@ def vehicle_health_api():
         print(f"Unexpected error in vehicle health API: {str(e)}")
         return jsonify({"error": "An unexpected error occurred while analyzing vehicle health"}), 500
 
+@app.route('/api/admin/stats')
+@admin_required
+def get_admin_stats():
+    try:
+        # Get total users
+        total_users = db_utils.get_total_users()
+        
+        # Get active appointments
+        active_appointments = db_utils.get_active_appointments()
+        
+        # Get monthly revenue
+        monthly_revenue = db_utils.get_monthly_revenue()
+        
+        # Get total service centers
+        total_centers = db_utils.get_total_centers()
+        
+        return jsonify({
+            "total_users": total_users,
+            "active_appointments": active_appointments,
+            "monthly_revenue": monthly_revenue,
+            "total_centers": total_centers
+        })
+    except Exception as e:
+        print(f"Error fetching admin stats: {str(e)}")
+        return jsonify({"error": "Failed to fetch admin statistics"}), 500
+
+@app.route('/api/admin/recent-appointments')
+@admin_required
+def get_recent_appointments():
+    try:
+        appointments = db_utils.get_recent_appointments(limit=10)
+        return jsonify([appointment.to_dict() for appointment in appointments])
+    except Exception as e:
+        print(f"Error fetching recent appointments: {str(e)}")
+        return jsonify({"error": "Failed to fetch recent appointments"}), 500
+
+@app.route('/api/admin/user-activity')
+@admin_required
+def get_user_activity():
+    try:
+        activities = db_utils.get_recent_user_activity(limit=10)
+        return jsonify([activity.to_dict() for activity in activities])
+    except Exception as e:
+        print(f"Error fetching user activity: {str(e)}")
+        return jsonify({"error": "Failed to fetch user activity"}), 500
+
+@app.route('/api/admin/monthly-stats')
+@admin_required
+def get_monthly_stats():
+    try:
+        stats = db_utils.get_monthly_statistics()
+        return jsonify(stats)
+    except Exception as e:
+        print(f"Error fetching monthly stats: {str(e)}")
+        return jsonify({"error": "Failed to fetch monthly statistics"}), 500
+
 if __name__ == "__main__":
-    # Use environment variable PORT if provided, otherwise default to 8080
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    import socket
+    from contextlib import closing
+    
+    def find_free_port(start_port=8082, max_port=9000):
+        """Find a free port between start_port and max_port."""
+        for port in range(start_port, max_port + 1):
+            with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+                try:
+                    sock.bind(('0.0.0.0', port))
+                    return port
+                except OSError:
+                    continue
+        return None
+    
+    # Try to find a free port
+    port = find_free_port()
+    if port is None:
+        print("Error: Could not find a free port between 8082 and 9000")
+        print("Please close other applications that might be using these ports")
+        print("or manually specify a port using the PORT environment variable")
+        exit(1)
+        
+    print(f"Starting server on port {port}")
+    try:
+        app.run(host="0.0.0.0", port=port, debug=True)
+    except OSError as e:
+        print(f"Error starting server: {e}")
+        print("Please make sure no other application is using the port")
+        exit(1)

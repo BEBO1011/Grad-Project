@@ -110,7 +110,7 @@
         </div>
     </div>
 
-    <script src="/static/js/frontend_api.js"></script>
+    <script src="/car_service/static/js/frontend_api.js"></script>
     <script>
         document.getElementById("signup-form").addEventListener("submit", async function(event) {
             event.preventDefault();
@@ -121,6 +121,7 @@
             const carBrand = document.getElementById("car-brand").value.trim();
             const carModel = document.getElementById("car-model").value.trim();
             const manufacturingYear = document.getElementById("manufacturing-year").value.trim();
+            console.log('XZ')
 
             if (!email || !fullName || !password || !carBrand || !carModel || !manufacturingYear) {
                 alert("Please fill in all fields.");

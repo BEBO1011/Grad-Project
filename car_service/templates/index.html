@@ -887,6 +887,7 @@
             }
         }
     </style>
+    <script src="../static/js/frontend_api.js"></script>
 </head>
 <body>
     <!-- Hero Section -->
@@ -1077,7 +1078,77 @@
             </div>
         </div>
     </section>
-    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    const userId = sessionStorage.getItem("userId") || localStorage.getItem("userId");
+
+    if (!userId) {
+        const protectedLinks = [
+            "/vehicle-health",
+            "/maintenance-centers",
+            "/chatbot"
+        ];
+
+        document.querySelectorAll("a[href]").forEach(link => {
+            const href = link.getAttribute("href");
+            if (protectedLinks.includes(href)) {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    alert("Please sign in to access this feature.");
+                });
+            }
+        });
+    }
+});
+        document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("signupForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById("signupEmail").value.trim();
+            const fullName = document.getElementById("name").value.trim();
+            const password = document.getElementById("signupPassword").value.trim();
+            const carBrand = document.getElementById("carBrand").value.trim();
+            const carModel = document.getElementById("carModel").value.trim();
+            const manufacturingYear = document.getElementById("carYear").value.trim();
+
+            if (!email || !fullName || !password || !carBrand || !carModel || !manufacturingYear) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                const response = await signup(email, fullName, password, carBrand, carModel, manufacturingYear);
+                if (response && response.success) {
+                    alert("Signup successful!");
+                    window.location.href = "/"; // Redirect to sign-in page
+                } else {
+                    alert("Signup failed. Try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again.");
+            }
+        });
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (!email || !password) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                const response = await signin(email, password);
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again.");
+            }
+        });
+    });
+    </script>
     <!-- Authentication Modal -->
     <div class="auth-modal" id="authModal">
         <div class="auth-box">
@@ -1099,7 +1170,7 @@
                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
                     </svg>
                 </div>
-                <button type="button" onclick="authenticate()">Continue</button>
+                <button  type="submit" >Continue</button>
                 
                 <p>Don't have an account? <a href="#" class="toggle-auth" id="showSignup">Sign Up</a></p>
                 
@@ -1141,7 +1212,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <input type="number" id="carYear" placeholder="Manufacturing Year" required min="1900" max="2025">
                 </div>
-                <button type="button" onclick="registerUser()">Create Account</button>
+                <button type="submit">Create Account</button>
                 
                 <p>Already have an account? <a href="#" class="toggle-auth" id="showLogin">Sign In</a></p>
             </form>
